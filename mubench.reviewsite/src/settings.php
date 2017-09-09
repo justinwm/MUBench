@@ -15,6 +15,8 @@ return [
             'path' => __DIR__ . '/../logs/app.log',
             'level' => \Monolog\Logger::DEBUG,
         ],
+        'site_base_url' => '/',
+        'upload' => "./upload",
     ],
     'db' => [
         'driver'    => 'mysql',

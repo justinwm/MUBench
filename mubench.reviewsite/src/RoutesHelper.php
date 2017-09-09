@@ -34,10 +34,6 @@ class RoutesHelper
         $this->statsHelper = new StatsHelper($db, $logger);
     }
 
-    public function index(Request $request, Response $response, array $args) {
-        return $this->render($this, $request, $response, $args, 'index.phtml', []);
-    }
-
     public function detector(Request $request, Response $response, array $args) {
         $ex2_review_size = $request->getQueryParam("ex2_review_size", $this->default_ex2_review_size);
         $detector = $this->getDetector($args['detector'], $request, $response);

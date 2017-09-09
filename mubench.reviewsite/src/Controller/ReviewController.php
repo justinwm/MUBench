@@ -12,6 +12,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Views\PhpRenderer;
 
+// REFACTOR migrate this to Controller base class
 class ReviewController
 {
     /** @var string */
