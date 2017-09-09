@@ -1,16 +1,13 @@
 <?php
 /** @var \Slim\App $app */
 
+use MuBench\ReviewSite\Controller\DownloadController;
 use MuBench\ReviewSite\Controller\FindingsUploader;
 use MuBench\ReviewSite\Controller\MetadataController;
-use MuBench\ReviewSite\Controller\ReviewController;
-use MuBench\ReviewSite\Controller\ReviewUploader;
-use MuBench\ReviewSite\Controller\SnippetUploader;
-use MuBench\ReviewSite\Controller\DownloadController;
 use MuBench\ReviewSite\Controller\MisuseTagsController;
-use MuBench\ReviewSite\DBConnection;
+use MuBench\ReviewSite\Controller\ReviewController;
+use MuBench\ReviewSite\Controller\SnippetUploader;
 use MuBench\ReviewSite\DirectoryHelper;
-use MuBench\ReviewSite\Model\Experiment;
 use MuBench\ReviewSite\RoutesHelper;
 use Slim\Http\Request;
 use Slim\Http\Response;
