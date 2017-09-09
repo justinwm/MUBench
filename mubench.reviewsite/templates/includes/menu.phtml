@@ -30,7 +30,7 @@ use MuBench\ReviewSite\Model\Experiment;
 
     <nav role="navigation">
         <ol>
-            <?php $this_exp = $experiment ?>
+            <?php $this_exp = isset($experiment) ? $experiment : null ?>
             <?php foreach ($experiments as $experiment): ?>
                 <?php include "menu-experiment.phtml" ?>
             <?php endforeach ?>

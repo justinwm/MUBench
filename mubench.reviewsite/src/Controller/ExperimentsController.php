@@ -9,6 +9,6 @@ class ExperimentsController extends Controller
 {
     public function index(Request $request, Response $response, array $args)
     {
-        return $this->render($request, $response, $args, 'index.phtml', []);
+        return $this->renderer->render($response, 'index.phtml');
     }
 }

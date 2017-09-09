@@ -4,11 +4,6 @@ return [
         'displayErrorDetails' => true, // set to false in production
         'addContentLengthHeader' => false, // Allow the web server to send the content-length header
 
-        // Renderer settings
-        'renderer' => [
-            'template_path' => __DIR__ . '/../templates/',
-        ],
-
         // Monolog settings
         'logger' => [
             'name' => 'mubench',
@@ -16,7 +11,6 @@ return [
             'level' => \Monolog\Logger::DEBUG,
         ],
         'site_base_url' => '/',
-        'upload' => "./upload",
     ],
     'db' => [
         'driver'    => 'mysql',
