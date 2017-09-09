@@ -13,10 +13,6 @@ $container = $app->getContainer();
 require __DIR__ . '/src/dependencies.php';
 require __DIR__ . '/src/middleware.php';
 
-$container['ExperimentsController'] = function ($container) {
-    return new \MuBench\ReviewSite\Controller\ExperimentsController($container);
-};
-
 require __DIR__ . '/src/routes.php';
 
 $app->run();
