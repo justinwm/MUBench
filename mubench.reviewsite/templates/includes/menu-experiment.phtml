@@ -19,7 +19,7 @@
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\Experiment;
 
-$is_current_experiment = strpos($path,  "/ex{$experiment->id}") !== false;
+$is_current_experiment = strpos($path,  "ex{$experiment->id}") !== false;
 ?>
 <li class="<?= $is_current_experiment ? "active" : "" ?>">
     <span>E<?= $experiment->id ?>: <?= $experiment->name ?></span>
