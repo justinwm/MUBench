@@ -73,29 +73,8 @@ class RoutesHelper
 
     private function render($handler, Request $request, Response $response, array $args, $template, array $params)
     {
-        $params["user"] = $this->getUser($request);
-
-        $params["site_base_url"] = htmlspecialchars($this->site_base_url);
-        $params["public_url_prefix"] = $params["site_base_url"] . "index.php/";
-        $params["private_url_prefix"] = $params["site_base_url"] . "index.php/private/";
-        $params["api_url_prefix"] = $params["site_base_url"] . "index.php/api/";
-        $params["uploads_url_prefix"] = $params["site_base_url"] . $this->upload_path;
-        $params["url_prefix"] = $params["user"] ? $params["private_url_prefix"] : $params["public_url_prefix"];
-
-        $path = $request->getUri()->getPath();
-        $params["path"] = htmlspecialchars(strcmp($path, "/") === 0 ? "" : $path);
-        $params["origin_param"] = htmlspecialchars("?origin=" . $params["path"]);
-        $params["origin_path"] = htmlspecialchars($request->getQueryParam("origin", ""));
-
-        $params["experiments"] = Experiment::all();
-        $params["detectors"] = [];
-        foreach ($params["experiments"] as $experiment) { /** @var Experiment $experiment */
-            $params["detectors"][$experiment->getId()] = $this->db->getDetectors($experiment->getId());
-        }
         $params["experiment"] = array_key_exists("exp", $args) ? Experiment::get($args["exp"]) : null;
-
         $params["detector"] = array_key_exists("detector", $args) ? $this->getDetector($args['detector'], $request, $response) : null;
-
         return $this->renderer->render($response, $template, $params);
     }
 
