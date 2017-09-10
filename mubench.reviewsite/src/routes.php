@@ -3,6 +3,7 @@
 
 use MuBench\ReviewSite\Controller\FindingsUploader;
 use MuBench\ReviewSite\Controller\MetadataUploader;
+use MuBench\ReviewSite\Controller\ResultsController;
 use MuBench\ReviewSite\Controller\ReviewController;
 use MuBench\ReviewSite\Controller\ReviewUploader;
 use MuBench\ReviewSite\Controller\SnippetUploader;
@@ -20,13 +21,16 @@ require_once "route_utils.php";
 $logger = $app->getContainer()['logger'];
 $database = $app->getContainer()['database'];
 $renderer = $app->getContainer()['renderer'];
+$siteBaseUrl = $settings["site_base_url"];
+
 // REFACTOR rename RoutesHelper to ResultsViewController
-$routesHelper = new RoutesHelper($database, $renderer, $logger, $settings['upload'], $settings['site_base_url'], $settings['default_ex2_review_size']);
+$routesHelper = new RoutesHelper($database, $renderer, $logger, $settings['upload'], $siteBaseUrl, $settings['default_ex2_review_size']);
 $downloadController = new DownloadController($database, $logger, $settings['default_ex2_review_size']);
-$reviewController = new ReviewController($settings["site_base_url"], $settings["upload"], $database, $renderer);
+$reviewController = new ReviewController($siteBaseUrl, $settings["upload"], $database, $renderer);
+$resultsController = new ResultsController($siteBaseUrl, $settings["default_ex2_review_size"], $database, $renderer);
 
 $app->get('/', [$routesHelper, 'index']);
-$app->get('/{exp:ex[1-3]}/{detector}', [$routesHelper, 'detector']);
+$app->get('/{exp:ex[1-3]}/{detector}', [$resultsController, 'get']);
 $app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}', [$reviewController, 'get']);
 $app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}/{reviewer}', [$reviewController, 'get']);
 $app->group('/stats', function() use ($app, $routesHelper) {
@@ -35,9 +39,9 @@ $app->group('/stats', function() use ($app, $routesHelper) {
     $app->get('/types', [$routesHelper, 'type_stats']);
 });
 
-$app->group('/private', function () use ($app, $routesHelper, $database, $reviewController) {
+$app->group('/private', function () use ($app, $routesHelper, $database, $reviewController, $resultsController) {
     $app->get('/', [$routesHelper, 'index']);
-    $app->get('/{exp:ex[1-3]}/{detector}', [$routesHelper, 'detector']);
+    $app->get('/{exp:ex[1-3]}/{detector}', [$resultsController, 'get']);
     $app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}', [$reviewController, 'get']);
     $app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}/{reviewer}', [$reviewController, 'get']);
     $app->group('/stats', function() use ($app, $routesHelper) {
