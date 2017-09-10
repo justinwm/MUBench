@@ -77,7 +77,12 @@ $container['renderer'] = function ($container) {
 
         'pathFor' => $pathFor,
         'isCurrentPath' => function ($routeName, $args = []) use ($container, $pathFor) {
-            return strpos($container->request->getUri()->getPath(), $pathFor($routeName, $args)) !== false;
+            $path = $container->request->getUri()->getPath();
+            if (strpos($path, '/index.php') === false) {
+                $path = '/index.php/' . $path;
+            }
+            $checkPath = $pathFor($routeName, $args);
+            return strpos($path, $checkPath) !== false;
         },
         'srcUrlFor' => function ($resourceName) use ($container, $siteBaseURL) {
             return  "$siteBaseURL$resourceName";
