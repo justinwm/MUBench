@@ -142,10 +142,10 @@ class ReviewController
         return $this->renderer->render($response, $template, $params);
     }
 
-    private function getDetector($detector_name, $request, $response)
+    private function getDetector($detectorName, $request, $response)
     {
         try{
-            return $this->db->getDetector($detector_name);
+            return $this->db->getDetector($detectorName);
         }catch (\InvalidArgumentException $e){
             throw new \Slim\Exception\NotFoundException($request, $response);
         }
