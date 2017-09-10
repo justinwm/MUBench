@@ -15,7 +15,7 @@ $container = $app->getContainer();
 
 require __DIR__ . '/src/dependencies.php';
 
-echo 'Creating experiments table<br/>';
+echo 'Creating experiments<br/>';
 $experiment = new \MuBench\ReviewSite\Models\Experiment;
 Schema::dropIfExists($experiment->getTable());
 Schema::create($experiment->getTable(), function(Blueprint $table) {
@@ -55,7 +55,7 @@ $run->project_id = 'mubench';
 $run->version_id = '42';
 $run->save();
 
-echo 'Creating findings table<br/>';
+echo 'Creating findings<br/>';
 $finding = new \MuBench\ReviewSite\Models\Finding;
 $finding->setDetector($detector);
 Schema::dropIfExists($finding->getTable());
