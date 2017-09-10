@@ -26,29 +26,29 @@ $reviewController = new ReviewController($settings["site_base_url"], $settings["
     $database, $renderer, $metadataController, $tagController);
 
 
-$app->get('/', \MuBench\ReviewSite\Controller\ExperimentsController::class.":index");
+$app->get('/', \MuBench\ReviewSite\Controller\ExperimentsController::class.":index")->setName('/');
 
-$app->get('/{exp:ex[1-3]}/{detector}', [$routesHelper, 'detector']);
+$app->get('/{exp:ex[1-3]}/{detector}', [$routesHelper, 'detector'])->setName('exp.det');
 $app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}', [$reviewController, 'get']);
 $app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}/{reviewer}', [$reviewController, 'get']);
 $app->group('/stats', function() use ($app, $routesHelper) {
-    $app->get('/results', [$routesHelper, 'result_stats']);
-    $app->get('/tags', [$routesHelper, 'tag_stats']);
-    $app->get('/types', [$routesHelper, 'type_stats']);
+    $app->get('/results', [$routesHelper, 'result_stats'])->setName('stats.results');
+    $app->get('/tags', [$routesHelper, 'tag_stats'])->setName('stats.tags');
+    $app->get('/types', [$routesHelper, 'type_stats'])->setName('stats.types');
 });
 
 $app->group('/private', function () use ($app, $routesHelper, $database, $reviewController) {
-    $app->get('/', \MuBench\ReviewSite\Controller\ExperimentsController::class.":index");
-    $app->get('/{exp:ex[1-3]}/{detector}', [$routesHelper, 'detector']);
+    $app->get('/', \MuBench\ReviewSite\Controller\ExperimentsController::class.":index")->setName('private./');
+    $app->get('/{exp:ex[1-3]}/{detector}', [$routesHelper, 'detector'])->setName('private.exp.det');
     $app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}', [$reviewController, 'get']);
     $app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}/{reviewer}', [$reviewController, 'get']);
     $app->group('/stats', function() use ($app, $routesHelper) {
-        $app->get('/results', [$routesHelper, 'result_stats']);
-        $app->get('/tags', [$routesHelper, 'tag_stats']);
-        $app->get('/types', [$routesHelper, 'type_stats']);
+        $app->get('/results', [$routesHelper, 'result_stats'])->setName('private.stats.results');
+        $app->get('/tags', [$routesHelper, 'tag_stats'])->setName('private.stats.tags');
+        $app->get('/types', [$routesHelper, 'type_stats'])->setName('private.stats.types');
     });
-    $app->get('/overview', [$routesHelper, 'overview']);
-    $app->get('/todo', [$routesHelper, 'todos']);
+    $app->get('/overview', [$routesHelper, 'overview'])->setName('private.overview');
+    $app->get('/todo', [$routesHelper, 'todos'])->setName('private.todo');
 })->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
 
 $app->group('/download', function () use ($app, $downloadController, $database) {

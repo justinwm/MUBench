@@ -1,11 +1,9 @@
 <?php
 /**
  * @var string $user the logged in user, if any
- *
- * @var string $site_base_url
- * @var string $public_url_prefix
- * @var string $private_url_prefix
- * @var string $url_prefix the public or private url prefix, depending on whether the user is logged in
+ * @var callable $pathFor function to resolve router paths
+ * @var callable $isCurrentPath function to check if a path is the current path
+ * @var callable $srcUrlFor function to resolve resources
  *
  * @var string $path the current route path
  * @var string $origin_param url parameter that carries the $path
@@ -23,9 +21,9 @@ use MuBench\ReviewSite\Models\Experiment;
 <div id="header">
     <div id="title">
         <a href="https://github.com/stg-tud/MUBench" title="MUBench Project">
-            <img id="logo" src="<?= $site_base_url ?>/assets/images/mubench_logo.png" />
+            <img id="logo" src="<?= $srcUrlFor('assets/images/mubench_logo.png') ?>" />
         </a>
-        <a href="<?= $url_prefix ?>" title="Home">Review<br/>Site</a>
+        <a href="<?= $pathFor('/') ?>" title="Home">Review<br/>Site</a>
     </div>
 
     <nav role="navigation">
@@ -35,27 +33,27 @@ use MuBench\ReviewSite\Models\Experiment;
                 <?php include "menu-experiment.phtml" ?>
             <?php endforeach ?>
             <?php $experiment = $this_exp ?>
-            <li class="<?= strpos($path, "/stats") !== false ? "active" : "" ?>">
+            <li class="<?= strpos($path, '/stats') !== false ? "active" : "" ?>">
                 <span>Statistics</span>
                 <ul>
-                    <li class="<?= strpos($path, "/stats") !== false ? "active" : "" ?>">
-                        <a href="<?= $public_url_prefix ?>stats/tags">Tags</a>
+                    <li class="<?= $isCurrentPath('stats.tags') ? "active" : "" ?>">
+                        <a href="<?= $pathFor('stats.tags') ?>">Tags</a>
                     </li>
-                    <li class="<?= strpos($path, "/stats") !== false ? "active" : "" ?>">
-                        <a href="<?= $public_url_prefix ?>stats/types">Types</a>
+                    <li class="<?= $isCurrentPath('stats.types') ? "active" : "" ?>">
+                        <a href="<?= $pathFor('stats.types') ?>">Types</a>
                     </li>
-                    <li class="<?= strpos($path, "/stats") !== false ? "active" : "" ?>">
-                        <a href="<?= $public_url_prefix ?>stats/results">Results</a>
+                    <li class="<?= $isCurrentPath('stats.results') ? "active" : "" ?>">
+                        <a href="<?= $pathFor('stats.results') ?>">Results</a>
                     </li>
                 </ul>
             </li>
             <?php if($user) : ?>
-                <li class="right <?= strpos($path, "/overview") !== false ? "active" : "" ?>">
-                    <a href="<?= $private_url_prefix ?>overview">My Reviews</a></li>
-                <li class="right <?= strpos($path, "/todo") !== false ? "active" : "" ?>">
-                    <a href="<?= $private_url_prefix ?>todo">Open Reviews</a></li>
+                <li class="right <?= $isCurrentPath('overview') ? "active" : "" ?>">
+                    <a href="<?= $pathFor('overview') ?>">My Reviews</a></li>
+                <li class="right <?= $isCurrentPath('todo') ? "active" : "" ?>">
+                    <a href="<?= $pathFor('todo') ?>">Open Reviews</a></li>
             <?php else: ?>
-                <li class="right"><a href="<?= $private_url_prefix . $path ?>">Login</a></li>
+                <li class="right"><a href="<?= $loginPath ?>">Login</a></li>
             <?php endif; ?>
         </ol>
     </nav>

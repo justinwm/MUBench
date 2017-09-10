@@ -50,7 +50,7 @@ $container['renderer'] = function ($container) {
 
     $user = array_key_exists('PHP_AUTH_USER', $serverParams) ? $serverParams['PHP_AUTH_USER'] : null;
 
-    $siteBaseURL = htmlspecialchars($container->settings['site_base_url']);
+    $siteBaseURL = rtrim(str_replace('index.php', '', $container->request->getUri()->getBasePath()), '/') . '/';
     $publicURLPrefix = $siteBaseURL . 'index.php/';
     $privateURLPrefix = $siteBaseURL . 'index.php/private/';
 
@@ -63,8 +63,26 @@ $container['renderer'] = function ($container) {
         $detectors[$experiment->id] = \MuBench\ReviewSite\Models\Detector::withFindings($experiment);
     }
 
+    $pathFor = function ($routeName, $args = [], $private = false) use ($container, $user) {
+        $routeName = $user || $private ? "private.$routeName" : $routeName;
+        $path = $container->router->pathFor($routeName, $args);
+        if (strpos($path, '/index.php') === false) {
+            $path = '/index.php' . $path;
+        }
+        return $path;
+    };
+
     $defaultTemplateVariables = [
         'user' => $user,
+
+        'pathFor' => $pathFor,
+        'isCurrentPath' => function ($routeName, $args = []) use ($container, $pathFor) {
+            return strpos($container->request->getUri()->getPath(), $pathFor($routeName, $args)) !== false;
+        },
+        'srcUrlFor' => function ($resourceName) use ($container, $siteBaseURL) {
+            return  "$siteBaseURL$resourceName";
+        },
+        'loginPath' => $privateURLPrefix . $path,
 
         'site_base_url' => $siteBaseURL,
         'public_url_prefix' => $publicURLPrefix,
