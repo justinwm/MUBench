@@ -16,8 +16,8 @@
  * @var Experiment $experiment the selected experiment, if any
  * @var Detector $detector the selected detector, if any
  */
-use MuBench\ReviewSite\Model\Detector;
-use MuBench\ReviewSite\Model\Experiment;
+use MuBench\ReviewSite\Models\Detector;
+use MuBench\ReviewSite\Models\Experiment;
 
 ?>
 <html>
@@ -32,11 +32,11 @@ use MuBench\ReviewSite\Model\Experiment;
 
         <ul id="experiments">
         <?php foreach($experiments as $experiment) : ?>
-            <li><span>Experiment <?= $experiment->getNumber() ?>: <?= htmlspecialchars($experiment->getTitle()) ?></span>
+            <li><span>Experiment <?= $experiment->id ?>: <?= htmlspecialchars($experiment->name) ?></span>
                 <ul>
-                <?php if ($detectors[$experiment->getId()]): ?>
-                    <?php foreach ($detectors[$experiment->getId()] as $detector): ?>
-                        <li><a href="<?= $url_prefix . $experiment->getId() . "/" . $detector->name ?>"><?= $detector->name ?></a></li>
+                <?php if ($detectors[$experiment->id]): ?>
+                    <?php foreach ($detectors[$experiment->id] as $detector): ?>
+                        <li><a href="<?= $url_prefix . '/ex' . $experiment->id . "/" . $detector->name ?>"><?= $detector->name ?></a></li>
                     <?php endforeach ?>
                 <?php else: ?>
                     <li>No Results</li>

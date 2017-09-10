@@ -4,6 +4,17 @@ return [
         'displayErrorDetails' => true, // set to false in production
         'addContentLengthHeader' => false, // Allow the web server to send the content-length header
 
+        'db' => [
+            'driver' => 'sqlite',
+            'host' => 'localhost',
+            'database' => 'test.sqlite',
+            'username' => 'admin',
+            'password' => 'admin',
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
+        ],
+
         // Monolog settings
         'logger' => [
             'name' => 'mubench',
@@ -12,6 +23,7 @@ return [
         ],
         'site_base_url' => '/',
     ],
+    // REFACTOR remove Pixie database setup after migration to Eloquent (see configuration above)
     'db' => [
         'driver'    => 'mysql',
         'host'      => 'localhost',
