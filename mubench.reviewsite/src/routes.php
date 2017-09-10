@@ -49,7 +49,7 @@ $app->group('/private', function () use ($app, $routesHelper, $database, $review
     });
     $app->get('/overview', [$routesHelper, 'overview']);
     $app->get('/todo', [$routesHelper, 'todos']);
-});
+})->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
 
 $app->group('/download', function () use ($app, $downloadController, $database) {
     $app->get('/{exp:ex[1-3]}/stats', [$downloadController, 'download_stats']);
@@ -123,6 +123,4 @@ $app->group('/api/upload', function () use ($app, $settings, $database, $tagCont
             $uploader->processSnippet($obj);
             return $response->withRedirect("{$settings['site_base_url']}index.php/{$obj['path']}");
         });
-
-
-});
+})->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
