@@ -51,7 +51,7 @@ $container['renderer'] = function ($container) {
     $user = array_key_exists('PHP_AUTH_USER', $serverParams) ? $serverParams['PHP_AUTH_USER'] : null;
 
     $siteBaseURL = htmlspecialchars($container->settings['site_base_url']);
-    $publicURLPrefix = $siteBaseURL . 'index.php';
+    $publicURLPrefix = $siteBaseURL . 'index.php/';
     $privateURLPrefix = $siteBaseURL . 'index.php/private/';
 
     $path = $request->getUri()->getPath();

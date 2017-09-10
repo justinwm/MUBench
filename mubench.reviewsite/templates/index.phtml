@@ -36,7 +36,7 @@ use MuBench\ReviewSite\Models\Experiment;
                 <ul>
                 <?php if ($detectors[$experiment->id]): ?>
                     <?php foreach ($detectors[$experiment->id] as $detector): ?>
-                        <li><a href="<?= $url_prefix . '/ex' . $experiment->id . "/" . $detector->name ?>"><?= $detector->name ?></a></li>
+                        <li><a href="<?= $url_prefix . 'ex' . $experiment->id . "/" . $detector->name ?>"><?= $detector->name ?></a></li>
                     <?php endforeach ?>
                 <?php else: ?>
                     <li>No Results</li>
