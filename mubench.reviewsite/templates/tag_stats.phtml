@@ -29,7 +29,7 @@
 <h1>Statistics: Tags</h1>
 
 <?php foreach($experiments as $exp): ?>
-<h2>Experiment <?= $exp->getNumber() ?></h2>
+<h2>Experiment <?= $exp->id ?></h2>
 <table>
     <tr>
         <td>Detector</td>
@@ -38,7 +38,7 @@
         <?php endforeach; ?>
     </tr>
 
-    <?php foreach ($results[$exp->getId()] as $key => $result) : /** @var $result RunsResult */ ?>
+    <?php foreach ($results['ex'.$exp->id] as $key => $result) : /** @var $result RunsResult */ ?>
         <tbody>
         <tr>
             <td> <?= htmlspecialchars($key) ?>
