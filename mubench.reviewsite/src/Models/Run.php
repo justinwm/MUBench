@@ -9,4 +9,9 @@ class Run extends DetectorDependent
     {
         return 'stats_' . $detector->id;
     }
+
+    public function misuses()
+    {
+        return $this->hasMany(Misuse::class, 'project_id', 'project_id')->where('version_id', $this->version_id);
+    }
 }

@@ -27,6 +27,7 @@ $reviewController = new ReviewController($settings["site_base_url"], $settings["
 
 
 $app->get('/', \MuBench\ReviewSite\Controller\ExperimentsController::class.":index")->setName('/');
+$app->get('/experiments/{e}/detectors/{d}/runs', \MuBench\ReviewSite\Controller\RunsController::class.":getIndex");
 
 $app->get('/{exp:ex[1-3]}/{detector}', [$routesHelper, 'detector'])->setName('exp.det');
 $app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}', [$reviewController, 'get']);
