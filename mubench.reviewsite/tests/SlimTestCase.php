@@ -20,8 +20,18 @@ class SlimTestCase extends DatabaseTestCase
     protected $response;
 
     public function setUp(){
+        $settings = require __DIR__ . '/../src/settings.php';
+        $app = new \Slim\App($settings);
+
+        require __DIR__ . '/../src/dependencies.php';
         parent::setUp();
-        $this->app = $this->getSlimInstance();
+        $container = $app->getContainer();
+        $container['database'] = function () { return $this->db; };
+        $container['database2'] = $this->db2;
+        $container['schema'] = $this->db2->schema();
+        require __DIR__ . '/../src/routes.php';
+
+        $this->app = $app;
     }
 
     public function get($path, $data = array(), $optionalHeaders = array()){
@@ -58,17 +68,5 @@ class SlimTestCase extends DatabaseTestCase
         $this->response = $app($this->request, $response);
         // Return the application output.
         return $this->response->getBody();
-    }
-
-    public function getSlimInstance(){
-        $settings = require __DIR__ . '/../src/settings.php';
-        $app = new \Slim\App($settings);
-
-        require __DIR__ . '/../src/dependencies.php';
-        $container = $app->getContainer();
-        $container['database'] = function () { return $this->db; };
-        require __DIR__ . '/../src/routes.php';
-
-        return $app;
     }
 }

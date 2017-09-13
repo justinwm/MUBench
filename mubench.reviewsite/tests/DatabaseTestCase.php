@@ -20,6 +20,9 @@ class DatabaseTestCase extends TestCase
      */
     protected $db;
 
+    protected $db2;
+    protected $schema;
+
     function setUp()
     {
         $connection = new \Pixie\Connection('sqlite', ['driver' => 'sqlite', 'database' => ':memory:']);
@@ -28,6 +31,17 @@ class DatabaseTestCase extends TestCase
         $this->pdo->pdo()->exec($this->mySQLToSQLite($mysql_structure));
         $this->logger = new \Monolog\Logger("test");
         $this->db = new DBConnection($connection, $this->logger);
+
+        $capsule = new \Illuminate\Database\Capsule\Manager;
+        $capsule->addConnection(['driver' => 'sqlite', 'database' => ':memory:']);
+        $capsule->setAsGlobal();
+        $capsule->bootEloquent();
+        $this->db2 = $capsule;
+        // The schema accesses the database through the app, which we do not have in
+        // this context. Therefore, use an array to provide the database. This seems
+        // to work fine.
+        /** @noinspection PhpParamsInspection */
+        \Illuminate\Support\Facades\Schema::setFacadeApplication(["db" => $capsule]);
     }
 
     private function mySQLToSQLite($mysql){
