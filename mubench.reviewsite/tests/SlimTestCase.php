@@ -28,7 +28,8 @@ class SlimTestCase extends DatabaseTestCase
         $container = $app->getContainer();
         $container['database'] = function () { return $this->db; };
         $container['database2'] = $this->db2;
-        $container['schema'] = $this->db2->schema();
+        $container['schema'] = $this->schema;
+
         require __DIR__ . '/../src/routes.php';
 
         $this->app = $app;

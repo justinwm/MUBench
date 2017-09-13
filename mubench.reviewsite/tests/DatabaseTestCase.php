@@ -20,7 +20,10 @@ class DatabaseTestCase extends TestCase
      */
     protected $db;
 
+    /** @var \Illuminate\Database\Capsule\Manager */
     protected $db2;
+
+    /** @var  \Illuminate\Support\Facades\Schema */
     protected $schema;
 
     function setUp()
@@ -37,11 +40,14 @@ class DatabaseTestCase extends TestCase
         $capsule->setAsGlobal();
         $capsule->bootEloquent();
         $this->db2 = $capsule;
+        $this->schema = $capsule->schema();
         // The schema accesses the database through the app, which we do not have in
         // this context. Therefore, use an array to provide the database. This seems
         // to work fine.
         /** @noinspection PhpParamsInspection */
         \Illuminate\Support\Facades\Schema::setFacadeApplication(["db" => $capsule]);
+
+        require __DIR__ . '/create_test_database.php';
     }
 
     private function mySQLToSQLite($mysql){
