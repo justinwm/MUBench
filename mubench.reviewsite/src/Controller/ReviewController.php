@@ -24,14 +24,18 @@ class ReviewController
     private $renderer;
     /** @var MetadataController */
     private $metadataController;
+    /** @var MisuseTagsController */
+    private $tagsController;
 
-    function __construct($site_base_url, $upload_path, DBConnection $db, PhpRenderer $renderer, MetadataController $metadataController)
+    function __construct($site_base_url, $upload_path, DBConnection $db, PhpRenderer $renderer,
+                         MetadataController $metadataController, MisuseTagsController $tagsController)
     {
         $this->site_base_url = $site_base_url;
         $this->upload_path = $upload_path;
         $this->db = $db;
         $this->renderer = $renderer;
         $this->metadataController = $metadataController;
+        $this->tagsController = $tagsController;
     }
 
     public function get(Request $request, Response $response, array $args)
@@ -63,9 +67,10 @@ class ReviewController
     function getMisuse($experimentId, Detector $detector, $projectId, $versionId, $misuseId)
     {
         $metadata = $this->metadataController->getMetadata($experimentId, $detector, $projectId, $versionId, $misuseId);
-        $potential_hits = $this->getPotentialHits($experimentId, $detector, $projectId, $versionId, $misuseId);
+        $potentialHits = $this->getPotentialHits($experimentId, $detector, $projectId, $versionId, $misuseId);
+        $tags = $this->tagsController->getTags($experimentId, $detector, $projectId, $versionId, $misuseId);
         // SMELL misuses don't need their review here
-        return new Misuse($metadata, $potential_hits, []);
+        return new Misuse($metadata, $potentialHits, [], $tags);
     }
 
     /**

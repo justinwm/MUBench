@@ -7,7 +7,7 @@ use MuBench\ReviewSite\Controller\ReviewController;
 use MuBench\ReviewSite\Controller\ReviewUploader;
 use MuBench\ReviewSite\Controller\SnippetUploader;
 use MuBench\ReviewSite\Controller\DownloadController;
-use MuBench\ReviewSite\Controller\TagController;
+use MuBench\ReviewSite\Controller\MisuseTagsController;
 use MuBench\ReviewSite\DBConnection;
 use MuBench\ReviewSite\DirectoryHelper;
 use MuBench\ReviewSite\Model\Experiment;
@@ -24,7 +24,9 @@ $renderer = $app->getContainer()['renderer'];
 $routesHelper = new RoutesHelper($database, $renderer, $logger, $settings['upload'], $settings['site_base_url'], $settings['default_ex2_review_size']);
 $downloadController = new DownloadController($database, $logger, $settings['default_ex2_review_size']);
 $metadataController = new MetadataController($database, $logger);
-$reviewController = new ReviewController($settings["site_base_url"], $settings["upload"], $database, $renderer, $metadataController);
+$tagController = new MisuseTagsController($database, $logger, $settings["site_base_url"]);
+$reviewController = new ReviewController($settings["site_base_url"], $settings["upload"],
+    $database, $renderer, $metadataController, $tagController);
 
 $app->get('/', [$routesHelper, 'index']);
 $app->get('/{exp:ex[1-3]}/{detector}', [$routesHelper, 'detector']);
@@ -56,7 +58,7 @@ $app->group('/download', function () use ($app, $downloadController, $database) 
 });
 
 
-$app->group('/api/upload', function () use ($app, $settings, $database, $metadataController, $reviewController) {
+$app->group('/api/upload', function () use ($app, $settings, $database, $tagController, $metadataController, $reviewController) {
     $app->post('/[{experiment:ex[1-3]}]',
         function (Request $request, Response $response, array $args) use ($settings, $database) {
             $experiment = $args['experiment'];
@@ -92,7 +94,9 @@ $app->group('/api/upload', function () use ($app, $settings, $database, $metadat
             return $response->withStatus(200);
         });
 
+    // REFACTOR migrate to /metadata/{project}/{version}/{misuse}/update
     $app->post('/metadata', [$metadataController, "update"]);
+    // REFACTOR migrate to /reviews/{exp}/{detector}/{project}/{version}/{misuse}/{reviewerName}/update
     $app->post('/review/{exp:ex[1-3]}/{detector}', [$reviewController, "update"]);
 
     $app->post('/delete/snippet/{exp:ex[1-3]}/{detector}',
@@ -108,13 +112,10 @@ $app->group('/api/upload', function () use ($app, $settings, $database, $metadat
             }
         });
 
-    $app->post('/delete/tag',
-        function (Request $request, Response $response, array $args) use ($database, $settings) {
-            $obj = $request->getParsedBody();
-            $controller = new TagController($database, $this->logger);
-            $controller->deleteMisuseTag($obj);
-            return $response->withRedirect("{$settings['site_base_url']}index.php/{$obj['path']}");
-        });
+    // REFACTOR migrate this route to /tags/{exp}/{detector}/{project}/{version}/{misuse}/{tagname}/add
+    $app->post('/tag', [$tagController, "add"]);
+    // REFACTOR migrate this route to /tags/{exp}/{detector}/{project}/{version}/{misuse}/{tagname}/delete
+    $app->post('/delete/tag', [$tagController, 'delete']);
 
     $app->post('/snippet',
         function (Request $request, Response $response, array $args) use ($database, $settings) {
@@ -124,12 +125,5 @@ $app->group('/api/upload', function () use ($app, $settings, $database, $metadat
             return $response->withRedirect("{$settings['site_base_url']}index.php/{$obj['path']}");
         });
 
-    $app->post('/tag',
-        function (Request $request, Response $response, array $args) use ($database, $settings) {
-            $obj = $request->getParsedBody();
-            $controller = new TagController($database, $this->logger);
-            $controller->saveTagForMisuse($obj);
-            return $response->withRedirect("{$settings['site_base_url']}index.php/{$obj['path']}");
-        });
 
 });

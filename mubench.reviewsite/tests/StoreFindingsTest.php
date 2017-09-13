@@ -5,6 +5,7 @@ require_once "DatabaseTestCase.php";
 use MuBench\ReviewSite\Controller\FindingsUploader;
 use MuBench\ReviewSite\Controller\MetadataController;
 use MuBench\ReviewSite\Controller\SnippetUploader;
+use MuBench\ReviewSite\Controller\MisuseTagsController;
 use MuBench\ReviewSite\Model\Misuse;
 
 class StoreFindingsTest extends DatabaseTestCase
@@ -77,7 +78,7 @@ class StoreFindingsTest extends DatabaseTestCase
             "number_of_findings" => "23",
             "misuses" => [
                 new Misuse(
-                    ["misuse" => "0", "snippets" => [0 => ["line" => "5", "snippet" => "-code-", "id" => "1"]], "tags" => []],
+                    ["misuse" => "0", "snippets" => [0 => ["line" => "5", "snippet" => "-code-", "id" => "1"]]],
                     [0 => [
                         "exp" => "ex2",
                         "project" => "-p-",
@@ -88,6 +89,7 @@ class StoreFindingsTest extends DatabaseTestCase
                         "custom2" => "-val2-"
                     ]
                     ],
+                    [],
                     []
                 )
             ],
@@ -185,8 +187,7 @@ EOT
                 'snippets' => [],
                 'patterns' => [
                     ['name' => '-p1-', 'code' => '-code-', 'line' => 42]
-                ],
-                'tags' => []
+                ]
             ],
             [[
                 'exp' => 'ex1',
@@ -197,7 +198,9 @@ EOT
                 'custom1' => '-val1-',
                 'custom2' => '-val2-',
             ]],
-            []);
+            [],
+            []
+        );
 
         self::assertEquals($expected_misuse, $misuse);
     }

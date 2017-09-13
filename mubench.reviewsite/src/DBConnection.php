@@ -115,13 +115,13 @@ class DBConnection
                     $misuse["violation_types"] = $this->getViolationTypeNamesForMisuse($project_id, $version_id, $misuse_id);
                 }
                 $misuse["snippets"] = $snippets;
-                $misuse["tags"] = $this->getTagsForMisuse($exp, $detector->id, $project_id, $version_id, $misuse_id);
+                $tags = $this->getTagsForMisuse($exp, $detector->id, $project_id, $version_id, $misuse_id);
 
                 if(strcmp($exp, "ex1") == 0){
                     $patterns = $this->getPatterns($misuse_id);
                     $misuse["patterns"] = $patterns;
                 }
-                $misuses[$key] = new Misuse($misuse, $potential_hits, $reviews);
+                $misuses[$key] = new Misuse($misuse, $potential_hits, $reviews, $tags);
             }
             if($max_reviews > -1 && strcmp($exp, "ex2") == 0){
                 $misuses = $this->filterMisusesForMaxReviews($misuses, $max_reviews);
@@ -298,10 +298,13 @@ class DBConnection
         return $this->table('tags')->get();
     }
 
-    public function getTagsForMisuse($experiment, $detector, $project, $version, $misuse)
+    private function getTagsForMisuse($experiment, $detector, $project, $version, $misuse)
     {
-        return $this->table('misuse_tags')->innerJoin('tags', 'misuse_tags.tag', '=', 'tags.id')->select('id', 'name')->where('exp', $experiment)->where('detector', $detector)
-            ->where('project', $project)->where('version', $version)->where('misuse', $misuse)->get();
+        /** @var array $tags */
+        $tags = $this->table('misuse_tags')->innerJoin('tags', 'misuse_tags.tag', '=', 'tags.id')->select('id', 'name')
+            ->where('exp', $experiment)->where('detector', $detector)->where('project', $project)
+            ->where('version', $version)->where('misuse', $misuse)->get();
+        return $tags;
     }
 
     public function getMisuseCountForType($type_id)

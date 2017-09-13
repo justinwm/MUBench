@@ -24,9 +24,10 @@ class ReviewControllerTest extends DatabaseTestCase
     {
         parent::setUp();
         $this->detector = $this->db->getOrCreateDetector('-d-');
+        $tagController = new MisuseTagsController($this->db, $this->logger, '-site-base-url-');
         $metadataController = new MetadataController($this->db, $this->logger);
         $renderer = new PhpRenderer();
-        $this->reviewController = new ReviewController('', '', $this->db, $renderer, $metadataController);
+        $this->reviewController = new ReviewController('', '', $this->db, $renderer, $metadataController, $tagController);
     }
 
 
@@ -140,8 +141,7 @@ class ReviewControllerTest extends DatabaseTestCase
                     [[
                         'line' => '273',
                         'snippet' => '-code-'
-                    ]],
-                'tags' => []
+                    ]]
             ],
             [
                 [
@@ -151,7 +151,7 @@ class ReviewControllerTest extends DatabaseTestCase
                     'misuse' => '-m-',
                     'rank' => '0'
                 ]
-            ], []);
+            ], [], []);
 
         self::assertEquals($expectedMisuse, $actualMisuse);
     }
@@ -180,8 +180,7 @@ class ReviewControllerTest extends DatabaseTestCase
                 'project' => '-p-',
                 'version' => '-v-',
                 'misuse' => 0,
-                'snippets' => [],
-                'tags' => []
+                'snippets' => []
             ],
             [
                 [
@@ -191,7 +190,7 @@ class ReviewControllerTest extends DatabaseTestCase
                     'misuse' => 0,
                     'rank' => 0
                 ]
-            ], []);
+            ], [], []);
         self::assertEquals($expectedMisuse, $actualMisuse);
     }
 
