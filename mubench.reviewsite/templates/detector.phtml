@@ -20,8 +20,9 @@
  */
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\Experiment;
+use MuBench\ReviewSite\Models\Misuse;
 use MuBench\ReviewSite\Model\Decision;
-use MuBench\ReviewSite\Model\Review;
+use MuBench\ReviewSite\Models\Review;
 use MuBench\ReviewSite\Model\ReviewState;
 
 $columns_to_ignore = array(
@@ -32,7 +33,11 @@ $columns_to_ignore = array(
     'detector',
     'result',
     'number_of_findings',
-    'runtime'
+    'runtime',
+    'id',
+    'experiment_id',
+    'version_id',
+    'project_id'
 );
 
 $markdown_parser = new Parsedown();
@@ -48,7 +53,7 @@ $markdown_parser = new Parsedown();
 <body>
 <?php include "includes/menu.phtml"; ?>
 
-<h1>Experiment <?= $experiment->id ?>: <?= htmlspecialchars($experiment->name) ?></h1>
+<h1>Experiment <?= /* @var Experiment */ $experiment->id ?>: <?= htmlspecialchars($experiment->name) ?></h1>
 <h2>Detector: <?= htmlspecialchars($detector->name); ?></h2>
 <a class="button" href="<?=$public_url_prefix?>download/<?=$experiment->id?>/<?=$detector->name?>"><i class="fa fa-download" aria-hidden="true"> download csv</i></a>
         <?php if($experiment->id === 2) : ?>
@@ -81,21 +86,22 @@ $markdown_parser = new Parsedown();
     <?php $last_project = "" ?>
     <?php foreach ($runs as $run) : ?>
         <?php
-        $project = $run->project;
-        $new_project = $last_project === $run->project;
+        $project = $run->project_id;
+        $new_project = $last_project !== $run->project_id;
         $last_project = $project;
-        $version = $run->version;
+        $version = $run->version_id;
         $new_version = true;
-        $additional_stats = array_filter(array_keys($run), function ($key) use ($columns_to_ignore, $run) {
-            return !in_array($key, $columns_to_ignore) && array_key_exists($key, $run) && !empty($run[$key]);
+        $attr = $run->getAttributes();
+        $additional_stats = array_filter(array_keys($attr), function ($key) use ($columns_to_ignore, $attr) {
+            return !in_array($key, $columns_to_ignore) && array_key_exists($key, $attr) && !empty($attr[$key]);
         });
         sort($additional_stats);
         ?>
-        <?php foreach ($run['misuses'] as $misuse) : /* @var $misuse \MuBench\ReviewSite\Model\Misuse */ ?>
+        <?php foreach ($run->misuses as $misuse) : /* @var $misuse \MuBench\ReviewSite\Model\Misuse */ ?>
             <?php
             $classes = [];
             if ($new_project) $classes[] = "top";
-            if (!$misuse->hasPotentialHits()) $classes[] = "no-hit";
+            //if (!$misuse->hasPotentialHits()) $classes[] = "no-hit";
             $style_classes = implode(" ", $classes);
             ?>
             <tr>
@@ -104,11 +110,11 @@ $markdown_parser = new Parsedown();
                 <td class="<?= $style_classes ?>">
                     <?= $new_version ? $markdown_parser->text($version) : ""; ?></td>
                 <td class="<?= $style_classes ?>">
-                    <?= $new_version ? $markdown_parser->text($run['result']) : ""; ?></td>
+                    <?= $new_version ? $markdown_parser->text($run->result) : ""; ?></td>
                 <td class="<?= $style_classes ?> right">
-                    <?= $new_version ? $markdown_parser->text($run['number_of_findings']) : ""; ?></td>
+                    <?= $new_version ? $markdown_parser->text($run->number_of_findings) : ""; ?></td>
                 <td class="<?= $style_classes ?> right">
-                    <?= $new_version ? $markdown_parser->text(number_format(floatval($run['runtime']), 1)) . "s" : ""; ?></td>
+                    <?= $new_version ? $markdown_parser->text(number_format(floatval($run->runtime), 1)) . "s" : ""; ?></td>
                 <td class="<?= $style_classes ?> right">
                     <?php if ($new_version) : ?>
                         <?php include "includes/modal.phtml"; ?>
@@ -120,7 +126,7 @@ $markdown_parser = new Parsedown();
                     <td class="<?= $style_classes ?>">
                         <ul>
                             <?php foreach($misuse->getViolationTypes() as $type): ?>
-                                <li><?= htmlspecialchars($type) ?></li>
+                                <li><?= htmlspecialchars($type->type->name) ?></li>
                             <?php endforeach; ?>
                         </ul>
                     </td>
@@ -160,7 +166,7 @@ $markdown_parser = new Parsedown();
                         <?php if($user && $misuse->hasReviewed($user)): ?>
                             <?php
                                 $user_review = $misuse->getReview($user);
-                                $reviews = $misuse->getReviews();
+                                $reviews = $misuse->reviews;
                             ?>
                             <?php if(true) : ?>
                                 <?php if($review_state == ReviewState::NEEDS_REVIEW && $user_review->identifiesHit()) : ?>
@@ -200,8 +206,8 @@ $markdown_parser = new Parsedown();
                     </td>
                     <td class="<?= $style_classes ?>">
                         <ul class="inline">
-                            <?php foreach($misuse->getReviews() as $review) : /** @var Review $review */ ?>
-                                <?php $reviewer_name = htmlspecialchars($review->getReviewerName()) ?>
+                            <?php foreach($misuse->reviews as $review) : /** @var /Mubench/ReviewSite/Models/Review $review */ ?>
+                                <?php $reviewer_name = htmlspecialchars($review->user->name) ?>
                                 <li style="display:inline"><a href="<?= $review_url ?>/<?= $reviewer_name ?>"><?= $reviewer_name ?></a></li>
                             <?php endforeach; ?>
                         </ul>
@@ -233,13 +239,13 @@ $markdown_parser = new Parsedown();
                     <?= $misuse->hasReviewed($user) ? $misuse->getReview($user)->getComment() : "" ?>
                 </td>
                 <td class="<?= $style_classes ?>">
-                    <? if($misuse->hasConclusiveReviewState()) : ?>
-                        <? foreach($misuse->getTags() as $tag) : ?>
+                    <?php if($misuse->hasConclusiveReviewState()) : ?>
+                        <?php foreach($misuse->misuse_tags as $tag) : ?>
                             <div class="misuse-tag">
-                                <span><?= htmlspecialchars($tag['name']) ?></span>
+                                <span><?= htmlspecialchars($tag->tag->name) ?></span>
                             </div>
-                        <? endforeach; ?>
-                    <? endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </td>
             </tr>
             <?php
@@ -247,7 +253,7 @@ $markdown_parser = new Parsedown();
             $new_project = false;
             ?>
         <?php endforeach; ?>
-        <?php if (!$run["misuses"]) : ?>
+        <?php if (count($run->misuses) == 0) : ?>
             <?php
             $classes = ["no-hit"];
             if ($new_project) $classes[] = "top";
