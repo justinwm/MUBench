@@ -9,4 +9,8 @@ class Finding extends DetectorDependent
     {
         return 'detector_' . $detector->id;
     }
+
+    public function misuse(){
+        $this->belongsTo(Misuse::class, 'misuse_id');
+    }
 }
