@@ -9,12 +9,12 @@ class Metadata extends Model
 {
     public function patterns()
     {
-        return $this->hasMany('MuBench\Models\Pattern', 'misuse', 'misuse');
+        return $this->hasMany(Pattern::class);
     }
 
-    public function types()
+    public function violation_types()
     {
-        return $this->hasMany(MetadataType::class);
+        return $this->belongsToMany(Type::class, 'metadata_types', 'type_id', 'metadata_id');
     }
 
 }

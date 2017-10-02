@@ -5,13 +5,14 @@ namespace MuBench\ReviewSite\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MetadataType extends Model
+class Reviewer extends Model
 {
+
     public $timestamps = false;
 
-    public function type()
+    public function reviews()
     {
-        return $this->belongsTo(Type::class);
+        return $this->hasMany(Review::class);
     }
 
 }

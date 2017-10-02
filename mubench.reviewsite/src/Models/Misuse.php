@@ -4,12 +4,14 @@ namespace MuBench\ReviewSite\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
+use MuBench\ReviewSite\Model\Decision;
+use MuBench\ReviewSite\Model\ReviewState;
 
 class Misuse extends Model
 {
     public function metadata()
     {
-        return $this->hasOne(Metadata::class);
+        return $this->belongsTo(Metadata::class);
     }
 
     public function reviews()
@@ -19,45 +21,185 @@ class Misuse extends Model
 
     public function misuse_tags()
     {
-        return $this->hasMany(MisuseTag::class);
+        return $this->belongsToMany(Tag::class, 'misuse_tags', 'tag_id', 'misuse_id');
+    }
+
+    public function detector()
+    {
+        return $this->belongsTo(Detector::class);
+    }
+
+    public function run()
+    {
+        return $this->belongsTo(Run::class);
+    }
+
+    public function findings()
+    {
+        return $this->hasMany(Finding::class);
+    }
+
+    public function snippets()
+    {
+        return $this->hasMany(Snippet::class);
+    }
+
+    public function getFile()
+    {
+        if($this->metadata){
+            return $this->metadata->file;
+        }
+        return $this->findings[0]->file;
+    }
+
+    public function getMethod()
+    {
+        if($this->metadata){
+            return $this->metadata->method;
+        }
+        return $this->findings[0]->method;
+    }
+
+    public function getProject()
+    {
+        return $this->run->project_muid;
+    }
+
+    public function getVersion()
+    {
+        return $this->run->version_muid;
+    }
+
+    protected function newRelatedInstance($class)
+    {
+        $instance = parent::newRelatedInstance($class);
+        if ($class == Run::class || $class == Finding::class) {
+            $instance->setDetector($this->detector);
+        }
+        return $instance;
     }
 
     // TODO: somehow link misuse with runs (custom table name problem)
 
     // TODO: implement all methods
-
-    public function getShortId()
-    {
-        // TODO: connect with runs table
-        $project = $this->project_id;
-        $id = $this->misuse_id;
-        return substr($id, 0, strlen($project)) === $project ? substr($id, strlen($project) + 1) :
-            $id;
-    }
-
     public function getViolationTypes()
     {
-        return $this->metadata->types;
+        return $this->metadata->violation_types;
     }
 
-    public function getReviewState()
+    public function getReviews()
     {
-        return "";
+        return $this->reviews->filter(function($review){
+            return $review->reviewer->name !== "resolution";
+        });
     }
 
-    public function hasPotentialHits()
+    public function hasSufficientReviews()
     {
-        return [];
-    }
-
-    public function hasReviewed($reviewer_name)
-    {
-        return false;
+        return $this->getReviewState() > ReviewState::NEEDS_REVIEW;
     }
 
     public function hasConclusiveReviewState()
     {
-        return true;
+        $review_state = $this->getReviewState();
+        return $review_state != ReviewState::NEEDS_REVIEW && $review_state != ReviewState::DISAGREEMENT && $review_state != ReviewState::NEEDS_CLARIFICATION && $review_state != ReviewState::UNRESOLVED;
+    }
+
+    public function hasInconclusiveReview()
+    {
+        $decisions = $this->getReviewDecisions();
+        if (array_key_exists(Decision::MAYBE, $decisions)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function hasViolationTypes()
+    {
+        return !empty($this->getViolationTypes());
+    }
+
+    public function hasSnippets(){
+        return !empty($this->snippets);
+    }
+
+    public function getReviewState()
+    {
+        if (!$this->hasPotentialHits()) {
+            return ReviewState::NOTHING_TO_REVIEW;
+        } elseif (count($this->reviews) < 2) {
+            return ReviewState::NEEDS_REVIEW;
+        } else {
+            $byResolution = $this->hasResolutionReview();
+            if ($byResolution) {
+                $decision = $this->getResolutionReview()->getDecision();
+                if ($decision == Decision::YES) {
+                    return ReviewState::RESOLVED_YES;
+                } elseif ($decision == Decision::NO) {
+                    return ReviewState::RESOLVED_NO;
+                } else {
+                    return ReviewState::UNRESOLVED;
+                }
+            } else {
+                $decisions = $this->getReviewDecisions();
+                if (array_key_exists(Decision::MAYBE, $decisions)) {
+                    return ReviewState::NEEDS_CLARIFICATION;
+                } elseif (count($decisions) > 1) {
+                    return ReviewState::DISAGREEMENT;
+                } elseif (array_key_exists(Decision::YES, $decisions)) {
+                    return ReviewState::AGREEMENT_YES;
+                } else {
+                    return ReviewState::AGREEMENT_NO;
+                }
+            }
+        }
+    }
+
+
+    private function getReviewDecisions(){
+        $decisions = [];
+        foreach ($this->reviews as $review) {
+            $decisions[$review->getDecision()] = true;
+        }
+        return $decisions;
+    }
+
+    public function hasResolutionReview()
+    {
+        return $this->hasReviewed(Reviewer::where('name', 'resolution')->first());
+    }
+
+    public function getReview($reviewer)
+    {
+        if(!$reviewer){
+            return NULL;
+        }
+        foreach ($this->reviews as $review) {
+            if ($review->reviewer->id == $reviewer->id) return $review;
+        }
+        return NULL;
+    }
+
+    public function getResolutionReview()
+    {
+        return $this->getReview(Reviewer::where('name', 'resolution')->first());
+    }
+
+    public function hasPotentialHits()
+    {
+        return !empty($this->findings);
+    }
+
+    public function hasReviewed($reviewer)
+    {
+        if($reviewer) {
+            foreach ($this->reviews as $review) {
+                if ($review->reviewer->id === $reviewer->id) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

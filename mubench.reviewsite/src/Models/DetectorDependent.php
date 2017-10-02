@@ -42,6 +42,6 @@ abstract class DetectorDependent extends Model
 
     public function experiment()
     {
-        return $this->belongsTo('MuBench\ReviewSite\Models\Experiment');
+        return $this->belongsTo(Experiment::class);
     }
 }
