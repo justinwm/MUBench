@@ -3,6 +3,7 @@
 use Interop\Container\ContainerInterface;
 use MuBench\ReviewSite\DBConnection;
 use MuBench\ReviewSite\Error;
+use MuBench\ReviewSite\Models\Reviewer;
 use Slim\Views\PhpRenderer;
 
 $container = $app->getContainer();
@@ -25,7 +26,7 @@ $container['errorHandler'] = function (ContainerInterface $c) {
 
 // REFACTOR delete Pixie as soon as everything is migrated to Eloquent
 $container['database'] = function (ContainerInterface $c) {
-    $settings = $c['db'];
+    $settings = $c['settings']['db'];
     $logger = $c->get('logger');
     return new DBConnection(new \Pixie\Connection($settings['driver'], $settings), $logger);
 };
@@ -48,7 +49,8 @@ $container['renderer'] = function ($container) {
     $request = $container->request;
     $serverParams = $request->getServerparams();
 
-    $user = array_key_exists('PHP_AUTH_USER', $serverParams) ? $serverParams['PHP_AUTH_USER'] : null;
+    $user_name = array_key_exists('PHP_AUTH_USER', $serverParams) ? $serverParams['PHP_AUTH_USER'] : null;
+    $user = Reviewer::where('name', $user_name)->first();
 
     $siteBaseURL = rtrim(str_replace('index.php', '', $container->request->getUri()->getBasePath()), '/') . '/';
     $publicURLPrefix = $siteBaseURL . 'index.php/';
@@ -104,6 +106,8 @@ $container['renderer'] = function ($container) {
         'experiment' => null,
         'detectors' => $detectors,
         'detector' => null,
+
+        'ex2_review_size' => $request->getQueryParam("ex2_review_size", $container["default_ex2_review_size"])
     ];
 
     return new PhpRenderer(__DIR__ . '/../templates/', $defaultTemplateVariables);

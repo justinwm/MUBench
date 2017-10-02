@@ -27,7 +27,17 @@ $reviewController = new ReviewController($settings["site_base_url"], $settings["
 
 
 $app->get('/', \MuBench\ReviewSite\Controller\ExperimentsController::class.":index")->setName('/');
-$app->get('/experiments/{e}/detectors/{d}/runs', \MuBench\ReviewSite\Controller\RunsController::class.":getIndex");
+$app->get('/experiments/{experiment_id}/detectors/{detector_id}/runs', \MuBench\ReviewSite\Controller\RunsController::class.":getIndex")->setName('experiment.detector');
+$app->get('/private/experiments/{experiment_id}/detectors/{detector_id}/runs', \MuBench\ReviewSite\Controller\RunsController::class.":getIndex")->setName('private.experiment.detector')
+    ->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
+$app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getIndex")
+    ->setName('view');
+$app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getIndex")
+    ->setName('review');
+$app->get('/private/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getIndex")
+    ->setName('private.view')->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
+$app->get('/private/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getIndex")
+    ->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container))->setName('private.review');
 
 $app->get('/{exp:ex[1-3]}/{detector}', [$routesHelper, 'detector'])->setName('exp.det');
 $app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}', [$reviewController, 'get']);
