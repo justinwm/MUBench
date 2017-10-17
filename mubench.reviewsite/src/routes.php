@@ -28,40 +28,25 @@ $reviewController = new ReviewController($settings["site_base_url"], $settings["
 
 $app->get('/', \MuBench\ReviewSite\Controller\ExperimentsController::class.":index")->setName('/');
 $app->get('/experiments/{experiment_id}/detectors/{detector_id}/runs', \MuBench\ReviewSite\Controller\RunsController::class.":getIndex")->setName('experiment.detector');
-$app->get('/private/experiments/{experiment_id}/detectors/{detector_id}/runs', \MuBench\ReviewSite\Controller\RunsController::class.":getIndex")->setName('private.experiment.detector')
-    ->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
 $app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getIndex")
     ->setName('view');
 $app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getIndex")
     ->setName('review');
-$app->get('/private/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getIndex")
-    ->setName('private.view')->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
-$app->get('/private/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getIndex")
-    ->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container))->setName('private.review');
-$app->get('/private/experiments/{experiment_id}/reviews/{reviewer_id}/open', \MuBench\ReviewSite\Controller\ReviewController2::class.":getTodo")->setName('private.todo')->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
-$app->get('/private/experiments/{experiment_id}/reviews/{reviewer_id}/closed', \MuBench\ReviewSite\Controller\ReviewController2::class.":getOverview")->setName('private.overview')->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
-
-$app->get('/{exp:ex[1-3]}/{detector}', [$routesHelper, 'detector'])->setName('exp.det');
-$app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}', [$reviewController, 'get']);
-$app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}/{reviewer}', [$reviewController, 'get']);
-$app->group('/stats', function() use ($app, $routesHelper) {
-    $app->get('/results', [$routesHelper, 'result_stats'])->setName('stats.results');
-    $app->get('/tags', [$routesHelper, 'tag_stats'])->setName('stats.tags');
-    $app->get('/types', [$routesHelper, 'type_stats'])->setName('stats.types');
-});
+$app->get('/reviews', \MuBench\ReviewSite\Controller\StatsController::class.":getResults")->setName('stats.results');
+$app->get('/tags', \MuBench\ReviewSite\Controller\StatsController::class.":getTags")->setName('stats.tags');
+$app->get('/types', \MuBench\ReviewSite\Controller\StatsController::class.":getTypes")->setName('stats.types');
 
 $app->group('/private', function () use ($app, $routesHelper, $database, $reviewController) {
     $app->get('/', \MuBench\ReviewSite\Controller\ExperimentsController::class.":index")->setName('private./');
-    $app->get('/{exp:ex[1-3]}/{detector}', [$routesHelper, 'detector'])->setName('private.exp.det');
-    $app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}', [$reviewController, 'get']);
-    $app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}/{reviewer}', [$reviewController, 'get']);
-    $app->group('/stats', function() use ($app, $routesHelper) {
-        $app->get('/results', [$routesHelper, 'result_stats'])->setName('private.stats.results');
-        $app->get('/tags', [$routesHelper, 'tag_stats'])->setName('private.stats.tags');
-        $app->get('/types', [$routesHelper, 'type_stats'])->setName('private.stats.types');
-    });
-    $app->get('/overview', [$routesHelper, 'overview']);
-    $app->get('/todo', \MuBench\ReviewSite\Controller\ReviewController2::class.":getTodo");
+    $app->get('/reviews', \MuBench\ReviewSite\Controller\StatsController::class.":getResults")->setName('private.stats.results');
+    $app->get('/tags', \MuBench\ReviewSite\Controller\StatsController::class.":getTags")->setName('private.stats.tags');
+    $app->get('/types', \MuBench\ReviewSite\Controller\StatsController::class.":getTypes")->setName('private.stats.types');
+    $app->get('/experiments/{experiment_id}/detectors/{detector_id}/runs', \MuBench\ReviewSite\Controller\RunsController::class.":getIndex")->setName('private.experiment.detector');
+    $app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getIndex")
+        ->setName('private.view');
+    $app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getIndex")->setName('private.review');
+    $app->get('/experiments/{experiment_id}/reviews/{reviewer_id}/open', \MuBench\ReviewSite\Controller\ReviewController2::class.":getTodo")->setName('private.todo');
+    $app->get('/experiments/{experiment_id}/reviews/{reviewer_id}/closed', \MuBench\ReviewSite\Controller\ReviewController2::class.":getOverview")->setName('private.overview');
 })->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
 
 $app->group('/download', function () use ($app, $downloadController, $database) {

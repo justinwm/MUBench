@@ -2,6 +2,7 @@
 
 namespace MuBench\ReviewSite\Model;
 
+use MuBench\ReviewSite\Models\Misuse;
 
 abstract class RunsResult
 {
@@ -19,25 +20,25 @@ abstract class RunsResult
 
     public $number_of_hits = 0;
 
-    function __construct(array $runs)
+    function __construct($runs)
     {
         $projects = array();
         $misuses = array();
         $synthetics = array();
         foreach ($runs as $run) {
-            if (strcmp($run["result"], "not run") === 0) {
+            if ($run->result === "not run") {
                 continue;
             }
-            if (strcmp($run["project"], "synthetic") === 0) {
-                $synthetics[$run["version"]] = 1;
+            if ($run->project_muid === "synthetic") {
+                $synthetics[$run->version_muid] = 1;
             } else {
-                $projects[$run["project"] . "." . $run["version"]] = 1;
+                $projects[$run->project_muid . "." . $run->version_muid] = 1;
             }
 
-            foreach ($run["misuses"] as $misuse) {
+            foreach ($run->misuses as $misuse) {
                 /** @var $misuse Misuse */
-                $misuses[$run["project"] . "." . $misuse->id] = 1;
-                if ($misuse->hasPotentialHits()) {
+                $misuses[$run->project_muid . "." . $misuse->id] = 1;
+                if ($misuse->findings) {
                     $this->misuses_to_review++;
                 }
                 $reviewState = $misuse->getReviewState();
@@ -58,7 +59,7 @@ abstract class RunsResult
                     case ReviewState::DISAGREEMENT:
                     case ReviewState::RESOLVED_NO:
                     case ReviewState::RESOLVED_YES:
-                        if (current($misuse->getReviews())->getDecision() == Decision::YES) {
+                        if (current($misuse->getReviews())[0]->getDecision() == Decision::YES) {
                             $this->yes_no_disagreements++;
                         } else {
                             $this->no_yes_disagreements++;

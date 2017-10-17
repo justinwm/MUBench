@@ -68,7 +68,7 @@ use MuBench\ReviewSite\Model\RunsResult;
     </tr>
     </thead>
 
-    <?php foreach ($results["ex1"] as $result) : /** @var $result RunsResult */ ?>
+    <?php foreach ($results[1] as $result) : /** @var $result RunsResult */ ?>
         <tbody>
         <tr>
             <td><?= $result->getDisplayName() ?></td>
@@ -138,7 +138,7 @@ use MuBench\ReviewSite\Model\RunsResult;
     </tr>
     </thead>
 
-    <?php foreach ($results["ex2"] as $result) : /** @var $result RunsResult */ ?>
+    <?php foreach ($results[2] as $result) : /** @var $result RunsResult */ ?>
         <tbody>
         <tr>
             <td><?= $result->getDisplayName() ?></td>
@@ -202,7 +202,7 @@ use MuBench\ReviewSite\Model\RunsResult;
     </tr>
     </thead>
 
-    <?php foreach ($results["ex3"] as $key => $result) : /** @var RunsResult $results */ ?>
+    <?php foreach ($results[3] as $key => $result) : /** @var RunsResult $results */ ?>
         <tbody>
         <tr>
             <td><?= $result->getDisplayName() ?></td>

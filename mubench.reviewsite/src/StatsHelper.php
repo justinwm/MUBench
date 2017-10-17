@@ -61,7 +61,7 @@ class StatsHelper
         $tags = $this->db->getAllTags();
         foreach (array("ex1", "ex2", "ex3") as $experiment) {
             $detectors = $this->db->getDetectors($experiment);
-            $results[$experiment] = array();
+            $results[$experiment->id] = array();
             $total = array();
             foreach($detectors as $detector) {
                 foreach($tags as $tag){
@@ -69,11 +69,11 @@ class StatsHelper
                         $total[$tag['name']] = array();
                     }
                     $tagged_misuses = $this->db->getTaggedMisuses($experiment, $detector, $tag['id']);
-                    $results[$experiment][$detector->name][$tag['name']] = $tagged_misuses;
-                    $total[$tag['name']] = array_merge($total[$tag['name']], $tagged_misuses);
+                    $results[$experiment->id][$detector->name][$tag->name] = $tagged_misuses;
+                    $total[$tag->name] = array_merge($total[$tag->name], $tagged_misuses);
                 }
             }
-            $results[$experiment]["total"] = $total;
+            $results[$experiment->id]["total"] = $total;
         }
         return $results;
     }

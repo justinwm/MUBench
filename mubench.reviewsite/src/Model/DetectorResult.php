@@ -2,6 +2,8 @@
 
 namespace MuBench\ReviewSite\Model;
 
+use MuBench\ReviewSite\Models\Detector;
+
 class DetectorResult extends RunsResult
 {
     /**
@@ -9,12 +11,9 @@ class DetectorResult extends RunsResult
      */
     private $detector;
 
-    /**
-     * @var array
-     */
     public $runs;
 
-    function __construct(Detector $detector, array $runs)
+    function __construct(Detector $detector, $runs)
     {
         parent::__construct($runs);
         $this->detector = $detector;

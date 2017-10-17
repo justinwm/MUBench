@@ -38,7 +38,8 @@ return [
     'upload' => "./upload",
     'users' => [
         "admin" => "pass",
-        "admin2" => "pass"
+        "admin2" => "pass",
+        "reviewer" => "pass"
     ],
     'site_base_url' => '/',
     'default_ex2_review_size' => '20'

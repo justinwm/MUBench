@@ -6,11 +6,13 @@ class ExperimentResult extends RunsResult
 {
     private $number_of_detectors;
 
-    function __construct(array $detector_results)
+    function __construct($detector_results)
     {
         $runs = array();
         foreach ($detector_results as $detector_result) {
-            $runs = array_merge($runs, $detector_result->runs);
+            foreach($detector_result->runs as $run){
+                $runs[] = $run;
+            }
         }
         parent::__construct($runs);
         $this->number_of_detectors = count($detector_results);
