@@ -38,6 +38,8 @@ $app->get('/private/experiments/{experiment_id}/detectors/{detector_id}/project/
     ->setName('private.view')->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
 $app->get('/private/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getIndex")
     ->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container))->setName('private.review');
+$app->get('/private/experiments/{experiment_id}/reviews/{reviewer_id}/open', \MuBench\ReviewSite\Controller\ReviewController2::class.":getTodo")->setName('private.todo')->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
+$app->get('/private/experiments/{experiment_id}/reviews/{reviewer_id}/closed', \MuBench\ReviewSite\Controller\ReviewController2::class.":getOverview")->setName('private.overview')->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
 
 $app->get('/{exp:ex[1-3]}/{detector}', [$routesHelper, 'detector'])->setName('exp.det');
 $app->get('/{exp:ex[1-3]}/{detector}/{project}/{version}/{misuse}', [$reviewController, 'get']);
@@ -58,8 +60,8 @@ $app->group('/private', function () use ($app, $routesHelper, $database, $review
         $app->get('/tags', [$routesHelper, 'tag_stats'])->setName('private.stats.tags');
         $app->get('/types', [$routesHelper, 'type_stats'])->setName('private.stats.types');
     });
-    $app->get('/overview', [$routesHelper, 'overview'])->setName('private.overview');
-    $app->get('/todo', [$routesHelper, 'todos'])->setName('private.todo');
+    $app->get('/overview', [$routesHelper, 'overview']);
+    $app->get('/todo', \MuBench\ReviewSite\Controller\ReviewController2::class.":getTodo");
 })->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
 
 $app->group('/download', function () use ($app, $downloadController, $database) {

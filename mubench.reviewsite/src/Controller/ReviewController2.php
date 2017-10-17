@@ -42,6 +42,58 @@ class ReviewController2 extends Controller
             'violation_types' => $all_violation_types, 'tags' => $all_tags]);
     }
 
+    public function getTodo(Request $request, Response $response, array $args)
+    {
+        $experiment_id = $args['experiment_id'];
+        $reviewer_id = $args['reviewer_id'];
+
+        $experiment = Experiment::find($experiment_id);
+        $reviewer = Reviewer::find($reviewer_id);
+
+        $detectors = Detector::withFindings($experiment);
+
+        $open_misuses = [];
+        foreach($detectors as $detector){
+            $runs = Run::of($detector)->in($experiment)->get();
+            foreach($runs as $run){
+                foreach($run->misuses as $misuse){
+                    /** @var Misuse $misuse */
+                    if(!$misuse->hasReviewed($reviewer) && !$misuse->hasSufficientReviews() && $misuse->findings){
+                        $open_misuses[$detector->name][] = $misuse;
+                    }
+                }
+            }
+
+        }
+        return $this->renderer->render($response, 'todo.phtml', ['open_misuses' => $open_misuses, 'experiment' => $experiment]);
+    }
+
+    public function getOverview(Request $request, Response $response, array $args)
+    {
+        $experiment_id = $args['experiment_id'];
+        $reviewer_id = $args['reviewer_id'];
+
+        $experiment = Experiment::find($experiment_id);
+        $reviewer = Reviewer::find($reviewer_id);
+
+        $detectors = Detector::withFindings($experiment);
+
+        $closed_misuses = [];
+        foreach($detectors as $detector){
+            $runs = Run::of($detector)->in($experiment)->get();
+            foreach($runs as $run){
+                foreach($run->misuses as $misuse){
+                    /** @var Misuse $misuse */
+                    if($misuse->hasReviewed($reviewer)){
+                        $closed_misuses[$detector->name][] = $misuse;
+                    }
+                }
+            }
+
+        }
+        return $this->renderer->render($response, 'overview.phtml', ['closed_misuses' => $closed_misuses, 'experiment' => $experiment]);
+    }
+
     private function getUser(Request $request)
     {
         $params = $request->getServerParams();

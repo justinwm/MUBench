@@ -13,6 +13,7 @@
  * @var array $detectors detectors (Detector) with results per experiment
  * @var Experiment $experiment the selected experiment, if any
  * @var Detector $detector the selected detector, if any
+ * @var Reviewer $user the logged in user
  */
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\Experiment;
@@ -48,10 +49,12 @@ use MuBench\ReviewSite\Models\Experiment;
                 </ul>
             </li>
             <?php if($user) : ?>
-                <li class="right <?= $isCurrentPath('overview') ? "active" : "" ?>">
-                    <a href="<?= $pathFor('overview') ?>">My Reviews</a></li>
-                <li class="right <?= $isCurrentPath('todo') ? "active" : "" ?>">
-                    <a href="<?= $pathFor('todo') ?>">Open Reviews</a></li>
+                <?php if($experiment) : ?>
+                    <li class="right <?= $isCurrentPath('overview', array('experiment_id' => $experiment->id, 'reviewer_id' => $user->id)) ? "active" : "" ?>">
+                        <a href="<?= $pathFor('overview', array('experiment_id' => $experiment->id, 'reviewer_id' => $user->id)) ?>">My Reviews</a></li>
+                    <li class="right <?= $isCurrentPath('todo',  array('experiment_id' => $experiment->id, 'reviewer_id' => $user->id)) ? "active" : "" ?>">
+                        <a href="<?= $pathFor('todo', array('experiment_id' => $experiment->id, 'reviewer_id' => $user->id)) ?>">Open Reviews</a></li>
+                <?php endif; ?>
             <?php else: ?>
                 <li class="right"><a href="<?= $loginPath ?>">Login</a></li>
             <?php endif; ?>
