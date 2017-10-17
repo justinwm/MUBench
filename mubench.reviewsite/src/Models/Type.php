@@ -9,4 +9,7 @@ class Type extends Model
 {
     public $timestamps = false;
 
+    public function metadata(){
+        return $this->belongsToMany(Metadata::class, 'metadata_types', 'type_id', 'metadata_id');
+    }
 }

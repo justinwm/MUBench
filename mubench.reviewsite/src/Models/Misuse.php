@@ -21,7 +21,13 @@ class Misuse extends Model
 
     public function misuse_tags()
     {
-        return $this->belongsToMany(Tag::class, 'misuse_tags', 'tag_id', 'misuse_id');
+        $tags = [];
+        foreach(Tag::all() as $tag){
+            if($tag->misuses->where('id', $this->id)->first()){
+                $tags[] = $tag;
+            }
+        }
+        return $tags;
     }
 
     public function detector()
@@ -84,7 +90,7 @@ class Misuse extends Model
     // TODO: implement all methods
     public function getViolationTypes()
     {
-        return $this->metadata->violation_types;
+        return $this->metadata->violation_types();
     }
 
     public function getReviews()

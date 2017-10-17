@@ -395,6 +395,9 @@ Schema::create($tag->getTable(), function(Blueprint $table){
 });
 $tag->name = 'test-dataset';
 $tag->save();
+$tag = new \MuBench\ReviewSite\Models\Tag;
+$tag->name = 'test-dataset2';
+$tag->save();
 
 echo 'Creating MisuseTag<br/>';
 Schema::dropIfExists('misuse_tags');
@@ -403,4 +406,7 @@ Schema::create('misuse_tags', function(Blueprint $table){
    $table->integer('misuse_id');
    $table->integer('tag_id');
 });
-$capsule->table('misuse_tags')->insert(array('misuse_id' => 1, 'tag_id' => 1));
+$capsule->table('misuse_tags')->insert(array('misuse_id' => 3, 'tag_id' => 1));
+$capsule->table('misuse_tags')->insert(array('misuse_id' => 1, 'tag_id' => 2));
+$capsule->table('misuse_tags')->insert(array('misuse_id' => 3, 'tag_id' => 2));
+$capsule->table('misuse_tags')->insert(array('misuse_id' => 2, 'tag_id' => 2));

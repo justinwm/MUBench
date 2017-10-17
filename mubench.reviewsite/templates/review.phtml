@@ -85,14 +85,14 @@ use MuBench\ReviewSite\Models\Experiment;
             <?php if($experiment->id !== 2) : ?>
                 <tr><td><b>Misuse:</b></td><td>misuse '<?= $markdown_parser->text($misuse->misuse_muid); ?>'</td></tr>
             <?php endif; ?>
-            <?php if($user || $misuse->tags) : ?>
+            <?php if($user || $misuse->misuse_tags()) : ?>
                 <tr>
                 <td><b>Tags:</b></td>
                 <td>
-                    <?php if($misuse->tags): ?>
-                        <?php foreach($misuse->tags as $tag) : ?>
+                    <?php if($misuse->misuse_tags()): ?>
+                        <?php foreach($misuse->misuse_tags() as $tag) : ?>
                             <div class="misuse-tag">
-                                <span><?= htmlspecialchars($tag['name']) ?></span>
+                                <span><?= htmlspecialchars($tag->name) ?></span>
                                 <?php if($user) : ?>
                                 <div style="display:inline-block;padding-right:2px;margin:0;color:black">
                                     <form action="<?= "{$api_url_prefix}upload/delete/tag"?>" method="post" target="">
@@ -150,7 +150,7 @@ use MuBench\ReviewSite\Models\Experiment;
             <tr><td class="vtop"><b>Violation Types:</b></td><td>
             <ul>
             <?php if($misuse->hasViolationTypes()) : ?>
-            <?php foreach($misuse->metadata->violation_types as $v) : ?>
+            <?php foreach($misuse->getViolationTypes() as $v) : ?>
                 <li><?= htmlspecialchars($v->name); ?></li>
             <?php endforeach; ?>
             <?php endif; ?>
