@@ -244,9 +244,14 @@ use MuBench\ReviewSite\Models\Experiment;
             }
 
             $potential_hits = $misuse->findings;
-            $columns = array_filter(array_keys(current($potential_hits->toArray())), function ($key) use ($columns_to_ignore, $potential_hits) {
-                return !in_array($key, $columns_to_ignore) && !is_empty($key, $potential_hits->toArray());
-            });
+            if($potential_hits->toArray()){
+                $columns = array_filter(array_keys(current($potential_hits->toArray())), function ($key) use ($columns_to_ignore, $potential_hits) {
+                    return !in_array($key, $columns_to_ignore) && !is_empty($key, $potential_hits->toArray());
+                });
+            }else{
+                $columns = [];
+            }
+
             sort($columns);
             ?>
 
@@ -333,10 +338,10 @@ use MuBench\ReviewSite\Models\Experiment;
        <?php endforeach; ?>
        </table>
         <?php endif; ?>
-            <?php if($user && $is_reviewer) :?>
+            <?php if($is_reviewer && $reviewer) :?>
                 <table class="invisible">
                 <tr><td>Reviewer Name:</td>
-                    <td><?= htmlspecialchars($reviewer_name); ?></td></tr>
+                    <td><?= htmlspecialchars($reviewer->name); ?></td></tr>
                 <tr><td class="vtop"><label for="review_comment">Comment</label>:</td>
                     <td>
                     <?php if($review) : ?>
@@ -346,7 +351,7 @@ use MuBench\ReviewSite\Models\Experiment;
                     <?php endif; ?>
                     </td></tr>
                 </table>
-                <input type="hidden" name="review_name" value="<?= htmlspecialchars($reviewer); ?>"/>
+                <input type="hidden" name="review_name" value="<?= htmlspecialchars($reviewer->name); ?>"/>
                 <input type="hidden" name="review_exp" value="<?= htmlspecialchars($experiment->id); ?>">
                 <input type="hidden" name="review_detector" value="<?= htmlspecialchars($detector->name); ?>">
                 <input type="hidden" name="review_project" value="<?= htmlspecialchars($misuse->getProject()); ?>">

@@ -28,7 +28,7 @@ class ReviewController2 extends Controller
         $user = $this->getUser($request);
         $reviewer = array_key_exists('reviewer_id', $args) ? Reviewer::find($args['reviewer_id']) : $user;
         $resolution_reviewer = Reviewer::where('name', 'resolution')->first();
-        $is_reviewer = ($user && $user->id == $reviewer->id) || $reviewer->id == $resolution_reviewer->id;
+        $is_reviewer = ($user && $reviewer && $user->id == $reviewer->id) || ($reviewer && $reviewer->id == $resolution_reviewer->id);
 
         $misuse = Run::of($detector)->in($experiment)->where('version_muid', $version_id)->where('project_muid', $project_id)->first()->misuses->find($misuse_id);
         $all_violation_types = Type::all();
@@ -36,7 +36,7 @@ class ReviewController2 extends Controller
 
         $review = $misuse->getReview($reviewer);
 
-        return $this->renderer->render($response, 'review.phtml', ['reviewer_name' => $reviewer->name, 'is_reviewer' => $is_reviewer,
+        return $this->renderer->render($response, 'review.phtml', ['reviewer' => $reviewer, 'is_reviewer' => $is_reviewer,
             'misuse' => $misuse,'experiment' => $experiment,
             'detector' => $detector, 'review' => $review,
             'violation_types' => $all_violation_types, 'tags' => $all_tags]);
