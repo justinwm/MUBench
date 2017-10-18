@@ -405,6 +405,7 @@ Schema::create('misuse_tags', function(Blueprint $table){
    $table->increments('id');
    $table->integer('misuse_id');
    $table->integer('tag_id');
+   $table->unique(['tag_id', 'misuse_id']);
 });
 $capsule->table('misuse_tags')->insert(array('misuse_id' => 3, 'tag_id' => 1));
 $capsule->table('misuse_tags')->insert(array('misuse_id' => 1, 'tag_id' => 2));

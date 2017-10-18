@@ -96,12 +96,8 @@ use MuBench\ReviewSite\Models\Experiment;
                                 <?php if($user) : ?>
                                 <div style="display:inline-block;padding-right:2px;margin:0;color:black">
                                     <form action="<?= "{$api_url_prefix}upload/delete/tag"?>" method="post" target="">
-                                        <input type="hidden" name="exp" value="<?= htmlspecialchars($experiment->id); ?>">
-                                        <input type="hidden" name="detector" value="<?= htmlspecialchars($detector->id); ?>">
-                                        <input type="hidden" name="project" value="<?= htmlspecialchars($misuse->getProject()); ?>">
-                                        <input type="hidden" name="version" value="<?= htmlspecialchars($misuse->getVersion()); ?>">
-                                        <input type="hidden" name="misuse" value="<?= htmlspecialchars($misuse->misuse_muid); ?>">
-                                        <input type="hidden" name="tag" value="<?= htmlspecialchars($tag['id']); ?>">
+                                        <input type="hidden" name="misuse_id" value="<?= htmlspecialchars($misuse->id); ?>">
+                                        <input type="hidden" name="tag_id" value="<?= htmlspecialchars($tag->id); ?>">
                                         <input type="hidden" name="path" value="<?= htmlspecialchars($path); ?>">
                                         <button style="border:none;background-color:gray;outline:none;margin:0;padding:0" type="submit"><i class="fa fa-trash"></i></button>
                                     </form>
@@ -113,13 +109,9 @@ use MuBench\ReviewSite\Models\Experiment;
                     <?php if($user) : ?>
                             <div style="display:inline-block;height:100%;padding:4px;">
                                 <form id="tag-form" action="<?= $api_url_prefix ?>upload/tag" method="post" target="">
-                                    <input type="hidden" name="exp" value="<?= htmlspecialchars($experiment->id); ?>">
-                                    <input type="hidden" name="detector" value="<?= htmlspecialchars($detector->id); ?>">
-                                    <input type="hidden" name="project" value="<?= htmlspecialchars($misuse->getProject()); ?>">
-                                    <input type="hidden" name="version" value="<?= htmlspecialchars($misuse->getVersion()); ?>">
-                                    <input type="hidden" name="misuse" value="<?= htmlspecialchars($misuse->id); ?>">
+                                    <input type="hidden" name="misuse_id" value="<?= htmlspecialchars($misuse->id); ?>">
                                     <input type="hidden" name="path" value="<?= htmlspecialchars($path); ?>">
-                                    <input id="tag-input" class="tag-input" maxlength="100" list="tags" name="tag" placeholder="add new tag" autocomplete="off">
+                                    <input id="tag-input" class="tag-input" maxlength="100" list="tags" name="tag_name" placeholder="add new tag" autocomplete="off">
                                     <datalist id="tags">
                                         <?php foreach($tags as $tag) : ?>
                                             <option value="<?= htmlspecialchars($tag['name']); ?>">

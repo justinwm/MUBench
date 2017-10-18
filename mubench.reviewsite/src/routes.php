@@ -110,9 +110,9 @@ $app->group('/api/upload', function () use ($app, $settings, $database, $tagCont
         });
 
     // REFACTOR migrate this route to /tags/{exp}/{detector}/{project}/{version}/{misuse}/{tagname}/add
-    $app->post('/tag', [$tagController, "add"]);
+    $app->post('/tag',\MuBench\ReviewSite\Controller\TagController::class.":add");
     // REFACTOR migrate this route to /tags/{exp}/{detector}/{project}/{version}/{misuse}/{tagname}/delete
-    $app->post('/delete/tag', [$tagController, 'delete']);
+    $app->post('/delete/tag', \MuBench\ReviewSite\Controller\TagController::class.":remove");
 
     $app->post('/snippet',
         function (Request $request, Response $response, array $args) use ($database, $settings) {
