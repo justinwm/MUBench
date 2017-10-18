@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 class FindingReview extends Model
 {
     public $timestamps = false;
+    public $fillable = ['review_id', 'rank'];
 
     public function violation_types()
     {

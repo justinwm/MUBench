@@ -123,6 +123,8 @@ $finding->additional_column = 'test_column';
 $finding->file = 'Test.java';
 $finding->method = "method(A)";
 $finding->save();
+$finding = new \MuBench\ReviewSite\Models\Finding;
+$finding->setDetector($detector);
 $finding->experiment_id = $experiment->id;
 $finding->misuse_id = 2;
 $finding->project_muid = 'mubench_2';

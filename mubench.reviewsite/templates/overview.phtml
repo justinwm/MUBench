@@ -65,8 +65,7 @@ use MuBench\ReviewSite\Model\ReviewState;
                 <td class="<?= $style_classes ?>">
                     <?= htmlspecialchars($misuse->misuse_muid); ?></td>
                 <?php
-                $review_url = $url_prefix . htmlspecialchars($experiment) . "/" . htmlspecialchars($detector) . "/" .
-                    htmlspecialchars($project) . "/" . htmlspecialchars($version) . "/" . htmlspecialchars($misuse->id);
+                $resolution_review = $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_id, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => 1));
                 ?>
                 <td class="<?= $style_classes ?>">
                     <?php $review_state = $misuse->getReviewState() ?>
@@ -76,17 +75,17 @@ use MuBench\ReviewSite\Model\ReviewState;
                     <?php elseif ($review_state == ReviewState::NEEDS_CLARIFICATION): ?>
                         <i class="fa fa-question-circle" aria-hidden="true" style="color:blue;" title="Needs Clarification"></i>
                     <?php elseif ($review_state == ReviewState::DISAGREEMENT): ?>
-                        <a href="<?= $review_url ?>/resolution<?= $origin_param ?>"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color:red;" title="Disagreement"></i></a>
+                        <a href="<?= $resolution_review ?><?= $origin_param ?>"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color:red;" title="Disagreement"></i></a>
                     <?php elseif ($review_state == ReviewState::AGREEMENT_YES): ?>
                         <i class="fa fa-thumbs-o-up" aria-hidden="true" style="color:green;" title="Agreement: Yes"></i>
                     <?php elseif ($review_state == ReviewState::AGREEMENT_NO): ?>
                         <i class="fa fa-thumbs-o-down" aria-hidden="true" style="color:darkred;" title="Agreement: No"></i>
                     <?php elseif ($review_state == ReviewState::RESOLVED_YES): ?>
                         <i class="fa fa-thumbs-o-up" aria-hidden="true" style="color:green;" title="Resolved: Yes"></i>
-                        (<a href="<?= $review_url ?>/resolution<?= $origin_param ?>"><i class="fa fa-handshake-o" aria-hidden="true" title="Resolution"></i></a>)
+                        (<a href="<?= $resolution_review ?><?= $origin_param ?>"><i class="fa fa-handshake-o" aria-hidden="true" title="Resolution"></i></a>)
                     <?php elseif ($review_state == ReviewState::RESOLVED_NO): ?>
                         <i class="fa fa-thumbs-o-down" aria-hidden="true" style="color:darkred;" title="Resolved: No"></i>
-                        (<a href="<?= $review_url ?>/resolution<?= $origin_param ?>"><i class="fa fa-handshake-o" aria-hidden="true" title="Resolution"></i></a>)
+                        (<a href="<?= $resolution_review ?><?= $origin_param ?>"><i class="fa fa-handshake-o" aria-hidden="true" title="Resolution"></i></a>)
                     <?php endif; ?>
                 </td>
                 <td class="<?= $style_classes ?>">
@@ -94,13 +93,13 @@ use MuBench\ReviewSite\Model\ReviewState;
                         <?php foreach($misuse->getReviews() as $review) : /** @var \MuBench\ReviewSite\Model\Review $review */ ?>
                             <?php $reviewer_name = htmlspecialchars($review->reviewer->name) ?>
                             <?php if($reviewer_name !== $user->name) : ?>
-                                <li style="display:inline"><a href="<?= $review_url ?>/<?= $reviewer_name ?>"><?= $reviewer_name ?></a></li>
+                                <li style="display:inline"><a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_id, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => $review->reviewer->id)) ?>"><?= $reviewer_name ?></a></li>
                             <?php endif; ?>
                         <?php endforeach; ?>
                     </ul>
                 </td>
                 <td class="<?= $style_classes ?>">
-                    <a href="<?= $review_url ?><?= $origin_param ?>" class="button">edit
+                    <a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_id, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => $user->id)) ?><?= $origin_param ?>" class="button">edit
                         <?php $your_decision = $misuse->getReview($user)->getDecision() ?>
                         <?php if ($your_decision == Decision::YES): ?>
                             (<i class="fa fa-thumbs-o-up" aria-hidden="true" style="color:green;" title="Yes"></i>)

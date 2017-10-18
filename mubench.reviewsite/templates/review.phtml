@@ -212,7 +212,7 @@ use MuBench\ReviewSite\Models\Experiment;
                         </td></tr>
             <?php endif; ?>
         </table>
-            <form action="<?= "{$api_url_prefix}upload/review/{$experiment->id}/{$detector->name}" ?>" method="post" target="">
+            <form action="<?= $pathFor('update.review', array('experiment_id' => $experiment->id, 'detector_id' => $detector->id, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => $reviewer->id), true) ?>" method="post" target="">
             <?php if($misuse->hasPotentialHits()) : ?>
 
             <?php if($experiment->id !== 2) : ?>
@@ -234,15 +234,10 @@ use MuBench\ReviewSite\Models\Experiment;
                     return $carry && empty($potential_hit[$property]);
                 }, true);
             }
-
             $potential_hits = $misuse->findings;
-            if($potential_hits->toArray()){
-                $columns = array_filter(array_keys(current($potential_hits->toArray())), function ($key) use ($columns_to_ignore, $potential_hits) {
-                    return !in_array($key, $columns_to_ignore) && !is_empty($key, $potential_hits->toArray());
-                });
-            }else{
-                $columns = [];
-            }
+            $columns = array_filter(array_keys(current($potential_hits->toArray())), function ($key) use ($columns_to_ignore, $potential_hits) {
+                return !in_array($key, $columns_to_ignore) && !is_empty($key, $potential_hits->toArray());
+            });
 
             sort($columns);
             ?>
@@ -317,10 +312,10 @@ use MuBench\ReviewSite\Models\Experiment;
                 <td>
                     <select name="review_hit[<?= htmlspecialchars($hit['rank']); ?>][types][]" title="Violation Types" size="<?= count($violation_types) ?>" multiple <?= ($user && $is_reviewer) ? "" : "disabled" ?>>
                         <?php foreach($violation_types as $type) : ?>
-                            <?php if($review && in_array($type['name'], $review->getHitViolationTypes($hit['rank']))) : ?>
-                                    <option selected="selected" value="<?= $type['id'] ?>"><?= htmlspecialchars($type['name']) ?></option>
+                            <?php if($review && in_array($type->name, $review->getHitViolationTypes($hit->rank))) : ?>
+                                    <option selected="selected" value="<?= $type->id ?>"><?= htmlspecialchars($type->name) ?></option>
                             <?php else: ?>
-                                <option value="<?= $type['id'] ?>"><?= htmlspecialchars($type['name']) ?></option>
+                                <option value="<?= $type->id ?>"><?= htmlspecialchars($type->name) ?></option>
                             <?php endif; ?>
                         <?php endforeach; ?>
                     </select>
@@ -343,12 +338,6 @@ use MuBench\ReviewSite\Models\Experiment;
                     <?php endif; ?>
                     </td></tr>
                 </table>
-                <input type="hidden" name="review_name" value="<?= htmlspecialchars($reviewer->name); ?>"/>
-                <input type="hidden" name="review_exp" value="<?= htmlspecialchars($experiment->id); ?>">
-                <input type="hidden" name="review_detector" value="<?= htmlspecialchars($detector->name); ?>">
-                <input type="hidden" name="review_project" value="<?= htmlspecialchars($misuse->getProject()); ?>">
-                <input type="hidden" name="review_version" value="<?= htmlspecialchars($misuse->getVersion()); ?>">
-                <input type="hidden" name="review_misuse" value="<?= htmlspecialchars($misuse->id); ?>">
                 <input type="hidden" name="origin" value="<?= htmlspecialchars($origin_path); ?>">
                 <input type="submit" value="Save Review" />
                 </form>

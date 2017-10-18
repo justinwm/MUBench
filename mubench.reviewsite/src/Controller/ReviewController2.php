@@ -5,6 +5,9 @@ namespace MuBench\ReviewSite\Controller;
 
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\Experiment;
+use MuBench\ReviewSite\Models\FindingReview;
+use MuBench\ReviewSite\Models\Misuse;
+use MuBench\ReviewSite\Models\Review;
 use MuBench\ReviewSite\Models\Reviewer;
 use MuBench\ReviewSite\Models\Run;
 use MuBench\ReviewSite\Models\Tag;
@@ -14,7 +17,7 @@ use Slim\Http\Response;
 
 class ReviewController2 extends Controller
 {
-    public function getIndex(Request $request, Response $response, array $args)
+    public function getReview(Request $request, Response $response, array $args)
     {
         $experiment_id = $args['experiment_id'];
         $detector_id = $args['detector_id'];
@@ -30,7 +33,7 @@ class ReviewController2 extends Controller
         $resolution_reviewer = Reviewer::where('name', 'resolution')->first();
         $is_reviewer = ($user && $reviewer && $user->id == $reviewer->id) || ($reviewer && $reviewer->id == $resolution_reviewer->id);
 
-        $misuse = Run::of($detector)->in($experiment)->where('version_muid', $version_id)->where('project_muid', $project_id)->first()->misuses->find($misuse_id);
+        $misuse = Misuse::find($misuse_id);
         $all_violation_types = Type::all();
         $all_tags = Tag::all();
 
@@ -92,6 +95,43 @@ class ReviewController2 extends Controller
 
         }
         return $this->renderer->render($response, 'overview.phtml', ['closed_misuses' => $closed_misuses, 'experiment' => $experiment]);
+    }
+
+    public function review(Request $request, Response $response, array $args)
+    {
+        $review = $request->getParsedBody();
+        $experiment_id = $args['experiment_id'];
+        $detector_id = $args['detector_id'];
+        $project_id = $args['project_id'];
+        $version_id = $args['version_id'];
+        $misuse_id = $args['misuse_id'];
+        $reviewer_id = $args['reviewer_id'];
+
+        $comment = $review['review_comment'];
+        $hits = $review['review_hit'];
+
+        $review = Review::firstOrNew(['misuse_id' => $misuse_id, 'reviewer_id' => $reviewer_id]);
+        $review->comment = $comment;
+        $review->save();
+
+        foreach ($hits as $rank => $hit) {
+            $findingReview = FindingReview::firstOrNew(['review_id' => $review->id,'rank' => $rank]);
+            $findingReview->decision = $hit['hit'];
+            $findingReview->save();
+            $this->database2->table('finding_review_types')->where('finding_review_id', $findingReview->id)->delete();
+            if (array_key_exists("types", $hit)) {
+                foreach ($hit['types'] as $type) {
+                   $this->database2->table('finding_review_types')->insert(['finding_review_id' => $findingReview->id, 'type_id' => $type]);
+                }
+            }
+        }
+        if ($review["origin"] != "") {
+            return $response->withRedirect("{$this->site_base_url}index.php/{$review["origin"]}");
+        }else {
+            return $response->withRedirect("{$this->site_base_url}index.php/private/experiments/{$experiment_id}/detectors/{$detector_id}/project/{$project_id}/version/{$version_id}/misuse/{$misuse_id}/reviewer/{$reviewer_id}");
+        }
+
+
     }
 
     private function getUser(Request $request)

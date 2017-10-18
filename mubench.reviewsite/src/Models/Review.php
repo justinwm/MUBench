@@ -8,6 +8,9 @@ use MuBench\ReviewSite\Model\Decision;
 
 class Review extends Model
 {
+
+    protected $fillable = ['misuse_id', 'reviewer_id'];
+
     public function reviewer()
     {
         return $this->belongsTo(Reviewer::class);
@@ -41,7 +44,7 @@ class Review extends Model
     }
 
     public function getHitViolationTypes($rank){
-        return $this->getFindingReviews($rank)->violation_types;
+        return $this->getFindingReviews($rank)->violation_types->toArray();
     }
 
     public function identifiesHit()
