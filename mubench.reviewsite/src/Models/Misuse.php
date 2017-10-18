@@ -126,7 +126,7 @@ class Misuse extends Model
     }
 
     public function hasSnippets(){
-        return !empty($this->snippets);
+        return $this->snippets;
     }
 
     public function getReviewState()

@@ -14,4 +14,5 @@ use Illuminate\Database\Eloquent\Model;
 class Snippet extends Model
 {
     public $timestamps = false;
+    public $fillable = ['misuse_id', 'snippet', 'line'];
 }

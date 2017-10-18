@@ -163,11 +163,6 @@ $snippet->misuse_id = 1;
 $snippet->line = 112;
 $snippet->snippet = "test snippet\ntest";
 $snippet->save();
-$snippet = new \MuBench\ReviewSite\Models\Snippet;
-$snippet->misuse_id = 3;
-$snippet->line = 112;
-$snippet->snippet = "test snippet\ntest";
-$snippet->save();
 
 
 echo 'Creating misuses (metadata)<br/>';

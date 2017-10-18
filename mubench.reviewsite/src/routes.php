@@ -114,11 +114,8 @@ $app->group('/api/upload', function () use ($app, $settings, $database, $tagCont
     // REFACTOR migrate this route to /tags/{exp}/{detector}/{project}/{version}/{misuse}/{tagname}/delete
     $app->post('/delete/tag', \MuBench\ReviewSite\Controller\TagController::class.":remove");
 
-    $app->post('/snippet',
-        function (Request $request, Response $response, array $args) use ($database, $settings) {
-            $obj = $request->getParsedBody();
-            $uploader = new SnippetUploader($database, $this->logger);
-            $uploader->processSnippet($obj);
-            return $response->withRedirect("{$settings['site_base_url']}index.php/{$obj['path']}");
-        });
+    $app->post('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/snippet',
+        \MuBench\ReviewSite\Controller\SnippetController::class.":add")->setName('private.snippet.add');
+    $app->post('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/snippet/{snippet_id}',
+        \MuBench\ReviewSite\Controller\SnippetController::class.":remove")->setName('private.snippet.remove');
 })->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
