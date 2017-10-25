@@ -1,27 +1,32 @@
 <?php
 
-require_once "DatabaseTestCase.php";
+namespace MuBench\ReviewSite\Controller;
+
+require_once 'SlimTestCase.php';
 
 use MuBench\ReviewSite\Controller\FindingsUploader;
+use MuBench\ReviewSite\Controller\ReviewController2;
 use MuBench\ReviewSite\Controller\ReviewUploader;
+use MuBench\ReviewSite\Controller\RunsController;
 use MuBench\ReviewSite\Model\Misuse;
 use MuBench\ReviewSite\Model\Review;
+use MuBench\ReviewSite\Models\Detector;
+use MuBench\ReviewSite\Models\Experiment;
+use MuBench\ReviewSite\Models\Run;
+use SlimTestCase;
 
-class MisuseFilterTest extends DatabaseTestCase
+class MisuseFilterTest extends SlimTestCase
 {
-    private $request_body;
+    private $reviewController;
+    private $runController;
 
     private $undecided_review = [
-        'review_name' => 'reviewer1',
-        'review_exp' => 'ex2',
-        'review_detector' => '-d-',
-        'review_project' => '-p-',
-        'review_version' => '-v-',
-        'review_misuse' => 1,
+        'reviewer_id' => 2,
+        'misuse_id' => 3,
         'review_comment' => '-comment-',
         'review_hit' => [
-            0 => [
-                'hit' => '?',
+            1 => [
+                'hit' => 'No',
                 'types' => [
                     'missing/call'
                 ]
@@ -30,15 +35,11 @@ class MisuseFilterTest extends DatabaseTestCase
     ];
 
     private $decided_review = [
-        'review_name' => 'reviewer2',
-        'review_exp' => 'ex2',
-        'review_detector' => '-d-',
-        'review_project' => '-p-',
-        'review_version' => '-v-',
-        'review_misuse' => 1,
+        'reviewer_id' => 3,
+        'misuse_id' => 3,
         'review_comment' => '-comment-',
         'review_hit' => [
-            0 => [
+            1 => [
                 'hit' => 'Yes',
                 'types' => [
                     'missing/call'
@@ -50,110 +51,40 @@ class MisuseFilterTest extends DatabaseTestCase
     function setUp()
     {
         parent::setUp();
-
-        $this->request_body = [
-            "detector" => "-d-",
-            "project" => "-p-",
-            "version" => "-v-",
-            "result" => "success",
-            "runtime" => 42.1,
-            "number_of_findings" => 23,
-            "potential_hits" => [
-                [
-                    "misuse" => "-m1-",
-                    "rank" => 0,
-                    "target_snippets" => []
-                ],
-                [
-                    "misuse" => "-m2-",
-                    "rank" => 1,
-                    "target_snippets" => []
-                ],
-                [
-                    "misuse" => "-m3-",
-                    "rank" => 2,
-                    "target_snippets" => []
-                ]]
-        ];
-
-    }
-
-    function test_no_reviews()
-    {
-        $uploader = new FindingsUploader($this->db, $this->logger);
-
-        $data = json_decode(json_encode($this->request_body));
-        $uploader->processData("ex2", $data);
-        $detector = $this->db->getOrCreateDetector("-d-");
-        $runs = $this->db->getRuns($detector, "ex2", 2);
-
-        self::assertEquals(2, sizeof($runs[0]['misuses']));
+        $this->reviewController = new ReviewController2($this->container);
+        $this->runController = new RunsController($this->container);
     }
 
     function test_inconclusive_reviews()
     {
-        $uploader = new FindingsUploader($this->db, $this->logger);
-        $review_uploader = new ReviewUploader($this->db, $this->logger);
-        $data = json_decode(json_encode($this->request_body));
-
-        $uploader->processData("ex2", $data);
-        $review_uploader->processReview($this->decided_review);
-        $review_uploader->processReview($this->undecided_review);
-
-        $detector = $this->db->getOrCreateDetector("-d-");
-        $runs = $this->db->getRuns($detector, "ex2", 2);
-
-
-        self::assertEquals(3, sizeof($runs[0]['misuses']));
+        $this->reviewController->updateReview($this->decided_review['misuse_id'], $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->decided_review['review_hit']);
+        $this->reviewController->updateReview($this->undecided_review['misuse_id'], $this->undecided_review['reviewer_id'], $this->undecided_review['review_comment'], $this->undecided_review['review_hit']);
+        $runs = $this->runController->getRuns(1, 2, 2);
+        self::assertEquals(3, sizeof($runs[0]->misuses));
     }
 
     function test_conclusive_reviews()
     {
-        $uploader = new FindingsUploader($this->db, $this->logger);
-        $review_uploader = new ReviewUploader($this->db, $this->logger);
-        $data = json_decode(json_encode($this->request_body));
-
-        $uploader->processData("ex2", $data);
-        $review_uploader->processReview($this->decided_review);
-        $decided_reviewer2 = $this->undecided_review;
-        $decided_reviewer2["review_hit"][0]["hit"] = "Yes";
-        $review_uploader->processReview($decided_reviewer2);
-
-        $detector = $this->db->getOrCreateDetector("-d-");
-        $runs = $this->db->getRuns($detector, "ex2", 2);
-
-
-        self::assertEquals(2, sizeof($runs[0]['misuses']));
+        $this->reviewController->updateReview($this->decided_review['misuse_id'], $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->decided_review['review_hit']);
+        $this->reviewController->updateReview($this->undecided_review['misuse_id'], $this->undecided_review['reviewer_id'], $this->undecided_review['review_comment'], $this->decided_review['review_hit']);
+        $runs = $this->runController->getRuns(1, 2, 2);
+        self::assertEquals(2, sizeof($runs[0]->misuses));
     }
 
     function test_one_inconclusive_review()
     {
-        $uploader = new FindingsUploader($this->db, $this->logger);
-        $review_uploader = new ReviewUploader($this->db, $this->logger);
-        $data = json_decode(json_encode($this->request_body));
-
-        $uploader->processData("ex2", $data);
-        $review_uploader->processReview($this->undecided_review);
-
-        $detector = $this->db->getOrCreateDetector("-d-");
-        $runs = $this->db->getRuns($detector, "ex2", 2);
-
-        self::assertEquals(3, sizeof($runs[0]['misuses']));
+        $this->reviewController->updateReview(4, $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->undecided_review['review_hit']);
+        $runs = $this->runController->getRuns(1, 2, 2);
+        self::assertEquals(3, sizeof($runs[0]->misuses));
     }
 
     function test_one_conclusive_review()
     {
-        $uploader = new FindingsUploader($this->db, $this->logger);
-        $review_uploader = new ReviewUploader($this->db, $this->logger);
-        $data = json_decode(json_encode($this->request_body));
-
-        $uploader->processData("ex2", $data);
-        $review_uploader->processReview($this->decided_review);
-
-        $detector = $this->db->getOrCreateDetector("-d-");
-        $runs = $this->db->getRuns($detector, "ex2", 2);
-
-        self::assertEquals(2, sizeof($runs[0]['misuses']));
+        $this->reviewController->updateReview($this->decided_review['misuse_id'], $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->decided_review['review_hit']);
+        $this->reviewController->updateReview($this->undecided_review['misuse_id'], $this->undecided_review['reviewer_id'], $this->undecided_review['review_comment'], $this->decided_review['review_hit']);
+        $this->reviewController->updateReview(4, $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->decided_review['review_hit']);
+        $runs = $this->runController->getRuns(1, 2, 2);
+        self::assertEquals(2, sizeof($runs[0]->misuses));
     }
 
 }

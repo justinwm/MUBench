@@ -4,68 +4,50 @@ namespace MuBench\ReviewSite\Controller;
 
 use DatabaseTestCase;
 use MuBench\ReviewSite\Model\Detector;
+use MuBench\ReviewSite\Models\Misuse;
+use SlimTestCase;
 
-class TagMisusesTest extends DatabaseTestCase
+class TagMisusesTest extends SlimTestCase
 {
-    /** @var MisuseTagsController */
+    /** @var TagController */
     private $tagController;
-
-    /** @var Detector */
-    private $detector;
 
     function setUp()
     {
         parent::setUp();
-        $this->tagController = new MisuseTagsController($this->db, $this->logger, "-site-base-url-");
-        $this->detector = $this->db->getOrCreateDetector('-d-');
-    }
-
-    function test_get_all_tags()
-    {
-        $this->db->table('tags')->insert(['name' => 'test1']);
-        $tags = $this->db->getAllTags();
-        $expected_tags = [
-            ['id' => 1, 'name' => 'test1']
-        ];
-        self::assertEquals($expected_tags, $tags);
+        $this->tagController = new TagController($this->container);
     }
 
     function test_save_misuse_tags()
     {
-        $this->db->table('tags')->insert(['name' => 'test1']);
-        $this->tagController->addTag('ex1', $this->detector, '-project-', '-version-', '-misuse-', 'test1');
+        $this->tagController->tagMisuse('test-dataset', 2);
 
-        $misuseTags = $this->tagController->getTags('ex1', $this->detector, "-project-", "-version-", "-misuse-");
-        self::assertEquals([['id' => 1, 'name' => 'test1']], $misuseTags);
+        $misuseTags = Misuse::find(2)->misuse_tags();
+        self::assertEquals('test-dataset', $misuseTags[0]->name);
     }
 
     function test_delete_misuse_tag()
     {
-        $this->db->table('tags')->insert(['name' => 'test1']);
-        $this->tagController->addTag('ex1', $this->detector, '-project-', '-version-', '-misuse-', 'test1');
+        $this->tagController->removeTag(2,1);
 
-        $this->tagController->deleteTag('ex1', $this->detector, '-project-', '-version-', '-misuse-', 'test1');
-
-        $misuseTags = $this->tagController->getTags('ex1', $this->detector, "-project-", "-version-", "-misuse-");
+        $misuseTags = Misuse::find(1)->misuse_tags();
         self::assertEquals([], $misuseTags);
     }
 
     function test_adding_same_tag_twice()
     {
-        $this->db->table('tags')->insert(['name' => 'test1']);
-        $this->tagController->addTag('ex1', $this->detector, '-project-', '-version-', '-misuse-', 'test1');
+        $this->tagController->tagMisuse('test-tag', 2);
+        $this->tagController->tagMisuse('test-tag', 2);
 
-        $this->tagController->addTag('ex1', $this->detector, '-project-', '-version-', '-misuse-', 'test1');
-
-        $misuseTags = $this->tagController->getTags('ex1', $this->detector, "-project-", "-version-", "-misuse-");
+        $misuseTags = Misuse::find(1)->misuse_tags();
         self::assertEquals(1, count($misuseTags));
     }
 
     function test_add_unknown_tag()
     {
-        $this->tagController->addTag('ex1', $this->detector, '-project-', '-version-', '-misuse-', 'unknown_tag');
+        $this->tagController->tagMisuse('test-tag', 2);
 
-        $misuse_tags = $this->tagController->getTags('ex1', $this->detector, "-project-", "-version-", "-misuse-");
-        self::assertEquals([['id' => 1, 'name' => 'unknown_tag']], $misuse_tags);
+        $misuseTags = Misuse::find(2)->misuse_tags();
+        self::assertEquals('test-tag', $misuseTags[0]->name);
     }
 }

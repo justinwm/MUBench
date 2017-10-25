@@ -258,6 +258,16 @@ $misuse->misuse_muid = '1';
 $misuse->detector_id = 1;
 $misuse->run_id = 3;
 $misuse->save();
+$misuse = new \MuBench\ReviewSite\Models\Misuse;
+$misuse->misuse_muid = '2';
+$misuse->detector_id = 1;
+$misuse->run_id = 3;
+$misuse->save();
+$misuse = new \MuBench\ReviewSite\Models\Misuse;
+$misuse->misuse_muid = '3';
+$misuse->detector_id = 1;
+$misuse->run_id = 3;
+$misuse->save();
 
 echo 'Creating review<br/>';
 $review = new \MuBench\ReviewSite\Models\Review;
@@ -289,11 +299,7 @@ $review->misuse_id = 3;
 $review->reviewer_id = 3;
 $review->comment = "This is a test comment 2!";
 $review->save();
-$review = new \MuBench\ReviewSite\Models\Review;
-$review->misuse_id = 3;
-$review->reviewer_id = 1;
-$review->comment = "resolution comment!";
-$review->save();
+
 
 echo 'Creating reviewer<br/>';
 $reviewer = new \MuBench\ReviewSite\Models\Reviewer;
@@ -345,11 +351,6 @@ $findingReview->save();
 $findingReview = new \MuBench\ReviewSite\Models\FindingReview;
 $findingReview->decision = 'No';
 $findingReview->review_id = 4;
-$findingReview->rank = '1';
-$findingReview->save();
-$findingReview = new \MuBench\ReviewSite\Models\FindingReview;
-$findingReview->decision = 'Yes';
-$findingReview->review_id = 5;
 $findingReview->rank = '1';
 $findingReview->save();
 
@@ -407,4 +408,3 @@ Schema::create('misuse_tags', function(Blueprint $table){
 $capsule->table('misuse_tags')->insert(array('misuse_id' => 3, 'tag_id' => 1));
 $capsule->table('misuse_tags')->insert(array('misuse_id' => 1, 'tag_id' => 2));
 $capsule->table('misuse_tags')->insert(array('misuse_id' => 3, 'tag_id' => 2));
-$capsule->table('misuse_tags')->insert(array('misuse_id' => 2, 'tag_id' => 2));

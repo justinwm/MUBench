@@ -28,13 +28,13 @@ class DatabaseTestCase extends TestCase
 
     function setUp()
     {
+
         $connection = new \Pixie\Connection('sqlite', ['driver' => 'sqlite', 'database' => ':memory:']);
         $this->pdo = $connection->getQueryBuilder();
         $mysql_structure = file_get_contents(dirname(__FILE__) . "/../init_db.sql");
-        $this->pdo->pdo()->exec($this->mySQLToSQLite($mysql_structure));
+        $this->pdo->pdo()->exec($this->mySQLToSQLite(";"));
         $this->logger = new \Monolog\Logger("test");
         $this->db = new DBConnection($connection, $this->logger);
-
         $capsule = new \Illuminate\Database\Capsule\Manager;
         $capsule->addConnection(['driver' => 'sqlite', 'database' => ':memory:']);
         $capsule->setAsGlobal();

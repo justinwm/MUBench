@@ -1,7 +1,7 @@
 <?php
 
-use MuBench\ReviewSite\DirectoryHelper;
-use MuBench\ReviewSite\RoutesHelper;
+require_once 'DatabaseTestCase.php';
+
 use Slim\Http\Environment;
 use Slim\Http\Headers;
 use Slim\Http\Request;
@@ -33,6 +33,7 @@ class SlimTestCase extends DatabaseTestCase
         require __DIR__ . '/../src/routes.php';
 
         $this->app = $app;
+        $this->container = $container;
     }
 
     public function get($path, $data = array(), $optionalHeaders = array()){
