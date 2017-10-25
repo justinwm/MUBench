@@ -3,6 +3,7 @@
 namespace MuBench\ReviewSite\Controller;
 
 
+use Illuminate\Database\Eloquent\Collection;
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\Experiment;
 use MuBench\ReviewSite\Models\Run;
@@ -19,14 +20,37 @@ class RunsController extends Controller
         // TODO Filter only this amount of misuses in exp2
         $ex2_review_size = $request->getQueryParam("ex2_review_size", "20");
 
-        $experiment = Experiment::find($experiment_id);
-        $detector = Detector::find($detector_id);
+        $runs = $this->getRuns($detector_id, $experiment_id, $ex2_review_size);
 
-        $runs = Run::of($detector)->in($experiment)->get();
         return $this->renderer->render($response, 'detector.phtml', [
             'experiment' => $experiment,
             'detector' => $detector,
             'runs' => $runs
         ]);
+    }
+
+    function getRuns($detector_id, $experiment_id, $max_reviews)
+    {
+        $experiment = Experiment::find($experiment_id);
+        $detector = Detector::find($detector_id);
+
+        $runs = Run::of($detector)->in($experiment)->get();
+
+        foreach($runs as $run){
+            $conclusive_reviews = 0;
+            $filtered_misuses = new Collection;
+            foreach ($run->misuses as $misuse) {
+                if ($conclusive_reviews >= $max_reviews) {
+                    break;
+                }
+                $filtered_misuses->add($misuse);
+                if ($misuse->hasConclusiveReviewState() || (!$misuse->hasSufficientReviews() && !$misuse->hasInconclusiveReview())) {
+                    $conclusive_reviews++;
+                }
+            }
+            $run->misuses = $filtered_misuses;
+        }
+
+        return $runs;
     }
 }
