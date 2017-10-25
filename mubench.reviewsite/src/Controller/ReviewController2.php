@@ -110,21 +110,8 @@ class ReviewController2 extends Controller
         $comment = $review['review_comment'];
         $hits = $review['review_hit'];
 
-        $review = Review::firstOrNew(['misuse_id' => $misuse_id, 'reviewer_id' => $reviewer_id]);
-        $review->comment = $comment;
-        $review->save();
+        $this->updateReview($misuse_id, $reviewer_id, $comment, $hits);
 
-        foreach ($hits as $rank => $hit) {
-            $findingReview = FindingReview::firstOrNew(['review_id' => $review->id,'rank' => $rank]);
-            $findingReview->decision = $hit['hit'];
-            $findingReview->save();
-            $this->database2->table('finding_review_types')->where('finding_review_id', $findingReview->id)->delete();
-            if (array_key_exists("types", $hit)) {
-                foreach ($hit['types'] as $type) {
-                   $this->database2->table('finding_review_types')->insert(['finding_review_id' => $findingReview->id, 'type_id' => $type]);
-                }
-            }
-        }
         if ($review["origin"] != "") {
             return $response->withRedirect("{$this->site_base_url}index.php/{$review["origin"]}");
         }else {
@@ -139,5 +126,24 @@ class ReviewController2 extends Controller
         $params = $request->getServerParams();
         $userName = array_key_exists('PHP_AUTH_USER', $params) ? $params['PHP_AUTH_USER'] : "";
         return Reviewer::where('name', $userName)->first();
+    }
+
+    public function updateReview($misuse_id, $reviewer_id, $comment, $hits)
+    {
+        $review = Review::firstOrNew(['misuse_id' => $misuse_id, 'reviewer_id' => $reviewer_id]);
+        $review->comment = $comment;
+        $review->save();
+
+        foreach ($hits as $rank => $hit) {
+            $findingReview = FindingReview::firstOrNew(['review_id' => $review->id, 'rank' => $rank]);
+            $findingReview->decision = $hit['hit'];
+            $findingReview->save();
+            $this->database2->table('finding_review_types')->where('finding_review_id', $findingReview->id)->delete();
+            if (array_key_exists("types", $hit)) {
+                foreach ($hit['types'] as $type) {
+                    $this->database2->table('finding_review_types')->insert(['finding_review_id' => $findingReview->id, 'type_id' => $type]);
+                }
+            }
+        }
     }
 }
