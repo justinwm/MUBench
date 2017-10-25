@@ -30,7 +30,7 @@ class ReviewController2 extends Controller
 
         $user = $this->getUser($request);
         $reviewer = array_key_exists('reviewer_id', $args) ? Reviewer::find($args['reviewer_id']) : $user;
-        $resolution_reviewer = Reviewer::where('name', 'resolution')->first();
+        $resolution_reviewer = Reviewer::firstOrCreate(['name' => 'resolution']);
         $is_reviewer = ($user && $reviewer && $user->id == $reviewer->id) || ($reviewer && $reviewer->id == $resolution_reviewer->id);
 
         $misuse = Misuse::find($misuse_id);
@@ -125,7 +125,7 @@ class ReviewController2 extends Controller
     {
         $params = $request->getServerParams();
         $userName = array_key_exists('PHP_AUTH_USER', $params) ? $params['PHP_AUTH_USER'] : "";
-        return Reviewer::where('name', $userName)->first();
+        return Reviewer::firstOrCreate(['name' => $userName]);
     }
 
     public function updateReview($misuse_id, $reviewer_id, $comment, $hits)
