@@ -3,216 +3,145 @@
 namespace MuBench\ReviewSite\Controller;
 
 
-use MuBench\ReviewSite\DBConnection;
-use MuBench\ReviewSite\Model\Detector;
-use MuBench\ReviewSite\Model\Experiment;
-use MuBench\ReviewSite\Model\Misuse;
-use MuBench\ReviewSite\Model\Review;
+use MuBench\ReviewSite\Models\Detector;
+use MuBench\ReviewSite\Models\Experiment;
+use MuBench\ReviewSite\Models\FindingReview;
+use MuBench\ReviewSite\Models\Misuse;
+use MuBench\ReviewSite\Models\Review;
+use MuBench\ReviewSite\Models\Reviewer;
+use MuBench\ReviewSite\Models\Run;
+use MuBench\ReviewSite\Models\Tag;
+use MuBench\ReviewSite\Models\Type;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Slim\Views\PhpRenderer;
 
-// REFACTOR migrate this to Controller base class
-class ReviewController
+class ReviewController extends Controller
 {
-    /** @var string */
-    private $site_base_url;
-    /** @var string */
-    private $upload_path;
-    /** @var DBConnection */
-    private $db;
-    /** @var PhpRenderer */
-    private $renderer;
-    /** @var MetadataController */
-    private $metadataController;
-    /** @var MisuseTagsController */
-    private $tagsController;
-
-    function __construct($site_base_url, $upload_path, DBConnection $db, PhpRenderer $renderer,
-                         MetadataController $metadataController, MisuseTagsController $tagsController)
+    public function getReview(Request $request, Response $response, array $args)
     {
-        $this->site_base_url = $site_base_url;
-        $this->upload_path = $upload_path;
-        $this->db = $db;
-        $this->renderer = $renderer;
-        $this->metadataController = $metadataController;
-        $this->tagsController = $tagsController;
-    }
+        $experiment_id = $args['experiment_id'];
+        $detector_id = $args['detector_id'];
+        $project_id = $args['project_id'];
+        $version_id = $args['version_id'];
+        $misuse_id = $args['misuse_id'];
 
-    public function get(Request $request, Response $response, array $args)
-    {
-        $experimentId = $args['exp'];
-        $detector = $this->getDetector($args['detector'], $request, $response);
-        $projectId = $args['project'];
-        $versionId = $args['version'];
-        $misuseId = $args['misuse'];
+        $experiment = Experiment::find($experiment_id);
+        $detector = Detector::find($detector_id);
 
         $user = $this->getUser($request);
-        $reviewerName = array_key_exists('reviewer', $args) ? $args['reviewer'] : $user;
-        $is_reviewer = strcmp($user, $reviewerName) == 0 || strcmp($reviewerName, "resolution") == 0;
+        $reviewer = array_key_exists('reviewer_id', $args) ? Reviewer::find($args['reviewer_id']) : $user;
+        $resolution_reviewer = Reviewer::firstOrCreate(['name' => 'resolution']);
+        $is_reviewer = ($user && $reviewer && $user->id == $reviewer->id) || ($reviewer && $reviewer->id == $resolution_reviewer->id);
 
-        $misuse = $this->getMisuse($experimentId, $detector, $projectId, $versionId, $misuseId);
-        $review = $this->getReview($experimentId, $detector, $projectId, $versionId, $misuseId, $reviewerName);
+        $misuse = Misuse::find($misuse_id);
+        $all_violation_types = Type::all();
+        $all_tags = Tag::all();
 
-        // SMELL do we need these getter on the db?
-        $all_violation_types = $this->db->getAllViolationTypes();
-        // SMELL do we need these getter on the db?
-        $all_tags = $this->db->getAllTags();
+        $review = $misuse->getReview($reviewer);
 
-        return $this->render($request, $response, $args, 'review.phtml',
-            ['reviewer' => $reviewerName, 'is_reviewer' => $is_reviewer,
-                'misuse' => $misuse, 'review' => $review,
-                'violation_types' => $all_violation_types, 'tags' => $all_tags]);
+        return $this->renderer->render($response, 'review.phtml', ['reviewer' => $reviewer, 'is_reviewer' => $is_reviewer,
+            'misuse' => $misuse,'experiment' => $experiment,
+            'detector' => $detector, 'review' => $review,
+            'violation_types' => $all_violation_types, 'tags' => $all_tags]);
     }
 
-    function getMisuse($experimentId, Detector $detector, $projectId, $versionId, $misuseId)
+    public function getTodo(Request $request, Response $response, array $args)
     {
-        $metadata = $this->metadataController->getMetadata($experimentId, $detector, $projectId, $versionId, $misuseId);
-        $potentialHits = $this->getPotentialHits($experimentId, $detector, $projectId, $versionId, $misuseId);
-        $tags = $this->tagsController->getTags($experimentId, $detector, $projectId, $versionId, $misuseId);
-        // SMELL misuses don't need their review here
-        return new Misuse($metadata, $potentialHits, [], $tags);
-    }
+        $experiment_id = $args['experiment_id'];
+        $reviewer_id = $args['reviewer_id'];
 
-    /**
-     * @return null|array
-     */
-    private function getPotentialHits($experimentId, Detector $detector, $projectId, $versionId, $misuseId)
-    {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->db->table($detector->getTableName())
-            ->where('exp', $experimentId)->where('project', $projectId)
-            ->where('version', $versionId)->where('misuse', $misuseId)
-            ->orderBy($this->db->raw("`rank` * 1"))->get();
-    }
+        $experiment = Experiment::find($experiment_id);
+        $reviewer = Reviewer::find($reviewer_id);
 
-    function getReview($experimentId, $detector, $projectId, $versionId, $misuseId, $reviewerName)
-    {
-        /** @var array $review */
-        $review = $this->db->table('reviews')->where('exp', $experimentId)->where('detector', $detector->id)
-            ->where('project', $projectId)->where('version', $versionId)->where('misuse', $misuseId)
-            ->where('name', $reviewerName)->first();
-        $review["finding_reviews"] = $this->getFindingReviews($review["id"]);
-        return new Review($review);
-    }
+        $detectors = Detector::withFindings($experiment);
 
-    private function getFindingReviews($reviewId)
-    {
-        /** @var array $finding_reviews */
-        $finding_reviews = $this->db->table('review_findings')->where('review', $reviewId)
-            ->orderBy($this->db->raw("`rank` * 1"))->get();
-
-        foreach ($finding_reviews as &$finding_review) {
-            $violation_types = $this->db->table('review_findings_types')
-                ->innerJoin('types', 'review_findings_types.type', '=', 'types.id')->select('name')
-                ->where('review_finding', $finding_review['id'])->get();
-            // REFACTOR return ['id', 'name'] and adjust template
-            $finding_review["violation_types"] = [];
-            foreach ($violation_types as $violation_type) {
-                $finding_review["violation_types"][] = $violation_type["name"];
+        $open_misuses = [];
+        foreach($detectors as $detector){
+            $runs = Run::of($detector)->in($experiment)->get();
+            foreach($runs as $run){
+                foreach($run->misuses as $misuse){
+                    /** @var Misuse $misuse */
+                    if(!$misuse->hasReviewed($reviewer) && !$misuse->hasSufficientReviews() && $misuse->findings){
+                        $open_misuses[$detector->name][] = $misuse;
+                    }
+                }
             }
+
         }
-        return $finding_reviews;
+        return $this->renderer->render($response, 'todo.phtml', ['open_misuses' => $open_misuses, 'experiment' => $experiment]);
     }
 
-    private function render(Request $request, Response $response, array $args, $template, array $params)
+    public function getOverview(Request $request, Response $response, array $args)
     {
-        $params["user"] = $this->getUser($request);
+        $experiment_id = $args['experiment_id'];
+        $reviewer_id = $args['reviewer_id'];
 
-        $params["site_base_url"] = htmlspecialchars($this->site_base_url);
-        $params["public_url_prefix"] = $params["site_base_url"] . "index.php/";
-        $params["private_url_prefix"] = $params["site_base_url"] . "index.php/private/";
-        $params["api_url_prefix"] = $params["site_base_url"] . "index.php/api/";
-        $params["uploads_url_prefix"] = $params["site_base_url"] . $this->upload_path;
-        $params["url_prefix"] = $params["user"] ? $params["private_url_prefix"] : $params["public_url_prefix"];
+        $experiment = Experiment::find($experiment_id);
+        $reviewer = Reviewer::find($reviewer_id);
 
-        $path = $request->getUri()->getPath();
-        $params["path"] = htmlspecialchars(strcmp($path, "/") === 0 ? "" : $path);
-        $params["origin_param"] = htmlspecialchars("?origin=" . $params["path"]);
-        $params["origin_path"] = htmlspecialchars($request->getQueryParam("origin", ""));
+        $detectors = Detector::withFindings($experiment);
 
-        $params["experiment"] = Experiment::get($args["exp"]);
-        $params["experiments"] = Experiment::all();
-        $params["detector"] = $this->getDetector($args['detector'], $request, $response);
-        $params["detectors"] = [];
-        foreach ($params["experiments"] as $experiment) { /** @var Experiment $experiment */
-            $params["detectors"][$experiment->getId()] = $this->db->getDetectors($experiment->getId());
+        $closed_misuses = [];
+        foreach($detectors as $detector){
+            $runs = Run::of($detector)->in($experiment)->get();
+            foreach($runs as $run){
+                foreach($run->misuses as $misuse){
+                    /** @var Misuse $misuse */
+                    if($misuse->hasReviewed($reviewer)){
+                        $closed_misuses[$detector->name][] = $misuse;
+                    }
+                }
+            }
+
         }
-
-        return $this->renderer->render($response, $template, $params);
+        return $this->renderer->render($response, 'overview.phtml', ['closed_misuses' => $closed_misuses, 'experiment' => $experiment]);
     }
 
-    private function getDetector($detectorName, $request, $response)
+    public function review(Request $request, Response $response, array $args)
     {
-        try{
-            return $this->db->getDetector($detectorName);
-        }catch (\InvalidArgumentException $e){
-            throw new \Slim\Exception\NotFoundException($request, $response);
+        $review = $request->getParsedBody();
+        $experiment_id = $args['experiment_id'];
+        $detector_id = $args['detector_id'];
+        $project_id = $args['project_id'];
+        $version_id = $args['version_id'];
+        $misuse_id = $args['misuse_id'];
+        $reviewer_id = $args['reviewer_id'];
+
+        $comment = $review['review_comment'];
+        $hits = $review['review_hit'];
+
+        $this->updateReview($misuse_id, $reviewer_id, $comment, $hits);
+
+        if ($review["origin"] != "") {
+            return $response->withRedirect("{$this->site_base_url}index.php/{$review["origin"]}");
+        }else {
+            return $response->withRedirect("{$this->site_base_url}index.php/private/experiments/{$experiment_id}/detectors/{$detector_id}/project/{$project_id}/version/{$version_id}/misuse/{$misuse_id}/reviewer/{$reviewer_id}");
         }
+
+
     }
 
     private function getUser(Request $request)
     {
         $params = $request->getServerParams();
-        return array_key_exists('PHP_AUTH_USER', $params) ? $params['PHP_AUTH_USER'] : "";
+        $userName = array_key_exists('PHP_AUTH_USER', $params) ? $params['PHP_AUTH_USER'] : "";
+        return Reviewer::firstOrCreate(['name' => $userName]);
     }
 
-    public function update(Request $request, Response $response, array $args)
+    public function updateReview($misuse_id, $reviewer_id, $comment, $hits)
     {
-        $review = $request->getParsedBody();
+        $review = Review::firstOrNew(['misuse_id' => $misuse_id, 'reviewer_id' => $reviewer_id]);
+        $review->comment = $comment;
+        $review->save();
 
-        // REFACTOR remove 'review_exp' and 'review_detector' from template and use $args here.
-        $experimentId = $review['review_exp'];
-        $detector = $this->getDetector($review['review_detector'], $request, $response);
-        $projectId = $review['review_project'];
-        $versionId = $review['review_version'];
-        $misuseId = $review['review_misuse'];
-        $reviewerName = $review['review_name'];
-        $comment = $review['review_comment'];
-        $hits = $review['review_hit'];
-
-        $this->updateReview($experimentId, $detector, $projectId, $versionId, $misuseId, $reviewerName, $comment, $hits);
-
-        if (strcmp($review["origin"], "") !== 0) {
-            return $response->withRedirect("{$this->site_base_url}index.php/{$review["origin"]}");
-        } else {
-            return $response->withRedirect("{$this->site_base_url}index.php/private/{$args['exp']}/{$args['detector']}");
-        }
-    }
-
-    function updateReview($experimentId, $detector, $projectId, $versionId, $misuseId, $reviewerName, $comment, $hits)
-    {
-        $this->deleteReview($experimentId, $detector, $projectId, $versionId, $misuseId, $reviewerName);
-        $this->saveReview($experimentId, $detector, $projectId, $versionId, $misuseId, $reviewerName, $comment, $hits);
-    }
-
-    private function deleteReview($experimentId, Detector $detector, $projectId, $versionId, $misuseId, $reviewerName)
-    {
-        $review = $review = $this->db->table('reviews')->where('exp', $experimentId)->where('detector', $detector->id)
-            ->where('project', $projectId)->where('version', $versionId)->where('misuse', $misuseId)
-            ->where('name', $reviewerName)->first();
-        if ($review) {
-            $reviewId = intval($review["id"]);
-            $this->db->table('reviews')->where('id', $reviewId)->delete();
-            foreach ($this->getFindingReviews($reviewId) as $findingReview) {
-                $findingId = intval($findingReview['id']);
-                $this->db->table('review_findings')->where('id', $findingId)->delete();
-                $this->db->table('review_findings_types')->where('review_finding', $findingId)->delete();
-            }
-        }
-    }
-
-    private function saveReview($experimentId, Detector $detector, $projectId, $versionId, $misuseId, $reviewerName, $comment, $findingReviews)
-    {
-        $reviewId = $this->db->table('reviews')->insert(['exp' => $experimentId,'detector' => $detector->id,
-            'project' => $projectId, 'version' => $versionId, 'misuse' => $misuseId, 'name' => $reviewerName,
-            'comment' => $comment]);
-        foreach ($findingReviews as $rank => $findingReview) {
-            $findingId = $this->db->table('review_findings')
-                ->insert(['review' => $reviewId, 'rank' => $rank, 'decision' => $findingReview['hit']]);
-            if (array_key_exists("types", $findingReview)) {
-                foreach ($findingReview['types'] as $type) {
-                    $this->db->table('review_findings_types')->insert(['review_finding' => $findingId, 'type' => $type]);
+        foreach ($hits as $rank => $hit) {
+            $findingReview = FindingReview::firstOrNew(['review_id' => $review->id, 'rank' => $rank]);
+            $findingReview->decision = $hit['hit'];
+            $findingReview->save();
+            $this->database2->table('finding_review_types')->where('finding_review_id', $findingReview->id)->delete();
+            if (array_key_exists("types", $hit)) {
+                foreach ($hit['types'] as $type) {
+                    $this->database2->table('finding_review_types')->insert(['finding_review_id' => $findingReview->id, 'type_id' => $type]);
                 }
             }
         }

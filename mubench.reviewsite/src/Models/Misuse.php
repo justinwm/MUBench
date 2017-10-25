@@ -90,7 +90,10 @@ class Misuse extends Model
     // TODO: implement all methods
     public function getViolationTypes()
     {
-        return $this->metadata->violation_types();
+        if($this->metadata){
+           return $this->metadata->violation_types();
+        }
+        return [];
     }
 
     public function getReviews()

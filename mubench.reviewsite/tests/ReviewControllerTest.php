@@ -12,17 +12,15 @@ use SlimTestCase;
 
 class ReviewControllerTest extends SlimTestCase
 {
-    private $detector;
-
     /**
-     * @var ReviewController2 $reviewController
+     * @var ReviewController $reviewController
      */
     private $reviewController;
 
     function setUp()
     {
         parent::setUp();
-        $this->reviewController = new ReviewController2($this->container);
+        $this->reviewController = new ReviewController($this->container);
     }
 
 

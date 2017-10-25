@@ -54,14 +54,14 @@ $markdown_parser = new Parsedown();
 
 <h1>Experiment <?= /* @var Experiment */ $experiment->id ?>: <?= htmlspecialchars($experiment->name) ?></h1>
 <h2>Detector: <?= htmlspecialchars($detector->name); ?></h2>
-<a class="button" href="<?=$public_url_prefix?>download/<?=$experiment->id?>/<?=$detector->name?>"><i class="fa fa-download" aria-hidden="true"> download csv</i></a>
-        <?php if($experiment->id === 2) : ?>
-            <form action="" method="get">
-                <label for="ex2_review_size">Max. Reviews per Project</label>:
-                <input type="text" id="ex2_review_size" name="ex2_review_size" value="<?= $ex2_review_size ?>" />
-                <input type="submit" value="update" />
-            </form>
-        <?php endif; ?>
+<a class="button" href="<?= $pathFor('download.runs', ['experiment_id' => $experiment->id, 'detector_id' => $detector->id]); ?>"><i class="fa fa-download" aria-hidden="true"> download csv</i></a>
+<?php if($experiment->id === 2) : ?>
+    <form action="" method="get">
+        <label for="ex2_review_size">Max. Reviews per Project</label>:
+        <input type="text" id="ex2_review_size" name="ex2_review_size" value="<?= $ex2_review_size ?>" />
+        <input type="submit" value="update" />
+    </form>
+<?php endif; ?>
 <table>
     <thead>
     <tr>

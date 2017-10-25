@@ -19,43 +19,38 @@ $database = $app->getContainer()['database'];
 $renderer = $app->getContainer()['renderer'];
 // REFACTOR rename RoutesHelper to ResultsViewController
 $routesHelper = new RoutesHelper($database, $renderer, $logger, $settings['upload'], $settings['site_base_url'], $settings['default_ex2_review_size']);
-$downloadController = new DownloadController($database, $logger, $settings['default_ex2_review_size']);
 $metadataController = new MetadataController($database, $logger);
-$tagController = new MisuseTagsController($database, $logger, $settings["site_base_url"]);
-$reviewController = new ReviewController($settings["site_base_url"], $settings["upload"],
-    $database, $renderer, $metadataController, $tagController);
+
 
 
 $app->get('/', \MuBench\ReviewSite\Controller\ExperimentsController::class.":index")->setName('/');
 $app->get('/experiments/{experiment_id}/detectors/{detector_id}/runs', \MuBench\ReviewSite\Controller\RunsController::class.":getIndex")->setName('experiment.detector');
-$app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getReview")
+$app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":getReview")
     ->setName('view');
-$app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getReview")
+$app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":getReview")
     ->setName('review');
 $app->get('/reviews', \MuBench\ReviewSite\Controller\StatsController::class.":getResults")->setName('stats.results');
+$app->get('/experiments/{experiment_id}/reviews.csv', \MuBench\ReviewSite\Controller\StatsController::class.":downloadResults")->setName('stats.results.csv');
 $app->get('/tags', \MuBench\ReviewSite\Controller\StatsController::class.":getTags")->setName('stats.tags');
 $app->get('/types', \MuBench\ReviewSite\Controller\StatsController::class.":getTypes")->setName('stats.types');
+$app->get('/experiments/{experiment_id}/detectors/{detector_id}/runs.csv', \MuBench\ReviewSite\Controller\RunsController::class.":downloadRuns")->setName('download.runs');
 
-$app->group('/private', function () use ($app, $routesHelper, $database, $reviewController) {
+$app->group('/private', function () use ($app, $routesHelper, $database) {
     $app->get('/', \MuBench\ReviewSite\Controller\ExperimentsController::class.":index")->setName('private./');
     $app->get('/reviews', \MuBench\ReviewSite\Controller\StatsController::class.":getResults")->setName('private.stats.results');
+    $app->get('/experiments/{experiment_id}/reviews.csv', \MuBench\ReviewSite\Controller\StatsController::class.":downloadResults")->setName('private.stats.results.csv');
     $app->get('/tags', \MuBench\ReviewSite\Controller\StatsController::class.":getTags")->setName('private.stats.tags');
     $app->get('/types', \MuBench\ReviewSite\Controller\StatsController::class.":getTypes")->setName('private.stats.types');
     $app->get('/experiments/{experiment_id}/detectors/{detector_id}/runs', \MuBench\ReviewSite\Controller\RunsController::class.":getIndex")->setName('private.experiment.detector');
-    $app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getReview")
+    $app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":getReview")
         ->setName('private.view');
-    $app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":getReview")->setName('private.review');
-    $app->get('/experiments/{experiment_id}/reviews/{reviewer_id}/open', \MuBench\ReviewSite\Controller\ReviewController2::class.":getTodo")->setName('private.todo');
-    $app->get('/experiments/{experiment_id}/reviews/{reviewer_id}/closed', \MuBench\ReviewSite\Controller\ReviewController2::class.":getOverview")->setName('private.overview');
+    $app->get('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":getReview")->setName('private.review');
+    $app->get('/experiments/{experiment_id}/reviews/{reviewer_id}/open', \MuBench\ReviewSite\Controller\ReviewController::class.":getTodo")->setName('private.todo');
+    $app->get('/experiments/{experiment_id}/reviews/{reviewer_id}/closed', \MuBench\ReviewSite\Controller\ReviewController::class.":getOverview")->setName('private.overview');
+    $app->get('/experiments/{experiment_id}/detectors/{detector_id}/runs.csv', \MuBench\ReviewSite\Controller\RunsController::class.":downloadRuns")->setName('private.download.runs');
 })->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
 
-$app->group('/download', function () use ($app, $downloadController, $database) {
-    $app->get('/{exp:ex[1-3]}/stats', [$downloadController, 'download_stats']);
-    $app->get('/{exp:ex[1-3]}/{detector}', [$downloadController, 'download_run_stats']);
-});
-
-
-$app->group('/api/upload', function () use ($app, $settings, $database, $tagController, $metadataController, $reviewController) {
+$app->group('/api/upload', function () use ($app, $settings, $database, $metadataController) {
     $app->post('/[{experiment:ex[1-3]}]',
         function (Request $request, Response $response, array $args) use ($settings, $database) {
             $experiment = $args['experiment'];
@@ -94,20 +89,7 @@ $app->group('/api/upload', function () use ($app, $settings, $database, $tagCont
     // REFACTOR migrate to /metadata/{project}/{version}/{misuse}/update
     $app->post('/metadata', [$metadataController, "update"]);
     // REFACTOR migrate to /reviews/{exp}/{detector}/{project}/{version}/{misuse}/{reviewerName}/update
-    $app->post('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController2::class.":review")->setName('private.update.review');
-
-    $app->post('/delete/snippet/{exp:ex[1-3]}/{detector}',
-        function (Request $request, Response $response, array $args) use ($database, $settings) {
-            $obj = $request->getParsedBody();
-            $site_base_url = $settings['site_base_url'];
-            $uploader = new SnippetUploader($database, $this->logger);
-            $uploader->deleteSnippet($obj['id']);
-            if (strcmp($obj["path"], "") !== 0) {
-                return $response->withRedirect("{$site_base_url}index.php/{$obj["path"]}");
-            } else {
-                return $response->withRedirect("{$site_base_url}index.php/private/{$args['exp']}/{$args['detector']}");
-            }
-        });
+    $app->post('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":review")->setName('private.update.review');
 
     // REFACTOR migrate this route to /tags/{exp}/{detector}/{project}/{version}/{misuse}/{tagname}/add
     $app->post('/tag',\MuBench\ReviewSite\Controller\TagController::class.":add");
