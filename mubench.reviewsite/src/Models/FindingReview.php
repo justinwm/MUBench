@@ -18,6 +18,6 @@ class FindingReview extends Model
 
     public function violation_types()
     {
-        return $this->belongsToMany(Type::class, 'finding_review_types', 'type_id', 'finding_review_id');
+        return $this->belongsToMany(Type::class, 'finding_review_types', 'finding_review_id', 'type_id');
     }
 }
