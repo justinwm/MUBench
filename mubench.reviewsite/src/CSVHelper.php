@@ -5,17 +5,18 @@ namespace MuBench\ReviewSite;
 class CSVHelper
 {
 
-    public function exportStatistics($experiment, $stats)
+    public static function exportStatistics($experiment, $stats)
     {
+        $rows = [];
         foreach ($stats as $stat) {
             $row = [];
             $row["detector"] = $stat->getDisplayName();
             $row["project"] = $stat->number_of_projects;
 
-            if (strcmp($experiment, "ex1") === 0) {
+            if ($experiment->id === 1) {
                 $row["synthetics"] = $stat->number_of_synthetics;
             }
-            if (strcmp($experiment, "ex1") === 0 || strcmp($experiment, "ex3") === 0) {
+            if ($experiment->id === 1 || $experiment->id === 3) {
                 $row["misuses"] = $stat->number_of_misuses;
             }
 
@@ -33,7 +34,7 @@ class CSVHelper
             $row["kappa_score"] = $stat->getKappaScore();
             $row["hits"] = $stat->number_of_hits;
 
-            if (strcmp($experiment, "ex2") === 0) {
+            if ($experiment->id === 2) {
                 $row["precision"] = $stat->getPrecision();
             } else {
                 $row["recall"] = $stat->getRecall();
@@ -41,20 +42,21 @@ class CSVHelper
 
             $rows[] = $row;
         }
-        return $this->createCSV($rows);
+        return CSVHelper::createCSV($rows);
     }
 
-    public function exportRunStatistics($runs)
+    public static function exportRunStatistics($runs)
     {
+        $rows = [];
         foreach ($runs as $run) {
             $run_details = [];
-            $run_details["project"] = $run["project"];
-            $run_details["version"] = $run["version"];
-            $run_details["result"] = $run["result"];
-            $run_details["number_of_findings"] = $run["number_of_findings"];
-            $run_details["runtime"] = $run["runtime"];
+            $run_details["project"] = $run->project_muid;
+            $run_details["version"] = $run->version_muid;
+            $run_details["result"] = $run->result;
+            $run_details["number_of_findings"] = $run->number_of_findings;
+            $run_details["runtime"] = $run->runtime;
 
-            foreach ($run['misuses'] as $misuse) {
+            foreach ($run->misuses as $misuse) {
                 $row = $run_details;
 
                 $row["misuse"] = $misuse->id;
@@ -62,7 +64,7 @@ class CSVHelper
                 if ($misuse->hasResolutionReview()) {
                     $resolution = $misuse->getResolutionReview();
                     $row["resolution_decision"] = $resolution->getDecision();
-                    $row["resolution_comment"] = $this->escapeText($resolution->getComment());
+                    $row["resolution_comment"] = CSVHelper::escapeText($resolution->comment);
                 } else {
                     $row["resolution_decision"] = "";
                     $row["resolution_comment"] = "";
@@ -72,9 +74,9 @@ class CSVHelper
                 $review_index = 0;
                 foreach ($reviews as $review) {
                     $review_index++;
-                    $row["review{$review_index}_name"] = $review->getReviewerName();
+                    $row["review{$review_index}_name"] = $review->reviewer->name;
                     $row["review{$review_index}_decision"] = $review->getDecision();
-                    $row["review{$review_index}_comment"] = $this->escapeText($review->getComment());
+                    $row["review{$review_index}_comment"] = CSVHelper::escapeText($review->comment);
                 }
 
                 $rows[] = $row;
@@ -83,11 +85,11 @@ class CSVHelper
                 $rows[] = $run_details;
             }
         }
-        return $this->createCSV($rows);
+        return CSVHelper::createCSV($rows);
     }
 
 
-    private function createCSV($rows)
+    private static function createCSV($rows)
     {
         $lines = [];
         $header = [];
@@ -104,7 +106,7 @@ class CSVHelper
         return implode("\n", $lines);
     }
 
-    private function escapeText($text){
+    private static function escapeText($text){
         return "\"" . $text . "\"";
     }
 
