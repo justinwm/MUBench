@@ -9,6 +9,7 @@ class Reviewer extends Model
 {
 
     public $timestamps = false;
+    protected $fillable = ['name'];
 
     public function reviews()
     {
