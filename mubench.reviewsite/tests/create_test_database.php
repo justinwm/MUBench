@@ -220,13 +220,16 @@ Schema::create($pattern->getTable(), function(Blueprint $table){
    $table->increments('id');
    $table->integer('metadata_id');
    $table->text('code');
+   $table->text('line');
 });
 $pattern->metadata_id = 1;
 $pattern->code = "m(A){\n\ta(A);\n}";
+$pattern->line = 10;
 $pattern->save();
 $pattern = new \MuBench\ReviewSite\Models\Pattern;
 $pattern->metadata_id = 2;
 $pattern->code = "m(A){\n\ta(A);\n}";
+$pattern->line = 10;
 $pattern->save();
 
 echo 'Creating misuses<br/>';
