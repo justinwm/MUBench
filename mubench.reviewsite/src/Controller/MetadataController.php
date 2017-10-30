@@ -46,13 +46,19 @@ class MetadataController extends Controller
 
     private function saveMetadata($projectId, $versionId, $misuseId, $description, $fix, $location)
     {
-        return Metadata::firstOrCreate(['project_muid' => $projectId, 'version_muid' => $versionId, 'misuse_muid' => $misuseId,
-            'description' => $description, 'fix_description' => $fix['description'],
-            'diff_url' => $fix['diff-url'], 'file' => $location['file'], 'method' => $location['method']]);
+        $metadata = Metadata::firstOrCreate(['project_muid' => $projectId, 'version_muid' => $versionId, 'misuse_muid' => $misuseId]);
+        $metadata->description = $description;
+        $metadata->fix_description = $fix['description'];
+        $metadata->diff_url = $fix['diff-url'];
+        $metadata->file = $location['file'];
+        $metadata->method = $location['method'];
+        $metadata->save();
+        return $metadata;
     }
 
     private function saveViolationTypes($metadataId, $violationTypes)
     {
+        // TODO: DELETE OLD METADATA_TYPES ?
         foreach ($violationTypes as $type_name) {
             $violation_type = Type::firstOrCreate(['name' => $type_name]);
             $this->database2->table('metadata_types')->insert(array('metadata_id' => $metadataId, 'type_id' => $violation_type->id));
