@@ -46,7 +46,7 @@ class MetadataController extends Controller
 
     private function saveMetadata($projectId, $versionId, $misuseId, $description, $fix, $location)
     {
-        $metadata = Metadata::firstOrCreate(['project_muid' => $projectId, 'version_muid' => $versionId, 'misuse_muid' => $misuseId]);
+        $metadata = Metadata::firstOrNew(['project_muid' => $projectId, 'version_muid' => $versionId, 'misuse_muid' => $misuseId]);
         $metadata->description = $description;
         $metadata->fix_description = $fix['description'];
         $metadata->diff_url = $fix['diff-url'];
