@@ -7,7 +7,7 @@ require_once "SlimTestCase.php";
 use MuBench\ReviewSite\Models\Metadata;
 use SlimTestCase;
 
-class StoreMetadataTest extends SlimTestCase
+class MetadataControllerTest extends SlimTestCase
 {
     /** @var MetadataController */
     private $metadataController;

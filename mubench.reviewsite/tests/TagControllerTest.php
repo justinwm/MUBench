@@ -7,7 +7,7 @@ use MuBench\ReviewSite\Model\Detector;
 use MuBench\ReviewSite\Models\Misuse;
 use SlimTestCase;
 
-class TagMisusesTest extends SlimTestCase
+class TagControllerTest extends SlimTestCase
 {
     /** @var TagController */
     private $tagController;
