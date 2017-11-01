@@ -47,7 +47,7 @@ class Misuse extends Model
 
     public function snippets()
     {
-        return $this->hasMany(Snippet::class);
+        return Snippet::where(['project_muid'=> $this->getProject(), 'version_muid' => $this->getVersion(), 'misuse_muid' => $this->misuse_muid], '=')->get();
     }
 
     public function getFile()
@@ -129,7 +129,7 @@ class Misuse extends Model
     }
 
     public function hasSnippets(){
-        return $this->snippets;
+        return sizeof($this->snippets()) > 0;
     }
 
     public function getReviewState()

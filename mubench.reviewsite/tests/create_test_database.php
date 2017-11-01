@@ -4,11 +4,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 
-
 echo 'Creating experiments<br/>';
 $experiment = new \MuBench\ReviewSite\Models\Experiment;
 Schema::dropIfExists($experiment->getTable());
-Schema::create($experiment->getTable(), function(Blueprint $table) {
+Schema::create($experiment->getTable(), function (Blueprint $table) {
     $table->increments('id');
     $table->string('name', 100);
 });
@@ -26,7 +25,7 @@ $experiment3->save();
 
 echo 'Creating detectors table<br/>';
 Schema::dropIfExists('detectors');
-Schema::create('detectors', function(Blueprint $table) {
+Schema::create('detectors', function (Blueprint $table) {
     $table->increments('id');
     $table->string('name', 100);
 });
@@ -40,7 +39,7 @@ echo 'Creating runs table<br/>';
 $run = new \MuBench\ReviewSite\Models\Run;
 $run->setDetector($detector);
 Schema::dropIfExists($run->getTable());
-Schema::create($run->getTable(), function(Blueprint $table) {
+Schema::create($run->getTable(), function (Blueprint $table) {
     $table->increments('id');
     $table->integer('experiment_id');
     $table->string('project_muid', 30);
@@ -97,7 +96,7 @@ echo 'Creating findings<br/>';
 $finding = new \MuBench\ReviewSite\Models\Finding;
 $finding->setDetector($detector);
 Schema::dropIfExists($finding->getTable());
-Schema::create($finding->getTable(), function(Blueprint $table) {
+Schema::create($finding->getTable(), function (Blueprint $table) {
     $table->increments('id');
     $table->integer('experiment_id');
     $table->integer('misuse_id');
@@ -149,17 +148,47 @@ $finding->additional_column = 'test_column';
 $finding->file = 'Test.java';
 $finding->method = "method(A)";
 $finding->save();
+$finding = new \MuBench\ReviewSite\Models\Finding;
+$finding->setDetector($detector);
+$finding->experiment_id = $experiment2->id;
+$finding->misuse_id = 4;
+$finding->project_muid = 'mubench';
+$finding->version_muid = '42';
+$finding->misuse_muid = '2';
+$finding->startline = 113;
+$finding->rank = 1;
+$finding->additional_column = 'test_column';
+$finding->file = 'Test.java';
+$finding->method = "method(A)";
+$finding->save();
+$finding = new \MuBench\ReviewSite\Models\Finding;
+$finding->setDetector($detector);
+$finding->experiment_id = $experiment2->id;
+$finding->misuse_id = 5;
+$finding->project_muid = 'mubench';
+$finding->version_muid = '42';
+$finding->misuse_muid = '3';
+$finding->startline = 113;
+$finding->rank = 1;
+$finding->additional_column = 'test_column';
+$finding->file = 'Test.java';
+$finding->method = "method(A)";
+$finding->save();
 
 echo 'Creating finding snippet<br/>';
 $snippet = new \MuBench\ReviewSite\Models\Snippet;
 Schema::dropIfExists($snippet->getTable());
-Schema::create($snippet->getTable(), function( Blueprint $table){
-   $table->increments('id');
-   $table->integer('misuse_id');
-   $table->integer('line');
-   $table->text('snippet');
+Schema::create($snippet->getTable(), function (Blueprint $table) {
+    $table->increments('id');
+    $table->string('project_muid', 30);
+    $table->string('version_muid', 30);
+    $table->string('misuse_muid', 30);
+    $table->integer('line');
+    $table->text('snippet');
 });
-$snippet->misuse_id = 1;
+$snippet->project_muid = 'mubench';
+$snippet->version_muid = '42';
+$snippet->misuse_muid = '1';
 $snippet->line = 112;
 $snippet->snippet = "test snippet\ntest";
 $snippet->save();
@@ -168,7 +197,7 @@ $snippet->save();
 echo 'Creating misuses (metadata)<br/>';
 $metadata = new \MuBench\ReviewSite\Models\Metadata;
 Schema::dropIfExists($metadata->getTable());
-Schema::create($metadata->getTable(), function(Blueprint $table) {
+Schema::create($metadata->getTable(), function (Blueprint $table) {
     $table->increments('id');
     $table->string('project_muid', 30);
     $table->string('version_muid', 30);
@@ -216,11 +245,11 @@ $metadata->save();
 echo 'Creating pattern<br/>';
 $pattern = new \MuBench\ReviewSite\Models\Pattern;
 Schema::dropIfExists($pattern->getTable());
-Schema::create($pattern->getTable(), function(Blueprint $table){
-   $table->increments('id');
-   $table->integer('metadata_id');
-   $table->text('code');
-   $table->text('line');
+Schema::create($pattern->getTable(), function (Blueprint $table) {
+    $table->increments('id');
+    $table->integer('metadata_id');
+    $table->text('code');
+    $table->text('line');
 });
 $pattern->metadata_id = 1;
 $pattern->code = "m(A){\n\ta(A);\n}";
@@ -235,7 +264,7 @@ $pattern->save();
 echo 'Creating misuses<br/>';
 $misuse = new \MuBench\ReviewSite\Models\Misuse;
 Schema::dropIfExists($misuse->getTable());
-Schema::create($misuse->getTable(), function(Blueprint $table) {
+Schema::create($misuse->getTable(), function (Blueprint $table) {
     $table->increments('id');
     $table->integer('metadata_id')->nullable();
     $table->integer('detector_id');
@@ -275,7 +304,7 @@ $misuse->save();
 echo 'Creating review<br/>';
 $review = new \MuBench\ReviewSite\Models\Review;
 Schema::dropIfExists($review->getTable());
-Schema::create($review->getTable(), function(Blueprint $table){
+Schema::create($review->getTable(), function (Blueprint $table) {
     $table->increments('id');
     $table->integer('misuse_id');
     $table->integer('reviewer_id');
@@ -307,7 +336,7 @@ $review->save();
 echo 'Creating reviewer<br/>';
 $reviewer = new \MuBench\ReviewSite\Models\Reviewer;
 Schema::dropIfExists($reviewer->getTable());
-Schema::create($reviewer->getTable(), function(Blueprint $table){
+Schema::create($reviewer->getTable(), function (Blueprint $table) {
     $table->increments('id');
     $table->text('name');
 });
@@ -331,7 +360,7 @@ $reviewer->save();
 echo 'Creating finding reviews<br/>';
 $findingReview = new \MuBench\ReviewSite\Models\FindingReview;
 Schema::dropIfExists($findingReview->getTable());
-Schema::create($findingReview->getTable(), function(Blueprint $table){
+Schema::create($findingReview->getTable(), function (Blueprint $table) {
     $table->increments('id');
     $table->integer('review_id');
     $table->text('decision');
@@ -361,16 +390,16 @@ $findingReview->save();
 echo 'Creating Violation Types<br/>';
 $type = new \MuBench\ReviewSite\Models\Type;
 Schema::dropIfExists($type->getTable());
-Schema::create($type->getTable(), function(Blueprint $table){
-   $table->increments('id');
-   $table->text('name');
+Schema::create($type->getTable(), function (Blueprint $table) {
+    $table->increments('id');
+    $table->text('name');
 });
 $type->name = 'missing/call';
 $type->save();
 
 echo 'Creating Violation Types for metadata misuses<br/>';
 Schema::dropIfExists('metadata_types');
-Schema::create('metadata_types', function (Blueprint $table){
+Schema::create('metadata_types', function (Blueprint $table) {
     $table->increments('id');
     $table->integer('metadata_id');
     $table->integer('type_id');
@@ -379,7 +408,7 @@ $capsule->table('metadata_types')->insert(array('metadata_id' => 1, 'type_id' =>
 
 echo 'Creating Violation Types for finding review<br/>';
 Schema::dropIfExists('finding_review_types');
-Schema::create('finding_review_types', function (Blueprint $table){
+Schema::create('finding_review_types', function (Blueprint $table) {
     $table->increments('id');
     $table->integer('finding_review_id');
     $table->integer('type_id');
@@ -390,9 +419,9 @@ $capsule->table('finding_review_types')->insert(array('finding_review_id' => 1, 
 echo 'Creating Tags<br/>';
 $tag = new \MuBench\ReviewSite\Models\Tag;
 Schema::dropIfExists($tag->getTable());
-Schema::create($tag->getTable(), function(Blueprint $table){
-   $table->increments('id');
-   $table->text('name');
+Schema::create($tag->getTable(), function (Blueprint $table) {
+    $table->increments('id');
+    $table->text('name');
 });
 $tag->name = 'test-dataset';
 $tag->save();
@@ -402,11 +431,11 @@ $tag->save();
 
 echo 'Creating MisuseTag<br/>';
 Schema::dropIfExists('misuse_tags');
-Schema::create('misuse_tags', function(Blueprint $table){
-   $table->increments('id');
-   $table->integer('misuse_id');
-   $table->integer('tag_id');
-   $table->unique(['tag_id', 'misuse_id']);
+Schema::create('misuse_tags', function (Blueprint $table) {
+    $table->increments('id');
+    $table->integer('misuse_id');
+    $table->integer('tag_id');
+    $table->unique(['tag_id', 'misuse_id']);
 });
 $capsule->table('misuse_tags')->insert(array('misuse_id' => 3, 'tag_id' => 1));
 $capsule->table('misuse_tags')->insert(array('misuse_id' => 1, 'tag_id' => 2));

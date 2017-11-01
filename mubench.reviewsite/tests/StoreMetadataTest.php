@@ -27,8 +27,8 @@ class StoreMetadataTest extends SlimTestCase
             [['id' => '-p1-', 'snippet' => ['code' => '-pattern-code-', 'first_line' => 42]]],
             [['code' => '-target-snippet-code-', 'first_line_number' => 273]]);
 
-        $metadata = Metadata::where('project_muid', '-p-')->where('version_muid', '-v-')->where('misuse_muid', '-m-')->first();
 
+        $metadata = Metadata::where(['project_muid'=> '-p-', 'version_muid' => '-v-', 'misuse_muid' => '-m-'], '=')->first();
         self::assertEquals('-p-', $metadata->project_muid);
         self::assertEquals('-v-', $metadata->version_muid);
         self::assertEquals('-m-', $metadata->misuse_muid);
