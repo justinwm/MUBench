@@ -9,11 +9,10 @@ class Tag extends Model
 {
 
     protected $fillable = ['name'];
+    public $timestamps = false;
 
     public function misuses()
     {
         return $this->belongsToMany(Misuse::class, 'misuse_tags', 'tag_id', 'misuse_id');
     }
-
-    public $timestamps = false;
 }

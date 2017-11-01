@@ -9,6 +9,9 @@ use MuBench\ReviewSite\Model\ReviewState;
 
 class Misuse extends Model
 {
+
+    protected $fillable = ['misuse_muid', 'run_id', 'detector_id', 'metadata_id'];
+
     public function metadata()
     {
         return $this->belongsTo(Metadata::class);

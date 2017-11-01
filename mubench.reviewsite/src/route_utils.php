@@ -16,8 +16,7 @@ function decodeJsonBody(Request $request) {
     return $body;
 }
 
-function error_response(Response $response, Logger $logger, $code, $message) {
-    $logger->error($message);
+function error_response(Response $response, $code, $message) {
     return $response->withStatus($code)->write($message);
 }
 

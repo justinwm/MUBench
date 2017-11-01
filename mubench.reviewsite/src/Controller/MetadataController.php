@@ -7,6 +7,7 @@ use MuBench\ReviewSite\DBConnection;
 use MuBench\ReviewSite\Model\Detector;
 use MuBench\ReviewSite\Models\Metadata;
 use MuBench\ReviewSite\Models\Pattern;
+use MuBench\ReviewSite\Models\Snippet;
 use MuBench\ReviewSite\Models\Type;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -18,7 +19,7 @@ class MetadataController extends Controller
     {
         $metadata = decodeJsonBody($request);
         if (!$metadata) {
-            return error_response($response, $this->logger, 400, 'empty: ' . print_r($request->getBody(), true));
+            return error_response($response,400, 'empty: ' . print_r($request->getBody(), true));
         }
         foreach ($metadata as $misuseMetadata) {
             $projectId = $misuseMetadata['project'];
@@ -58,7 +59,7 @@ class MetadataController extends Controller
 
     private function saveViolationTypes($metadataId, $violationTypes)
     {
-        // TODO: DELETE OLD METADATA_TYPES ?
+        $this->database2->table('metadata_types')->where('metadata_id', '=', $metadataId)->delete();
         foreach ($violationTypes as $type_name) {
             $violation_type = Type::firstOrCreate(['name' => $type_name]);
             $this->database2->table('metadata_types')->insert(array('metadata_id' => $metadataId, 'type_id' => $violation_type->id));
@@ -67,22 +68,25 @@ class MetadataController extends Controller
 
     private function savePatterns($metadataId, $patterns)
     {
-        // TODO: DELETE PATTERTNS ?
         if ($patterns) {
             foreach ($patterns as $pattern) {
-                Pattern::firstOrCreate(['metadata_id' => $metadataId, 'code' => $pattern['snippet']['code'], 'line' => $pattern['snippet']['first_line']]);
+                $p = Pattern::firstOrNew(['metadata_id' => $metadataId]);
+                $p->code = $pattern['snippet']['code'];
+                $p->line = $pattern['snippet']['first_line'];
+                $p->save();
             }
         }
     }
 
     private function saveTargetSnippets($misuseId, $projectId, $versionId, $targetSnippets)
     {
-        // TODO: ???
-       /* if ($targetSnippets) {
+        if ($targetSnippets) {
             foreach ($targetSnippets as $snippet) {
-                $this->db->table('meta_snippets')->insert(['project' => $projectId, 'version' => $versionId,
-                    'misuse' => $misuseId, 'snippet' => $snippet['code'], 'line' => $snippet['first_line_number']]);
+                $s = Snippet::firstOrNew(['project_muid' => $projectId, 'version_muid' => $versionId, 'misuse_muid' => $misuseId]);
+                $s->snippet = $snippet['code'];
+                $s->line = $snippet['first_line_number'];
+                $s->save();
             }
-        }*/
+        }
     }
 }

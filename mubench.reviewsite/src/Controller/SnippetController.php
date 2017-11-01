@@ -19,16 +19,32 @@ class SnippetController extends Controller
     public function add(Request $request, Response $response, array $args)
     {
         $form = $request->getParsedBody();
-        Snippet::create(['snippet'=> $form['snippet'], 'line' => $form['line'], 'misuse_id' => $form['misuse_id']]);
+        $projectId = $args['project_muid'];
+        $versionId = $args['version_muid'];
+        $misuseId = $args['misuse_muid'];
+        $code = $form['snippet'];
+        $line = $form['line'];
+        $this->createSnippet($projectId, $versionId, $misuseId, $code, $line);
         return $response->withRedirect("{$this->site_base_url}index.php/{$form['path']}");
     }
 
     public function remove(Request $request, Response $response, array $args)
     {
         $form = $request->getParsedBody();
-        $snippet = Snippet::find($args['snippet_id']);
-        $snippet->delete();
+        $snippetId = $args['snippet_id'];
+        $this->deleteSnippet($snippetId);
         return $response->withRedirect("{$this->site_base_url}index.php/{$form['path']}");
+    }
+
+    function deleteSnippet($snippetId)
+    {
+        $snippet = Snippet::find($snippetId);
+        $snippet->delete();
+    }
+
+    function createSnippet($projectId, $versionId, $misuseId, $code, $line)
+    {
+        Snippet::create(['snippet'=> $code, 'line' => $line, 'misuse_muid' => $misuseId, 'project_muid' => $projectId, 'version_muid' => $versionId]);
     }
 
 }

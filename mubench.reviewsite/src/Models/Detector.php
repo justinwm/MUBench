@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Detector extends Model
 {
     public $timestamps = false;
+    protected $fillable = ['name'];
 
     public static function withFindings(Experiment $experiment)
     {
