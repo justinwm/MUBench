@@ -95,7 +95,7 @@ use MuBench\ReviewSite\Models\Experiment;
                                 <span><?= htmlspecialchars($tag->name) ?></span>
                                 <?php if($user) : ?>
                                 <div style="display:inline-block;padding-right:2px;margin:0;color:black">
-                                    <form action="<?= "{$api_url_prefix}upload/delete/tag"?>" method="post" target="">
+                                    <form action="<?= $pathFor('tag.remove') ?>" method="post" target="">
                                         <input type="hidden" name="misuse_id" value="<?= htmlspecialchars($misuse->id); ?>">
                                         <input type="hidden" name="tag_id" value="<?= htmlspecialchars($tag->id); ?>">
                                         <input type="hidden" name="path" value="<?= htmlspecialchars($path); ?>">
@@ -108,7 +108,7 @@ use MuBench\ReviewSite\Models\Experiment;
                     <?php endif; ?>
                     <?php if($user) : ?>
                             <div style="display:inline-block;height:100%;padding:4px;">
-                                <form id="tag-form" action="<?= $api_url_prefix ?>upload/tag" method="post" target="">
+                                <form id="tag-form" action="<?= $pathFor('tag.add') ?>" method="post" target="">
                                     <input type="hidden" name="misuse_id" value="<?= htmlspecialchars($misuse->id); ?>">
                                     <input type="hidden" name="path" value="<?= htmlspecialchars($path); ?>">
                                     <input id="tag-input" class="tag-input" maxlength="100" list="tags" name="tag_name" placeholder="add new tag" autocomplete="off">
@@ -305,9 +305,9 @@ use MuBench\ReviewSite\Models\Experiment;
             <?php endforeach; ?>
             <?php if($experiment->id === 2) : ?>
                 <td>
-                    <select name="review_hit[<?= htmlspecialchars($hit['rank']); ?>][types][]" title="Violation Types" size="<?= count($violation_types) ?>" multiple <?= ($user && $is_reviewer) ? "" : "disabled" ?>>
+                    <select name="review_hit[<?= htmlspecialchars($hit->rank); ?>][types][]" title="Violation Types" size="<?= count($violation_types) ?>" multiple <?= ($user && $is_reviewer) ? "" : "disabled" ?>>
                         <?php foreach($violation_types as $type) : ?>
-                            <?php if($review && in_array($type->name, $review->getHitViolationTypes($hit->rank))) : ?>
+                            <?php if($review && in_array($type->id, array_column($review->getHitViolationTypes($hit->rank), 'id'))) : ?>
                                     <option selected="selected" value="<?= $type->id ?>"><?= htmlspecialchars($type->name) ?></option>
                             <?php else: ?>
                                 <option value="<?= $type->id ?>"><?= htmlspecialchars($type->name) ?></option>

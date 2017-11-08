@@ -18,8 +18,6 @@ require_once "route_utils.php";
 $logger = $app->getContainer()['logger'];
 $database = $app->getContainer()['database'];
 $renderer = $app->getContainer()['renderer'];
-// REFACTOR rename RoutesHelper to ResultsViewController
-$routesHelper = new RoutesHelper($database, $renderer, $logger, $settings['upload'], $settings['site_base_url'], $settings['default_ex2_review_size']);
 
 $app->get('/', \MuBench\ReviewSite\Controller\ExperimentsController::class.":index")->setName('/');
 $app->get('/experiments/{experiment_id}/detectors/{detector_id}/runs', \MuBench\ReviewSite\Controller\RunsController::class.":getIndex")->setName('experiment.detector');
@@ -33,7 +31,7 @@ $app->get('/tags', \MuBench\ReviewSite\Controller\StatsController::class.":getTa
 $app->get('/types', \MuBench\ReviewSite\Controller\StatsController::class.":getTypes")->setName('stats.types');
 $app->get('/experiments/{experiment_id}/detectors/{detector_id}/runs.csv', \MuBench\ReviewSite\Controller\RunsController::class.":downloadRuns")->setName('download.runs');
 
-$app->group('/private', function () use ($app, $routesHelper, $database) {
+$app->group('/private', function () use ($app) {
     $app->get('/', \MuBench\ReviewSite\Controller\ExperimentsController::class.":index")->setName('private./');
     $app->get('/reviews', \MuBench\ReviewSite\Controller\StatsController::class.":getResults")->setName('private.stats.results');
     $app->get('/experiments/{experiment_id}/reviews.csv', \MuBench\ReviewSite\Controller\StatsController::class.":downloadResults")->setName('private.stats.results.csv');
@@ -48,9 +46,13 @@ $app->group('/private', function () use ($app, $routesHelper, $database) {
     $app->get('/experiments/{experiment_id}/detectors/{detector_id}/runs.csv', \MuBench\ReviewSite\Controller\RunsController::class.":downloadRuns")->setName('private.download.runs');
 })->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
 
-$app->group('/api/upload', function () use ($app, $settings, $database) {
+$app->group('', function () use ($app, $settings) {
+    $app->post('/metadata', \MuBench\ReviewSite\Controller\MetadataController::class.":update");
+    $app->post('/tag',\MuBench\ReviewSite\Controller\TagController::class.":add")->setName('private.tag.add');
+    $app->post('/delete/tag', \MuBench\ReviewSite\Controller\TagController::class.":remove")->setName('private.tag.remove');
+
     $app->post('/[{experiment_id}]',
-        function (Request $request, Response $response, array $args) use ($settings, $database) {
+        function (Request $request, Response $response, array $args) use ($settings) {
             $experimentId = $args['experiment_id'];
             $run = decodeJsonBody($request);
             if (!$run) {
@@ -84,18 +86,12 @@ $app->group('/api/upload', function () use ($app, $settings, $database) {
             return $response->withStatus(200);
         });
 
-    // REFACTOR migrate to /metadata/{project}/{version}/{misuse}/update
-    $app->post('/metadata', \MuBench\ReviewSite\Controller\MetadataController::class.":update");
-    // REFACTOR migrate to /reviews/{exp}/{detector}/{project}/{version}/{misuse}/{reviewerName}/update
-    $app->post('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":review")->setName('private.update.review');
+    $app->group('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}', function() use ($app) {
+        $app->post('/reviewer/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":review")->setName('private.update.review');
+        $app->post('/snippet',
+            \MuBench\ReviewSite\Controller\SnippetController::class.":add")->setName('private.snippet.add');
+        $app->post('/snippet/{snippet_id}',
+            \MuBench\ReviewSite\Controller\SnippetController::class.":remove")->setName('private.snippet.remove');
+    });
 
-    // REFACTOR migrate this route to /tags/{exp}/{detector}/{project}/{version}/{misuse}/{tagname}/add
-    $app->post('/tag',\MuBench\ReviewSite\Controller\TagController::class.":add");
-    // REFACTOR migrate this route to /tags/{exp}/{detector}/{project}/{version}/{misuse}/{tagname}/delete
-    $app->post('/delete/tag', \MuBench\ReviewSite\Controller\TagController::class.":remove");
-
-    $app->post('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/snippet',
-        \MuBench\ReviewSite\Controller\SnippetController::class.":add")->setName('private.snippet.add');
-    $app->post('/experiments/{experiment_id}/detectors/{detector_id}/project/{project_id}/version/{version_id}/misuse/{misuse_id}/snippet/{snippet_id}',
-        \MuBench\ReviewSite\Controller\SnippetController::class.":remove")->setName('private.snippet.remove');
 })->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
