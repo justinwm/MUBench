@@ -1,8 +1,6 @@
 <?php
 
-namespace MuBench\ReviewSite\Model;
-
-use MuBench\ReviewSite\Models\Misuse;
+namespace MuBench\ReviewSite\Models;
 
 abstract class RunsResult
 {

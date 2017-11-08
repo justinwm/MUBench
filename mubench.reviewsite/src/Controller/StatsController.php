@@ -4,11 +4,11 @@ namespace MuBench\ReviewSite\Controller;
 
 
 use MuBench\ReviewSite\CSVHelper;
-use MuBench\ReviewSite\Model\DetectorResult;
-use MuBench\ReviewSite\Model\ExperimentResult;
+use MuBench\ReviewSite\Models\DetectorResult;
+use MuBench\ReviewSite\Models\ExperimentResult;
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\Experiment;
-use MuBench\ReviewSite\Model\ReviewState;
+use MuBench\ReviewSite\Models\ReviewState;
 use MuBench\ReviewSite\Models\Run;
 use MuBench\ReviewSite\Models\Tag;
 use MuBench\ReviewSite\Models\Type;

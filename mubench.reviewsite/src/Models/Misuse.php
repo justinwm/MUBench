@@ -4,8 +4,6 @@ namespace MuBench\ReviewSite\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
-use MuBench\ReviewSite\Model\Decision;
-use MuBench\ReviewSite\Model\ReviewState;
 
 class Misuse extends Model
 {

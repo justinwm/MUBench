@@ -1,8 +1,6 @@
 <?php
 
-use MuBench\ReviewSite\Model\Misuse;
-use MuBench\ReviewSite\Model\Review;
-use MuBench\ReviewSite\Model\ReviewState;
+use MuBench\ReviewSite\Models\ReviewState;
 
 class ReviewStateTest extends \PHPUnit\Framework\TestCase
 {

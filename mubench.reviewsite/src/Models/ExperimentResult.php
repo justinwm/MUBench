@@ -1,6 +1,6 @@
 <?php
 
-namespace MuBench\ReviewSite\Model;
+namespace MuBench\ReviewSite\Models;
 
 class ExperimentResult extends RunsResult
 {

@@ -1,8 +1,6 @@
 <?php
 
-namespace MuBench\ReviewSite\Model;
-
-use MuBench\ReviewSite\Models\Detector;
+namespace MuBench\ReviewSite\Models;
 
 class DetectorResult extends RunsResult
 {

@@ -4,7 +4,6 @@ namespace MuBench\ReviewSite\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
-use MuBench\ReviewSite\Model\Decision;
 
 class Review extends Model
 {
