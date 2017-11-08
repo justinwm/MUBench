@@ -1,7 +1,8 @@
 <?php
 
-require_once 'DatabaseTestCase.php';
-
+use PHPUnit\Framework\TestCase;
+use Monolog\Logger;
+use Pixie\QueryBuilder\QueryBuilderHandler;
 use Slim\Http\Environment;
 use Slim\Http\Headers;
 use Slim\Http\Request;
@@ -9,7 +10,7 @@ use Slim\Http\RequestBody;
 use Slim\Http\Response;
 use Slim\Http\Uri;
 
-class SlimTestCase extends DatabaseTestCase
+class SlimTestCase extends TestCase
 {
     protected $app;
 
@@ -19,15 +20,38 @@ class SlimTestCase extends DatabaseTestCase
     /** @var Response */
     protected $response;
 
+    /**
+     * @var Logger $logger
+     */
+    protected $logger;
+
+    /** @var \Illuminate\Database\Capsule\Manager */
+    protected $db;
+
+    /** @var  \Illuminate\Support\Facades\Schema */
+    protected $schema;
+
     public function setUp(){
         $settings = require __DIR__ . '/../src/settings.php';
         $app = new \Slim\App($settings);
 
         require __DIR__ . '/../src/dependencies.php';
-        parent::setUp();
+        $this->logger = new \Monolog\Logger("test");
+        $capsule = new \Illuminate\Database\Capsule\Manager;
+        $capsule->addConnection(['driver' => 'sqlite', 'database' => ':memory:']);
+        $capsule->setAsGlobal();
+        $capsule->bootEloquent();
+        $this->db = $capsule;
+        $this->schema = $capsule->schema();
+        // The schema accesses the database through the app, which we do not have in
+        // this context. Therefore, use an array to provide the database. This seems
+        // to work fine.
+        /** @noinspection PhpParamsInspection */
+        \Illuminate\Support\Facades\Schema::setFacadeApplication(["db" => $capsule]);
+
+        require __DIR__ . '/create_test_database.php';
         $container = $app->getContainer();
-        $container['database'] = function () { return $this->db; };
-        $container['database2'] = $this->db2;
+        $container['database2'] = $this->db;
         $container['schema'] = $this->schema;
 
         require __DIR__ . '/../src/routes.php';
@@ -70,5 +94,21 @@ class SlimTestCase extends DatabaseTestCase
         $this->response = $app($this->request, $response);
         // Return the application output.
         return $this->response->getBody();
+    }
+
+    private function mySQLToSQLite($mysql){
+        $lines = explode("\n", $mysql);
+        for ($i = count($lines) - 1; $i >= 0; $i--) {
+            // remove all named keys, i.e., leave only PRIMARY keys
+            if (strpos($lines[$i], 'KEY `') !== false) {
+                $lines[$i] = "";
+                $lines[$i - 1] = substr($lines[$i - 1], 0, -1); // remove trailing comma in previous line
+            }
+        }
+        $sqlite = implode("\n", $lines);
+        $sqlite = str_replace("AUTO_INCREMENT", "", $sqlite);
+        $sqlite = str_replace("int(11)", "INTEGER", $sqlite);
+        $sqlite = str_replace(" ENGINE=MyISAM  DEFAULT CHARSET=latin1;", ";", $sqlite);
+        return $sqlite;
     }
 }

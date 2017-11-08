@@ -105,7 +105,7 @@ Schema::create($finding->getTable(), function (Blueprint $table) {
     $table->string('misuse_muid', 30);
     $table->integer('startline');
     $table->integer('rank');
-    $table->integer('additional_column');
+    $table->integer('additional_column')->nullable();
     $table->text('file');
     $table->text('method');
     $table->dateTime('created_at');

@@ -197,7 +197,7 @@ class Misuse extends Model
 
     public function hasPotentialHits()
     {
-        return !empty($this->findings);
+        return sizeof($this->findings) > 0;
     }
 
     public function hasReviewed($reviewer)

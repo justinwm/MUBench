@@ -1,12 +1,19 @@
 <?php
 
+require_once 'SlimTestCase.php';
+
+use MuBench\ReviewSite\Controller\ReviewController;
+use MuBench\ReviewSite\Models\Detector;
+use MuBench\ReviewSite\Models\Experiment;
+use MuBench\ReviewSite\Models\Misuse;
+use MuBench\ReviewSite\Models\Reviewer;
 use MuBench\ReviewSite\Models\ReviewState;
 
-class ReviewStateTest extends \PHPUnit\Framework\TestCase
+class ReviewStateTest extends SlimTestCase
 {
     function test_no_potential_hits()
     {
-        $misuse = new Misuse(["misuse" => "test"], [], [], []);
+        $misuse = Misuse::create(['misuse_muid' => "test", 'run_id' => 1, 'detector_id' => 1]);
 
         self::assertEquals(ReviewState::NOTHING_TO_REVIEW, $misuse->getReviewState());
     }
@@ -92,23 +99,31 @@ class ReviewStateTest extends \PHPUnit\Framework\TestCase
 
     private function someMisuseWithOneFindingAndReviewDecisions($decisions, $resolutionDecision = null)
     {
+        $misuse = Misuse::create(['misuse_muid' => "test", 'run_id' => 1, 'detector_id' => 1]);
         $findingRank = '0';
-
+        $finding = new \MuBench\ReviewSite\Models\Finding;
+        $finding->setDetector(Detector::find(1));
+        $finding->experiment_id = Experiment::find(2);
+        $finding->misuse_id = $misuse->id;
+        $finding->project_muid = 'mubench';
+        $finding->version_muid = '42';
+        $finding->misuse_muid = 'test';
+        $finding->startline = 113;
+        $finding->rank = 1;
+        $finding->file = 'Test.java';
+        $finding->method = "method(A)";
+        $finding->save();
         $reviews = [];
+        $reviewController = new ReviewController($this->container);
         foreach ($decisions as $index => $decision) {
-            $reviews[] = new Review([
-                'name' => 'reviewer_' . $index,
-                'finding_reviews' => [$findingRank => ['decision' => $decision]]
-            ]);
+            $reviewer = Reviewer::firstOrCreate(['name' => 'reviewer' . $index]);
+            $reviewController->updateReview($misuse->id, $reviewer->id, '', [['hit' => $decision]]);
         }
 
         if ($resolutionDecision) {
-            $reviews[] = new Review([
-                'name' => 'resolution',
-                'finding_reviews' => [$findingRank => ['decision' => $resolutionDecision]]
-            ]);
+            $reviewController->updateReview($misuse->id, Reviewer::where('name', 'resolution')->first()->id, '', [['hit' => $resolutionDecision]]);
         }
 
-        return new Misuse(['misuse' => 'test'], [['rank' => $findingRank]], $reviews, []);
+        return $misuse;
     }
 }
