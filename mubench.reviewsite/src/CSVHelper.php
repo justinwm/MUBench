@@ -59,7 +59,7 @@ class CSVHelper
             foreach ($run->misuses as $misuse) {
                 $row = $run_details;
 
-                $row["misuse"] = $misuse->id;
+                $row["misuse"] = $misuse->misuse_muid;
                 $row["decision"] = $misuse->getReviewState();
                 if ($misuse->hasResolutionReview()) {
                     $resolution = $misuse->getResolutionReview();

@@ -100,7 +100,6 @@ class ReviewStateTest extends SlimTestCase
     private function someMisuseWithOneFindingAndReviewDecisions($decisions, $resolutionDecision = null)
     {
         $misuse = Misuse::create(['misuse_muid' => "test", 'run_id' => 1, 'detector_id' => 1]);
-        $findingRank = '0';
         $finding = new \MuBench\ReviewSite\Models\Finding;
         $finding->setDetector(Detector::find(1));
         $finding->experiment_id = Experiment::find(2);
@@ -113,7 +112,6 @@ class ReviewStateTest extends SlimTestCase
         $finding->file = 'Test.java';
         $finding->method = "method(A)";
         $finding->save();
-        $reviews = [];
         $reviewController = new ReviewController($this->container);
         foreach ($decisions as $index => $decision) {
             $reviewer = Reviewer::firstOrCreate(['name' => 'reviewer' . $index]);
