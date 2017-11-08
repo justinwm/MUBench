@@ -59,10 +59,10 @@ class MetadataController extends Controller
 
     private function saveViolationTypes($metadataId, $violationTypes)
     {
-        $this->database2->table('metadata_types')->where('metadata_id', '=', $metadataId)->delete();
+        $this->database->table('metadata_types')->where('metadata_id', '=', $metadataId)->delete();
         foreach ($violationTypes as $type_name) {
             $violation_type = Type::firstOrCreate(['name' => $type_name]);
-            $this->database2->table('metadata_types')->insert(array('metadata_id' => $metadataId, 'type_id' => $violation_type->id));
+            $this->database->table('metadata_types')->insert(array('metadata_id' => $metadataId, 'type_id' => $violation_type->id));
         }
     }
 

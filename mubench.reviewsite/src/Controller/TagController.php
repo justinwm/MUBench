@@ -37,7 +37,7 @@ class TagController extends Controller
     {
         $tag = Tag::firstOrCreate(['name' => $tagName]);
         try{
-            $this->database2->table('misuse_tags')->insert(array('misuse_id' => $misuseId, 'tag_id' => $tag->id));
+            $this->database->table('misuse_tags')->insert(array('misuse_id' => $misuseId, 'tag_id' => $tag->id));
         }catch(QueryException $exception){
 
         }
@@ -45,6 +45,6 @@ class TagController extends Controller
 
     public function removeTag($tagId, $misuseId)
     {
-        $this->database2->table('misuse_tags')->where('misuse_id', $misuseId)->where('tag_id', $tagId)->delete();
+        $this->database->table('misuse_tags')->where('misuse_id', $misuseId)->where('tag_id', $tagId)->delete();
     }
 }

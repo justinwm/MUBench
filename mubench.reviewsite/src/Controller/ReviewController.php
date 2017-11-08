@@ -138,10 +138,10 @@ class ReviewController extends Controller
             $findingReview = FindingReview::firstOrNew(['review_id' => $review->id, 'rank' => $rank]);
             $findingReview->decision = $hit['hit'];
             $findingReview->save();
-            $this->database2->table('finding_review_types')->where('finding_review_id', $findingReview->id)->delete();
+            $this->database->table('finding_review_types')->where('finding_review_id', $findingReview->id)->delete();
             if (array_key_exists("types", $hit)) {
                 foreach ($hit['types'] as $type) {
-                    $this->database2->table('finding_review_types')->insert(['finding_review_id' => $findingReview->id, 'type_id' => $type]);
+                    $this->database->table('finding_review_types')->insert(['finding_review_id' => $findingReview->id, 'type_id' => $type]);
                 }
             }
         }
