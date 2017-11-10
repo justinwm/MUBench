@@ -16,7 +16,7 @@ use Slim\Http\Response;
 class SnippetController extends Controller
 {
 
-    public function add(Request $request, Response $response, array $args)
+    public function postSnippet(Request $request, Response $response, array $args)
     {
         $form = $request->getParsedBody();
         $projectId = $args['project_muid'];
@@ -28,23 +28,18 @@ class SnippetController extends Controller
         return $response->withRedirect("{$this->site_base_url}index.php/{$form['path']}");
     }
 
-    public function remove(Request $request, Response $response, array $args)
+    public function deleteSnippet(Request $request, Response $response, array $args)
     {
         $form = $request->getParsedBody();
         $snippetId = $args['snippet_id'];
-        $this->deleteSnippet($snippetId);
-        return $response->withRedirect("{$this->site_base_url}index.php/{$form['path']}");
-    }
 
-    function deleteSnippet($snippetId)
-    {
-        $snippet = Snippet::find($snippetId);
-        $snippet->delete();
+        Snippet::find($snippetId)->delete();
+
+        return $response->withRedirect("{$this->site_base_url}index.php/{$form['path']}");
     }
 
     function createSnippet($projectId, $versionId, $misuseId, $code, $line)
     {
         Snippet::create(['snippet'=> $code, 'line' => $line, 'misuse_muid' => $misuseId, 'project_muid' => $projectId, 'version_muid' => $versionId]);
     }
-
 }
