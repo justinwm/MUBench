@@ -16,6 +16,9 @@
   "autoload": {
     "psr-4": {
       "MuBench\\ReviewSite\\": "src"
-    }
+    },
+    "files": [
+      "src/csv_utils.php"
+    ]
   }
 }

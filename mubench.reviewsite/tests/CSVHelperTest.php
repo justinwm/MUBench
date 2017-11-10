@@ -3,6 +3,8 @@
 require_once 'SlimTestCase.php';
 
 use MuBench\ReviewSite\Controller\ReviewController;
+use MuBench\ReviewSite\Controller\RunsController;
+use MuBench\ReviewSite\Controller\StatsController;
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\Experiment;
 use MuBench\ReviewSite\Models\Misuse;
@@ -61,7 +63,7 @@ class CSVHelperTest extends SlimTestCase
                 "-d1-,1,0,1,1,2,0,0,0,0,0,0,0,0,0,0,0,0",
                 "-d2-,1,0,1,1,0,0,1,0,1,0,0,0,1,0,1,1,1",
             "Total,1,0,2,2,2,0,1,0,1,0,0,0,0.5,0,0.5,1,0.25"]);
-        self::assertEquals($expected_csv, CSVHelper::exportStatistics($experiment, $stats));
+        self::assertEquals($expected_csv, StatsController::exportStatistics($experiment, $stats));
     }
 
     public function test_ex2_stats_as_csv()
@@ -81,7 +83,7 @@ class CSVHelperTest extends SlimTestCase
             "-d1-,1,1,2,0,0,0,0,0,0,0,0,0,0,0,0",
             "-d2-,1,1,0,0,1,0,1,0,0,0,1,0,1,1,1",
             "Total,1,2,2,0,1,0,1,0,0,0,0.5,0,0.5,1,0.5"]);
-        self::assertEquals($expected_csv, CSVHelper::exportStatistics($experiment, $stats));
+        self::assertEquals($expected_csv, StatsController::exportStatistics($experiment, $stats));
     }
 
     public function test_ex3_stats_as_csv()
@@ -104,7 +106,7 @@ class CSVHelperTest extends SlimTestCase
             "Total,1,2,2,2,0,1,0,1,0,0,0,0.5,0,0.5,1,0.25"
         ]);
 
-        self::assertEquals($expected_csv, CSVHelper::exportStatistics($experiment, $stats));
+        self::assertEquals($expected_csv, StatsController::exportStatistics($experiment, $stats));
     }
 
     function test_export_detector_run_as_csv()
@@ -119,7 +121,7 @@ class CSVHelperTest extends SlimTestCase
             "-p-,-v-,success,23,42.1,0,1,,"
         ]);
 
-        self::assertEquals($expected_csv, CSVHelper::exportRunStatistics($runs));
+        self::assertEquals($expected_csv, RunsController::exportRunStatistics($runs));
     }
 
     private function createSomeRun(Experiment $experiment, Detector $detector, $misuses)
