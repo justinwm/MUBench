@@ -1,7 +1,6 @@
 <?php
 
 use Interop\Container\ContainerInterface;
-use MuBench\ReviewSite\DBConnection;
 use MuBench\ReviewSite\Error;
 use MuBench\ReviewSite\Models\Reviewer;
 use Slim\Views\PhpRenderer;
