@@ -4,6 +4,7 @@ namespace MuBench\ReviewSite\Controller;
 
 
 use Illuminate\Database\QueryException;
+use MuBench\ReviewSite\Models\Misuse;
 use MuBench\ReviewSite\Models\Tag;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -18,8 +19,8 @@ class TagController extends Controller
         $tag_name = $formData['tag_name'];
         $misuse_id = $formData['misuse_id'];
 
-        $this->tagMisuse($tag_name, $misuse_id);
-        // TODO: refactor
+        $this->addTagToMisuse($misuse_id, $tag_name);
+
         return $response->withRedirect("{$this->site_base_url}index.php/{$formData['path']}");
     }
 
@@ -28,23 +29,20 @@ class TagController extends Controller
         $formData = $request->getParsedBody();
         $tag_id = $formData['tag_id'];
         $misuse_id = $formData['misuse_id'];
-        $this->removeTag($tag_id, $misuse_id);
-        // TODO: refactor
+
+        $this->deleteTagFromMisuse($misuse_id, $tag_id);
+
         return $response->withRedirect("{$this->site_base_url}index.php/{$formData['path']}");
     }
 
-    public function tagMisuse($tagName, $misuseId)
+    function addTagToMisuse($misuseId, $tagName)
     {
         $tag = Tag::firstOrCreate(['name' => $tagName]);
-        try{
-            $this->database->table('misuse_tags')->insert(array('misuse_id' => $misuseId, 'tag_id' => $tag->id));
-        }catch(QueryException $exception){
-
-        }
+        Misuse::find($misuseId)->misuse_tags()->syncWithoutDetaching($tag->id);
     }
 
-    public function removeTag($tagId, $misuseId)
+    function deleteTagFromMisuse($misuseId, $tagId)
     {
-        $this->database->table('misuse_tags')->where('misuse_id', $misuseId)->where('tag_id', $tagId)->delete();
+        Misuse::find($misuseId)->misuse_tags()->detach($tagId);
     }
 }

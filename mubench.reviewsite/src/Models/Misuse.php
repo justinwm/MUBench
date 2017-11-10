@@ -22,13 +22,7 @@ class Misuse extends Model
 
     public function misuse_tags()
     {
-        $tags = [];
-        foreach(Tag::all() as $tag){
-            if($tag->misuses->where('id', $this->id)->first()){
-                $tags[] = $tag;
-            }
-        }
-        return $tags;
+        return $this->belongsToMany(Tag::class, 'misuse_tags', 'misuse_id', 'tag_id');
     }
 
     public function detector()

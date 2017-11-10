@@ -238,8 +238,8 @@ $markdown_parser = new Parsedown();
                 </td>
                 <td class="<?= $style_classes ?>">
                     <?php if($misuse->hasConclusiveReviewState()) : ?>
-                        <?php if($misuse->misuse_tags()): ?>
-                            <?php foreach($misuse->misuse_tags() as $tag) : ?>
+                        <?php if($misuse->misuse_tags): ?>
+                            <?php foreach($misuse->misuse_tags as $tag) : ?>
                                 <div class="misuse-tag">
                                     <span><?= htmlspecialchars($tag->name) ?></span>
                                 </div>

@@ -85,12 +85,12 @@ use MuBench\ReviewSite\Models\Experiment;
             <?php if($experiment->id !== 2) : ?>
                 <tr><td><b>Misuse:</b></td><td>misuse '<?= $markdown_parser->text($misuse->misuse_muid); ?>'</td></tr>
             <?php endif; ?>
-            <?php if($user || $misuse->misuse_tags()) : ?>
+            <?php if($user || $misuse->misuse_tags) : ?>
                 <tr>
                 <td><b>Tags:</b></td>
                 <td>
-                    <?php if($misuse->misuse_tags()): ?>
-                        <?php foreach($misuse->misuse_tags() as $tag) : ?>
+                    <?php if($misuse->misuse_tags): ?>
+                        <?php foreach($misuse->misuse_tags as $tag) : ?>
                             <div class="misuse-tag">
                                 <span><?= htmlspecialchars($tag->name) ?></span>
                                 <?php if($user) : ?>
