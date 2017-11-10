@@ -115,7 +115,9 @@ class ReviewController extends Controller
         if ($review["origin"] != "") {
             return $response->withRedirect("{$this->site_base_url}index.php/{$review["origin"]}");
         }else {
-            return $response->withRedirect("{$this->site_base_url}index.php/private/experiments/{$experiment_id}/detectors/{$detector_id}/project/{$project_id}/version/{$version_id}/misuse/{$misuse_id}/reviewer/{$reviewer_id}");
+            return $response->withRedirect($this->router->pathFor("private.review", ["experiment_id" => $experiment_id,
+                "detector_id" => $detector_id, "project_id" => $project_id, "version_id" => $version_id,
+                "misuse_id" => $misuse_id, "reviewer_id" => $reviewer_id]));
         }
 
 
