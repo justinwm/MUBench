@@ -127,22 +127,17 @@ class ReviewController extends Controller
         return Reviewer::firstOrCreate(['name' => $userName]);
     }
 
-    public function updateOrCreateReview($misuse_id, $reviewer_id, $comment, $hits)
+    public function updateOrCreateReview($misuse_id, $reviewer_id, $comment, $findings_reviews_by_rank)
     {
         $review = Review::firstOrNew(['misuse_id' => $misuse_id, 'reviewer_id' => $reviewer_id]);
         $review->comment = $comment;
         $review->save();
 
-        foreach ($hits as $rank => $hit) {
+        foreach ($findings_reviews_by_rank as $rank => $findings_review) {
             $findingReview = FindingReview::firstOrNew(['review_id' => $review->id, 'rank' => $rank]);
-            $findingReview->decision = $hit['hit'];
+            $findingReview->decision = $findings_review['hit'];
             $findingReview->save();
-            $this->database->table('finding_review_types')->where('finding_review_id', $findingReview->id)->delete();
-            if (array_key_exists("types", $hit)) {
-                foreach ($hit['types'] as $type) {
-                    $this->database->table('finding_review_types')->insert(['finding_review_id' => $findingReview->id, 'type_id' => $type]);
-                }
-            }
+            $findingReview->violation_types()->sync($findings_review['types']);
         }
     }
 }
