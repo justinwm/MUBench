@@ -16,8 +16,6 @@ use Slim\Http\Response;
 
 class StatsController extends Controller
 {
-
-
     public function getResults(Request $request, Response $response, array $args)
     {
         $ex2_review_size = $request->getQueryParam("ex2_review_size", $this->default_ex2_review_size);
