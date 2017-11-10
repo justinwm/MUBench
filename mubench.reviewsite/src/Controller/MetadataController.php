@@ -15,7 +15,7 @@ use Slim\Http\Response;
 class MetadataController extends Controller
 {
 
-    public function update(Request $request, Response $response, array $args)
+    public function putMetadata(Request $request, Response $response, array $args)
     {
         $metadata = decodeJsonBody($request);
         if (!$metadata) {

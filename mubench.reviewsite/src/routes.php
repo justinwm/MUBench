@@ -43,7 +43,7 @@ $app->group('/private', function () use ($app) {
 })->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
 
 $app->group('', function () use ($app, $settings) {
-    $app->post('/metadata', \MuBench\ReviewSite\Controller\MetadataController::class.":update");
+    $app->post('/metadata', \MuBench\ReviewSite\Controller\MetadataController::class.":putMetadata");
     // /experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/misuses/{misuse_id}/tags/{tag_id}
     $app->post('/tags',\MuBench\ReviewSite\Controller\TagController::class.":add")->setName('private.tag.add');
     // /experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/misuses/{misuse_id}/tags/{tag_id}/delete
