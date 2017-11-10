@@ -26,7 +26,7 @@ class ReviewControllerTest extends SlimTestCase
 
     function test_store_review()
     {
-        $this->reviewController->updateOrCreateReview(1, 1, '-comment-', [['hit' => 'Yes']]);
+        $this->reviewController->updateOrCreateReview(1, 1, '-comment-', [['hit' => 'Yes', 'types' => []]]);
 
         $review = Misuse::find(1)->getReview(Reviewer::find(1));
         self::assertEquals('-comment-', $review->comment);
@@ -35,8 +35,8 @@ class ReviewControllerTest extends SlimTestCase
 
     function test_update_review()
     {
-        $this->reviewController->updateOrCreateReview(1, 1, '-comment-', [['hit' => 'Yes']]);
-        $this->reviewController->updateOrCreateReview(1, 1, '-comment-', [['hit' => 'No']]);
+        $this->reviewController->updateOrCreateReview(1, 1, '-comment-', [['hit' => 'Yes', 'types' => []]]);
+        $this->reviewController->updateOrCreateReview(1, 1, '-comment-', [['hit' => 'No', 'types' => []]]);
 
         $review = Misuse::find(1)->getReview(Reviewer::find(1));
         self::assertEquals('-comment-', $review->comment);
