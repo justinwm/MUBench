@@ -23,18 +23,6 @@ return [
         ],
         'site_base_url' => '/',
     ],
-    // REFACTOR remove Pixie database setup after migration to Eloquent (see configuration above)
-    'db' => [
-        'driver'    => 'mysql',
-        'host'      => 'localhost',
-        'database'  => 'database',
-        'username'  => 'username',
-        'password'  => 'password',
-        'charset'   => 'utf8',
-        'collation' => 'utf8_unicode_ci',
-        'prefix'    => 'mubench_',
-        'options'   => []
-    ],
     'upload' => "./upload",
     'users' => [
         "admin" => "pass",
