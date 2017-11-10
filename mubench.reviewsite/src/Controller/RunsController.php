@@ -34,9 +34,10 @@ class RunsController extends Controller
     {
         $experiment_id = $args['experiment_id'];
         $detector_id = $args['detector_id'];
-        $ex2_review_size = $request->getQueryParam("ex2_review_size", $this->default_ex2_review_size);
+
         $detector = Detector::find($detector_id);
         $experiment = Experiment::find($experiment_id);
+        $ex2_review_size = $request->getQueryParam("ex2_review_size", $this->default_ex2_review_size);
 
         $runs = $this->getRuns($detector, $experiment, $ex2_review_size);
 
