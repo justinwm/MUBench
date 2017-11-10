@@ -156,11 +156,11 @@ class CSVHelperTest extends SlimTestCase
         $reviewController = new ReviewController($this->container);
         foreach ($decisions as $index => $decision) {
             $reviewer = Reviewer::firstOrCreate(['name' => '-reviewer' . $index . '-']);
-            $reviewController->updateReview($misuse->id, $reviewer->id, '-comment-', [['hit' => $decision]]);
+            $reviewController->updateOrCreateReview($misuse->id, $reviewer->id, '-comment-', [['hit' => $decision]]);
         }
 
         if ($resolutionDecision) {
-            $reviewController->updateReview($misuse->id, Reviewer::where('name', 'resolution')->first()->id, '-comment-', [['hit' => $resolutionDecision]]);
+            $reviewController->updateOrCreateReview($misuse->id, Reviewer::where('name', 'resolution')->first()->id, '-comment-', [['hit' => $resolutionDecision]]);
         }
 
         return $misuse;

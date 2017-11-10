@@ -17,9 +17,13 @@ use SlimTestCase;
 
 class MisuseFilterTest extends SlimTestCase
 {
+    /** @var ReviewController */
     private $reviewController;
+    /** @var RunsController */
     private $runController;
+    /** @var Experiment */
     private $experiment;
+    /** @var Detector */
     private $detector;
 
     private $undecided_review = [
@@ -61,32 +65,32 @@ class MisuseFilterTest extends SlimTestCase
 
     function test_inconclusive_reviews()
     {
-        $this->reviewController->updateReview($this->decided_review['misuse_id'], $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->decided_review['review_hit']);
-        $this->reviewController->updateReview($this->undecided_review['misuse_id'], $this->undecided_review['reviewer_id'], $this->undecided_review['review_comment'], $this->undecided_review['review_hit']);
+        $this->reviewController->updateOrCreateReview($this->decided_review['misuse_id'], $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->decided_review['review_hit']);
+        $this->reviewController->updateOrCreateReview($this->undecided_review['misuse_id'], $this->undecided_review['reviewer_id'], $this->undecided_review['review_comment'], $this->undecided_review['review_hit']);
         $runs = $this->runController->getRuns($this->detector, $this->experiment, 2);
         self::assertEquals(3, sizeof($runs[0]->misuses));
     }
 
     function test_conclusive_reviews()
     {
-        $this->reviewController->updateReview($this->decided_review['misuse_id'], $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->decided_review['review_hit']);
-        $this->reviewController->updateReview($this->undecided_review['misuse_id'], $this->undecided_review['reviewer_id'], $this->undecided_review['review_comment'], $this->decided_review['review_hit']);
+        $this->reviewController->updateOrCreateReview($this->decided_review['misuse_id'], $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->decided_review['review_hit']);
+        $this->reviewController->updateOrCreateReview($this->undecided_review['misuse_id'], $this->undecided_review['reviewer_id'], $this->undecided_review['review_comment'], $this->decided_review['review_hit']);
         $runs = $this->runController->getRuns($this->detector, $this->experiment, 2);
         self::assertEquals(2, sizeof($runs[0]->misuses));
     }
 
     function test_one_inconclusive_review()
     {
-        $this->reviewController->updateReview(4, $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->undecided_review['review_hit']);
+        $this->reviewController->updateOrCreateReview(4, $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->undecided_review['review_hit']);
         $runs = $this->runController->getRuns($this->detector, $this->experiment, 2);
         self::assertEquals(3, sizeof($runs[0]->misuses));
     }
 
     function test_one_conclusive_review()
     {
-        $this->reviewController->updateReview($this->decided_review['misuse_id'], $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->decided_review['review_hit']);
-        $this->reviewController->updateReview($this->undecided_review['misuse_id'], $this->undecided_review['reviewer_id'], $this->undecided_review['review_comment'], $this->decided_review['review_hit']);
-        $this->reviewController->updateReview(4, $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->decided_review['review_hit']);
+        $this->reviewController->updateOrCreateReview($this->decided_review['misuse_id'], $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->decided_review['review_hit']);
+        $this->reviewController->updateOrCreateReview($this->undecided_review['misuse_id'], $this->undecided_review['reviewer_id'], $this->undecided_review['review_comment'], $this->decided_review['review_hit']);
+        $this->reviewController->updateOrCreateReview(4, $this->decided_review['reviewer_id'], $this->decided_review['review_comment'], $this->decided_review['review_hit']);
         $runs = $this->runController->getRuns($this->detector, $this->experiment, 2);
         self::assertEquals(2, sizeof($runs[0]->misuses));
     }

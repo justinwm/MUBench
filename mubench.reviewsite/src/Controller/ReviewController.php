@@ -106,11 +106,10 @@ class ReviewController extends Controller
         $version_id = $args['version_id'];
         $misuse_id = $args['misuse_id'];
         $reviewer_id = $args['reviewer_id'];
-
         $comment = $review['review_comment'];
         $hits = $review['review_hit'];
 
-        $this->updateReview($misuse_id, $reviewer_id, $comment, $hits);
+        $this->updateOrCreateReview($misuse_id, $reviewer_id, $comment, $hits);
 
         if ($review["origin"] != "") {
             return $response->withRedirect("{$this->site_base_url}index.php/{$review["origin"]}");
@@ -119,8 +118,6 @@ class ReviewController extends Controller
                 "detector_id" => $detector_id, "project_id" => $project_id, "version_id" => $version_id,
                 "misuse_id" => $misuse_id, "reviewer_id" => $reviewer_id]));
         }
-
-
     }
 
     private function getUser(Request $request)
@@ -130,7 +127,7 @@ class ReviewController extends Controller
         return Reviewer::firstOrCreate(['name' => $userName]);
     }
 
-    public function updateReview($misuse_id, $reviewer_id, $comment, $hits)
+    public function updateOrCreateReview($misuse_id, $reviewer_id, $comment, $hits)
     {
         $review = Review::firstOrNew(['misuse_id' => $misuse_id, 'reviewer_id' => $reviewer_id]);
         $review->comment = $comment;

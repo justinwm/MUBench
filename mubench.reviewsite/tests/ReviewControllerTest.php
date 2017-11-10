@@ -26,7 +26,7 @@ class ReviewControllerTest extends SlimTestCase
 
     function test_store_review()
     {
-        $this->reviewController->updateReview(1, 1, '-comment-', [['hit' => 'Yes']]);
+        $this->reviewController->updateOrCreateReview(1, 1, '-comment-', [['hit' => 'Yes']]);
 
         $review = Misuse::find(1)->getReview(Reviewer::find(1));
         self::assertEquals('-comment-', $review->comment);
@@ -35,8 +35,8 @@ class ReviewControllerTest extends SlimTestCase
 
     function test_update_review()
     {
-        $this->reviewController->updateReview(1, 1, '-comment-', [['hit' => 'Yes']]);
-        $this->reviewController->updateReview(1, 1, '-comment-', [['hit' => 'No']]);
+        $this->reviewController->updateOrCreateReview(1, 1, '-comment-', [['hit' => 'Yes']]);
+        $this->reviewController->updateOrCreateReview(1, 1, '-comment-', [['hit' => 'No']]);
 
         $review = Misuse::find(1)->getReview(Reviewer::find(1));
         self::assertEquals('-comment-', $review->comment);
@@ -45,7 +45,7 @@ class ReviewControllerTest extends SlimTestCase
 
     function test_stores_violation_types()
     {
-        $this->reviewController->updateReview(1, 1, '-comment-', [['hit' => 'No', 'types' => [1]]]);
+        $this->reviewController->updateOrCreateReview(1, 1, '-comment-', [['hit' => 'No', 'types' => [1]]]);
 
         $review = Misuse::find(1)->getReview(Reviewer::find(1));
         $violation_types = $review->getHitViolationTypes('0');
