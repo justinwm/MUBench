@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jonas
- * Date: 01.11.2017
- * Time: 12:17
- */
-
 namespace MuBench\ReviewSite\Controller;
 
 
@@ -34,7 +27,7 @@ class FindingsController extends Controller
 
         $potential_hits = $run->{'potential_hits'};
 
-        $this->createOrUpdateRunTable($detector, $run);
+        $this->createOrUpdateRunsTable($detector, $run);
         $this->updateRun($detector, $experiment, $projectId, $versionId, $run);
         if ($potential_hits) {
             $run = Run::of($detector)->in($experiment)->where(['project_muid' => $projectId, 'version_muid' => $versionId])->first();
@@ -43,7 +36,7 @@ class FindingsController extends Controller
         }
     }
 
-    private function createOrUpdateRunTable(Detector $detector, $run)
+    private function createOrUpdateRunsTable(Detector $detector, $run)
     {
         $propertyToColumnNameMapping = $this->getColumnNamesFromProperties($run);
         $propertyToColumnNameMapping = $this->removeDisruptiveStatsColumns($propertyToColumnNameMapping);
@@ -76,10 +69,10 @@ class FindingsController extends Controller
 
     private function getPropertyColumnNames($table_name)
     {
-        $columns = Schema::getColumnListing($table_name);
-        return $columns;
+        return Schema::getColumnListing($table_name);
     }
 
+    /** @noinspection PhpUnusedPrivateMethodInspection used in createOrUpdateFindingsTable */
     private function createFindingsTable($table_name)
     {
         Schema::create($table_name, function (Blueprint $table) {
@@ -98,7 +91,8 @@ class FindingsController extends Controller
         });
     }
 
-    private function createStatsTable($table_name)
+    /** @noinspection PhpUnusedPrivateMethodInspection used in createOrUpdateRunsTable */
+    private function createRunsTable($table_name)
     {
         Schema::create($table_name, function (Blueprint $table) {
             $table->increments('id');

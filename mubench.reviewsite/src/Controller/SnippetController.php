@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jonas
- * Date: 18.10.2017
- * Time: 21:30
- */
 
 namespace MuBench\ReviewSite\Controller;
 
