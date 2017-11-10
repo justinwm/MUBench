@@ -183,7 +183,6 @@ Schema::create($snippet->getTable(), function (Blueprint $table) {
     $table->string('project_muid', 30);
     $table->string('version_muid', 30);
     $table->string('misuse_muid', 30);
-    $table->integer('rank')->nullable();
     $table->integer('line');
     $table->text('snippet');
 });
@@ -191,7 +190,6 @@ $snippet->project_muid = 'mubench';
 $snippet->version_muid = '42';
 $snippet->misuse_muid = '1';
 $snippet->line = 112;
-$snippet->rank = 1;
 $snippet->snippet = "test snippet\ntest";
 $snippet->save();
 

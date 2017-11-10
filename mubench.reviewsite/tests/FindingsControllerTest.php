@@ -16,6 +16,7 @@ class FindingsControllerTest extends SlimTestCase
 {
     private $request_body;
 
+    /** @var FindingsController */
     private $findingController;
 
     function setUp()

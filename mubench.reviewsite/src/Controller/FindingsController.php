@@ -42,7 +42,7 @@ class FindingsController extends Controller
         $propertyToColumnNameMapping = $this->removeDisruptiveStatsColumns($propertyToColumnNameMapping);
         $run = new \MuBench\ReviewSite\Models\Run;
         $run->setDetector($detector);
-        $this->createOrUpdateTable($run->getTable(), $propertyToColumnNameMapping, array($this, 'createStatsTable'));
+        $this->createOrUpdateTable($run->getTable(), $propertyToColumnNameMapping, array($this, 'createRunsTable'));
     }
 
     private function createOrUpdateFindingsTable(Detector $detector, $findings)
@@ -221,8 +221,7 @@ class FindingsController extends Controller
     private function storeFindingTargetSnippets($projectId, $versionId, $misuseId, $rank, $snippets)
     {
         foreach ($snippets as $snippet) {
-            Snippet::create(['project_muid' => $projectId, 'version_muid' => $versionId,
-                'misuse_muid' => $misuseId, 'rank' => $rank, 'line' => $snippet->{'first_line_number'}, 'snippet' => $snippet->{'code'}]);
+            SnippetController::createSnippet($projectId, $versionId, $misuseId, $snippet->{'code'}, $snippet->{'first_line_number'});
         }
     }
 
