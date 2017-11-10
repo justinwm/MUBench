@@ -86,7 +86,7 @@ $app->group('', function () use ($app, $settings) {
         });
 
     $app->group('/experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/misuses/{misuse_id}', function() use ($app) {
-        $app->post('/reviewers/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":review")->setName('private.update.review');
+        $app->post('/reviewers/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":postReview")->setName('private.update.review');
         // /snippets/{snippet_id}
         $app->post('/snippets', \MuBench\ReviewSite\Controller\SnippetController::class.":add")->setName('private.snippet.add');
         // /snippets/{snippet_id}/delete

@@ -97,7 +97,7 @@ class ReviewController extends Controller
         return $this->renderer->render($response, 'overview.phtml', ['closed_misuses' => $closed_misuses, 'experiment' => $experiment]);
     }
 
-    public function review(Request $request, Response $response, array $args)
+    public function postReview(Request $request, Response $response, array $args)
     {
         $review = $request->getParsedBody();
         $experiment_id = $args['experiment_id'];
