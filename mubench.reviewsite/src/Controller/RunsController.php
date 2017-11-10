@@ -19,7 +19,6 @@ class RunsController extends Controller
 
         $experiment = Experiment::find($experiment_id);
         $detector = Detector::find($detector_id);
-        // TODO Filter only this amount of misuses in exp2
         $ex2_review_size = $request->getQueryParam("ex2_review_size", $this->default_ex2_review_size);
 
         $runs = $this->getRuns($detector, $experiment, $ex2_review_size);
