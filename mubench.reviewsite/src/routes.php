@@ -46,9 +46,12 @@ $app->group('/private', function () use ($app) {
 
 $app->group('', function () use ($app, $settings) {
     $app->post('/metadata', \MuBench\ReviewSite\Controller\MetadataController::class.":update");
+    // /experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/misuses/{misuse_id}/tags/{tag_id}
     $app->post('/tags',\MuBench\ReviewSite\Controller\TagController::class.":add")->setName('private.tag.add');
+    // /experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/misuses/{misuse_id}/tags/{tag_id}/delete
     $app->post('/delete/tag', \MuBench\ReviewSite\Controller\TagController::class.":remove")->setName('private.tag.remove');
 
+    // /experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/runs
     $app->post('/experiments/[{experiment_id}]',
         function (Request $request, Response $response, array $args) use ($settings) {
             $experimentId = $args['experiment_id'];
@@ -86,7 +89,9 @@ $app->group('', function () use ($app, $settings) {
 
     $app->group('/experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/misuses/{misuse_id}', function() use ($app) {
         $app->post('/reviewers/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":review")->setName('private.update.review');
+        // /snippets/{snippet_id}
         $app->post('/snippets', \MuBench\ReviewSite\Controller\SnippetController::class.":add")->setName('private.snippet.add');
+        // /snippets/{snippet_id}/delete
         $app->post('/snippets/{snippet_id}', \MuBench\ReviewSite\Controller\SnippetController::class.":remove")->setName('private.snippet.remove');
     });
 
