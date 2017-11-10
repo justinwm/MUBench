@@ -14,10 +14,8 @@ use \MuBench\ReviewSite\CSVHelper;
 use MuBench\ReviewSite\Models\Reviewer;
 use MuBench\ReviewSite\Models\Run;
 
-class CSVHelperTest extends SlimTestCase
+class StatsControllerTest extends SlimTestCase
 {
-
-    private $csv_helper;
     private $detector1;
     private $detector2;
     private $no_reviews_misuse;
