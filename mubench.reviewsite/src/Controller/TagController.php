@@ -11,9 +11,7 @@ use Slim\Http\Response;
 
 class TagController extends Controller
 {
-
-
-    public function add(Request $request, Response $response)
+    public function postTag(Request $request, Response $response)
     {
         $formData = $request->getParsedBody();
         $tag_name = $formData['tag_name'];
@@ -24,7 +22,7 @@ class TagController extends Controller
         return $response->withRedirect("{$this->site_base_url}index.php/{$formData['path']}");
     }
 
-    public function remove(Request $request, Response $response)
+    public function deleteTag(Request $request, Response $response)
     {
         $formData = $request->getParsedBody();
         $tag_id = $formData['tag_id'];
