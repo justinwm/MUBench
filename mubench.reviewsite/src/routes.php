@@ -13,8 +13,6 @@ use MuBench\ReviewSite\RoutesHelper;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-require_once "route_utils.php";
-
 $logger = $app->getContainer()['logger'];
 $database = $app->getContainer()['database'];
 $renderer = $app->getContainer()['renderer'];

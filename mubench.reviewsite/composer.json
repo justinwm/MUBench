@@ -18,6 +18,7 @@
       "MuBench\\ReviewSite\\": "src"
     },
     "files": [
+      "src/route_utils.php",
       "src/csv_utils.php"
     ]
   }
