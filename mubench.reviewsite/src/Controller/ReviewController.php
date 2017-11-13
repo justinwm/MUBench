@@ -28,10 +28,9 @@ class ReviewController extends Controller
         $experiment = Experiment::find($experiment_id);
         $detector = Detector::find($detector_id);
 
-        $user = $this->getUser($request);
-        $reviewer = array_key_exists('reviewer_id', $args) ? Reviewer::find($args['reviewer_id']) : $user;
+        $reviewer = array_key_exists('reviewer_id', $args) ? Reviewer::find($args['reviewer_id']) : $this->user;
         $resolution_reviewer = Reviewer::firstOrCreate(['name' => 'resolution']);
-        $is_reviewer = ($user && $reviewer && $user->id == $reviewer->id) || ($reviewer && $reviewer->id == $resolution_reviewer->id);
+        $is_reviewer = ($this->user && $reviewer && $this->user->id == $reviewer->id) || ($reviewer && $reviewer->id == $resolution_reviewer->id);
 
         $misuse = Misuse::find($misuse_id);
         $all_violation_types = Type::all();
@@ -118,13 +117,6 @@ class ReviewController extends Controller
                 "detector_id" => $detector_id, "project_id" => $project_id, "version_id" => $version_id,
                 "misuse_id" => $misuse_id, "reviewer_id" => $reviewer_id]));
         }
-    }
-
-    private function getUser(Request $request)
-    {
-        $params = $request->getServerParams();
-        $userName = array_key_exists('PHP_AUTH_USER', $params) ? $params['PHP_AUTH_USER'] : "";
-        return Reviewer::firstOrCreate(['name' => $userName]);
     }
 
     public function updateOrCreateReview($misuse_id, $reviewer_id, $comment, $findings_reviews_by_rank)

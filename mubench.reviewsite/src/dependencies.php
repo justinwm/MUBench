@@ -29,23 +29,24 @@ $capsule->setAsGlobal();
 $capsule->bootEloquent();
 $container['database'] = $capsule;
 $container['schema'] = $capsule->schema();
+
+/** @var \Slim\Http\Request $request */
+$request = $container->request;
+$serverParams = $request->getServerparams();
+$user_name = array_key_exists('PHP_AUTH_USER', $serverParams) ? $serverParams['PHP_AUTH_USER'] : null;
+$user = null;
+if($user_name){
+    $user = Reviewer::firstOrCreate(['name' => $user_name]);
+}
+$container['user'] = $user;
+
 // The schema accesses the database through the app, which we do not have in
 // this context. Therefore, use an array to provide the database. This seems
 // to work fine.
 /** @noinspection PhpParamsInspection */
 \Illuminate\Support\Facades\Schema::setFacadeApplication(["db" => $capsule]);
 
-$container['renderer'] = function ($container) {
-    /** @var \Slim\Http\Request $request */
-    $request = $container->request;
-    $serverParams = $request->getServerparams();
-
-    $user_name = array_key_exists('PHP_AUTH_USER', $serverParams) ? $serverParams['PHP_AUTH_USER'] : null;
-    $user = null;
-    if($user_name){
-        $user = Reviewer::firstOrCreate(['name' => $user_name]);
-    }
-
+$container['renderer'] = function ($container) use ($request, $user) {
     $siteBaseURL = rtrim(str_replace('index.php', '', $container->request->getUri()->getBasePath()), '/') . '/';
     $publicURLPrefix = $siteBaseURL . 'index.php/';
     $privateURLPrefix = $siteBaseURL . 'index.php/private/';
