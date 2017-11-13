@@ -2,6 +2,8 @@
 
 require_once 'SlimTestCase.php';
 
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use MuBench\ReviewSite\Controller\ReviewController;
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\Experiment;
@@ -14,7 +16,24 @@ class ReviewStateTest extends SlimTestCase
     function test_no_potential_hits()
     {
         $misuse = Misuse::create(['misuse_muid' => "test", 'run_id' => 1, 'detector_id' => 1]);
-
+        $detector = Detector::firstOrCreate(['name' => 'test-detector']);
+        $finding = new \MuBench\ReviewSite\Models\Finding;
+        $finding->setDetector($detector);
+        Schema::create($finding->getTable(), function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('experiment_id');
+            $table->integer('misuse_id');
+            $table->string('project_muid', 30);
+            $table->string('version_muid', 30);
+            $table->string('misuse_muid', 30);
+            $table->integer('startline');
+            $table->integer('rank');
+            $table->integer('additional_column')->nullable();
+            $table->text('file');
+            $table->text('method');
+            $table->dateTime('created_at');
+            $table->dateTime('updated_at');
+        });
         self::assertEquals(ReviewState::NOTHING_TO_REVIEW, $misuse->getReviewState());
     }
 
@@ -100,18 +119,8 @@ class ReviewStateTest extends SlimTestCase
     private function someMisuseWithOneFindingAndReviewDecisions($decisions, $resolutionDecision = null)
     {
         $misuse = Misuse::create(['misuse_muid' => "test", 'run_id' => 1, 'detector_id' => 1]);
-        $finding = new \MuBench\ReviewSite\Models\Finding;
-        $finding->setDetector(Detector::find(1));
-        $finding->experiment_id = Experiment::find(2);
-        $finding->misuse_id = $misuse->id;
-        $finding->project_muid = 'mubench';
-        $finding->version_muid = '42';
-        $finding->misuse_muid = 'test';
-        $finding->startline = 113;
-        $finding->rank = 1;
-        $finding->file = 'Test.java';
-        $finding->method = "method(A)";
-        $finding->save();
+        $detector = Detector::firstOrCreate(['name' => 'test-detector']);
+        $finding = $this->createFindingWith(Experiment::find(2), $detector, $misuse);
         $reviewController = new ReviewController($this->container);
         foreach ($decisions as $index => $decision) {
             $reviewer = Reviewer::firstOrCreate(['name' => 'reviewer' . $index]);
@@ -119,7 +128,7 @@ class ReviewStateTest extends SlimTestCase
         }
 
         if ($resolutionDecision) {
-            $reviewController->updateOrCreateReview($misuse->id, Reviewer::where('name', 'resolution')->first()->id, '', [['hit' => $resolutionDecision, 'types' => []]]);
+            $reviewController->updateOrCreateReview($misuse->id, Reviewer::firstOrCreate(['name' => 'resolution'])->id, '', [['hit' => $resolutionDecision, 'types' => []]]);
         }
 
         return $misuse;

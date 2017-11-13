@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Type extends Model
 {
+    public $fillable = ['name'];
     public $timestamps = false;
 
     public function metadata(){

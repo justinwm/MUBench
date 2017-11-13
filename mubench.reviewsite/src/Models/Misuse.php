@@ -131,7 +131,7 @@ class Misuse extends Model
     {
         if (!$this->hasPotentialHits()) {
             return ReviewState::NOTHING_TO_REVIEW;
-        } elseif (count($this->reviews) < 2) {
+        } elseif (sizeof($this->reviews) < 2) {
             return ReviewState::NEEDS_REVIEW;
         } else {
             $byResolution = $this->hasResolutionReview();

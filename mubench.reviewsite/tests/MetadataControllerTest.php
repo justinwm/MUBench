@@ -57,7 +57,7 @@ class MetadataControllerTest extends SlimTestCase
 
         $metadata = Metadata::where('project_muid', '-p-')->where('version_muid', '-v-')->where('misuse_muid', '-m-')->first();
 
-        self::assertEquals(4, $metadata->id);
+        self::assertEquals(1, $metadata->id);
         self::assertEquals('-p-', $metadata->project_muid);
         self::assertEquals('-v-', $metadata->version_muid);
         self::assertEquals('-m-', $metadata->misuse_muid);
