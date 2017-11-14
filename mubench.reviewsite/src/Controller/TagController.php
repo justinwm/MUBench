@@ -11,22 +11,22 @@ use Slim\Http\Response;
 
 class TagController extends Controller
 {
-    public function postTag(Request $request, Response $response)
+    public function postTag(Request $request, Response $response, array $args)
     {
         $formData = $request->getParsedBody();
-        $tag_name = $formData['tag_name'];
-        $misuse_id = $formData['misuse_id'];
+        $tag_id = $formData['tag_name'];
+        $misuse_id = $args['misuse_id'];
 
-        $this->addTagToMisuse($misuse_id, $tag_name);
+        $this->addTagToMisuse($misuse_id, $tag_id);
 
         return $response->withRedirect("{$this->site_base_url}index.php/{$formData['path']}");
     }
 
-    public function deleteTag(Request $request, Response $response)
+    public function deleteTag(Request $request, Response $response, array $args)
     {
         $formData = $request->getParsedBody();
-        $tag_id = $formData['tag_id'];
-        $misuse_id = $formData['misuse_id'];
+        $tag_id = $args['tag_id'];
+        $misuse_id = $args['misuse_id'];
 
         $this->deleteTagFromMisuse($misuse_id, $tag_id);
 

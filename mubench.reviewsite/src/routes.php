@@ -45,19 +45,17 @@ $app->group('/private', function () use ($app) {
 $app->group('', function () use ($app, $settings) {
     $app->post('/metadata', \MuBench\ReviewSite\Controller\MetadataController::class.":putMetadata");
     // /experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/misuses/{misuse_id}/tags/{tag_id}
-    $app->post('/tags',\MuBench\ReviewSite\Controller\TagController::class.":postTag")->setName('private.tag.add');
-    // /experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/misuses/{misuse_id}/tags/{tag_id}/delete
-    $app->post('/delete/tag', \MuBench\ReviewSite\Controller\TagController::class.":deleteTag")->setName('private.tag.remove');
 
-    // /experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/runs
     $app->post('/experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/runs', \MuBench\ReviewSite\Controller\RunsController::class.":postRun");
 
     $app->group('/experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/misuses/{misuse_id}', function() use ($app) {
+        $app->post('/tags/add',\MuBench\ReviewSite\Controller\TagController::class.":postTag")->setName('private.tag.add');
+        $app->post('/tags/{tag_id}/delete', \MuBench\ReviewSite\Controller\TagController::class.":deleteTag")->setName('private.tag.remove');
+
         $app->post('/reviewers/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":postReview")->setName('private.update.review');
         // /snippets/{snippet_id}
         $app->post('/snippets', \MuBench\ReviewSite\Controller\SnippetController::class.":postSnippet")->setName('private.snippet.add');
-        // /snippets/{snippet_id}/delete
-        $app->post('/snippets/{snippet_id}', \MuBench\ReviewSite\Controller\SnippetController::class.":deleteSnippet")->setName('private.snippet.remove');
+        $app->post('/snippets/{snippet_id}/delete', \MuBench\ReviewSite\Controller\SnippetController::class.":deleteSnippet")->setName('private.snippet.remove');
     });
 
 })->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));

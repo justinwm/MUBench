@@ -95,9 +95,7 @@ use MuBench\ReviewSite\Models\Experiment;
                                 <span><?= htmlspecialchars($tag->name) ?></span>
                                 <?php if($user) : ?>
                                 <div style="display:inline-block;padding-right:2px;margin:0;color:black">
-                                    <form action="<?= $pathFor('tag.remove') ?>" method="post" target="">
-                                        <input type="hidden" name="misuse_id" value="<?= htmlspecialchars($misuse->id); ?>">
-                                        <input type="hidden" name="tag_id" value="<?= htmlspecialchars($tag->id); ?>">
+                                    <form action="<?= $pathFor('tag.remove', array('experiment_id' => $experiment->id, 'detector_id' => $detector->id, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'tag_id' => $tag->id)) ?>" method="post" target="">
                                         <input type="hidden" name="path" value="<?= htmlspecialchars($path); ?>">
                                         <button style="border:none;background-color:gray;outline:none;margin:0;padding:0" type="submit"><i class="fa fa-trash"></i></button>
                                     </form>
@@ -108,7 +106,7 @@ use MuBench\ReviewSite\Models\Experiment;
                     <?php endif; ?>
                     <?php if($user) : ?>
                             <div style="display:inline-block;height:100%;padding:4px;">
-                                <form id="tag-form" action="<?= $pathFor('tag.add') ?>" method="post" target="">
+                                <form id="tag-form" action="<?= $pathFor('tag.add', array('experiment_id' => $experiment->id, 'detector_id' => $detector->id, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id)) ?>" method="post" target="">
                                     <input type="hidden" name="misuse_id" value="<?= htmlspecialchars($misuse->id); ?>">
                                     <input type="hidden" name="path" value="<?= htmlspecialchars($path); ?>">
                                     <input id="tag-input" class="tag-input" maxlength="100" list="tags" name="tag_name" placeholder="add new tag" autocomplete="off">
