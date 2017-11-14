@@ -3,7 +3,6 @@
 namespace MuBench\ReviewSite\Controller;
 
 
-use Illuminate\Database\QueryException;
 use MuBench\ReviewSite\Models\Misuse;
 use MuBench\ReviewSite\Models\Tag;
 use Slim\Http\Request;
@@ -31,6 +30,25 @@ class TagController extends Controller
         $this->deleteTagFromMisuse($misuse_id, $tag_id);
 
         return $response->withRedirect("{$this->site_base_url}index.php/{$formData['path']}");
+    }
+
+    public function getTags(Request $request, Response $response, array $args)
+    {
+        $tags = Tag::all();
+        $results = array(1 => array(), 2 => array(), 3 => array());
+        $totals = array(1 => array(), 2 => array(), 3 => array());
+        foreach($tags as $tag){
+            $tagged_misuses = $tag->misuses;
+            foreach($tagged_misuses as $misuse){
+                $results[$misuse->run->experiment_id][$misuse->detector->name][$tag->name][] = $misuse;
+                $totals[$misuse->run->experiment_id][$tag->name][] = $misuse;
+            }
+        }
+        foreach($totals as $key => $total){
+            $results[$key]["total"] = $total;
+        }
+        return $this->renderer->render($response, 'tag_stats.phtml',
+            ['results' => $results, 'tags' => $tags]);
     }
 
     function addTagToMisuse($misuseId, $tagName)

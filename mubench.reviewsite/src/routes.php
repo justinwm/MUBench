@@ -22,10 +22,10 @@ $app->get('/experiments/{experiment_id}/detectors/{detector_id}/runs', \MuBench\
 $app->get('/experiments/{experiment_id}/detectors/{detector_id}/runs.csv', \MuBench\ReviewSite\Controller\RunsController::class.":downloadRuns")->setName('download.runs');
 $app->get('/experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/misuses/{misuse_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":getReview")->setName('view');
 $app->get('/experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/misuses/{misuse_id}/reviewers/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":getReview")->setName('review');
-$app->get('/results', \MuBench\ReviewSite\Controller\StatsController::class.":getResults")->setName('stats.results');
-$app->get('/experiments/{experiment_id}/results.csv', \MuBench\ReviewSite\Controller\StatsController::class.":downloadResults")->setName('stats.results.csv');
-$app->get('/tags', \MuBench\ReviewSite\Controller\StatsController::class.":getTags")->setName('stats.tags');
-$app->get('/types', \MuBench\ReviewSite\Controller\StatsController::class.":getTypes")->setName('stats.types');
+$app->get('/results', \MuBench\ReviewSite\Controller\RunsController::class.":getResults")->setName('stats.results');
+$app->get('/experiments/{experiment_id}/results.csv', \MuBench\ReviewSite\Controller\RunsController::class.":downloadResults")->setName('stats.results.csv');
+$app->get('/tags', \MuBench\ReviewSite\Controller\TagController::class.":getTags")->setName('stats.tags');
+$app->get('/types', \MuBench\ReviewSite\Controller\TypeController::class.":getTypes")->setName('stats.types');
 
 
 $app->group('/private', function () use ($app) {
@@ -36,10 +36,10 @@ $app->group('/private', function () use ($app) {
     $app->get('/experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/misuses/{misuse_id}/reviewers/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":getReview")->setName('private.review');
     $app->get('/experiments/{experiment_id}/reviews/{reviewer_id}/open', \MuBench\ReviewSite\Controller\ReviewController::class.":getTodo")->setName('private.todo');
     $app->get('/experiments/{experiment_id}/reviews/{reviewer_id}/closed', \MuBench\ReviewSite\Controller\ReviewController::class.":getOverview")->setName('private.overview');
-    $app->get('/results', \MuBench\ReviewSite\Controller\StatsController::class.":getResults")->setName('private.stats.results');
-    $app->get('/experiments/{experiment_id}/results.csv', \MuBench\ReviewSite\Controller\StatsController::class.":downloadResults")->setName('private.stats.results.csv');
-    $app->get('/tags', \MuBench\ReviewSite\Controller\StatsController::class.":getTags")->setName('private.stats.tags');
-    $app->get('/types', \MuBench\ReviewSite\Controller\StatsController::class.":getTypes")->setName('private.stats.types');
+    $app->get('/results', \MuBench\ReviewSite\Controller\RunsController::class.":getResults")->setName('private.stats.results');
+    $app->get('/experiments/{experiment_id}/results.csv', \MuBench\ReviewSite\Controller\RunsController::class.":downloadResults")->setName('private.stats.results.csv');
+    $app->get('/tags', \MuBench\ReviewSite\Controller\TagController::class.":getTags")->setName('private.stats.tags');
+    $app->get('/types', \MuBench\ReviewSite\Controller\TypeController::class.":getTypes")->setName('private.stats.types');
 })->add(new \MuBench\ReviewSite\Middleware\AuthMiddleware($container));
 
 $app->group('', function () use ($app, $settings) {
