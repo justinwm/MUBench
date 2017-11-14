@@ -14,7 +14,7 @@ class TagController extends Controller
     {
         $formData = $request->getParsedBody();
         $tag_id = $formData['tag_name'];
-        $misuse_id = $args['misuse_id'];
+        $misuse_id = $formData['misuse_id'];
 
         $this->addTagToMisuse($misuse_id, $tag_id);
 
@@ -25,7 +25,7 @@ class TagController extends Controller
     {
         $formData = $request->getParsedBody();
         $tag_id = $args['tag_id'];
-        $misuse_id = $args['misuse_id'];
+        $misuse_id = $formData['misuse_id'];
 
         $this->deleteTagFromMisuse($misuse_id, $tag_id);
 

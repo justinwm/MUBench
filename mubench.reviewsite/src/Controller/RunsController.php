@@ -24,7 +24,7 @@ class RunsController extends Controller
     public function getIndex(Request $request, Response $response, array $args)
     {
         $experiment_id = $args['experiment_id'];
-        $detector_muid = $args['detector_id'];
+        $detector_muid = $args['detector_muid'];
 
         $experiment = Experiment::find($experiment_id);
         $detector = Detector::find($detector_muid);
@@ -42,9 +42,9 @@ class RunsController extends Controller
     public function downloadRuns(Request $request, Response $response, array $args)
     {
         $experiment_id = $args['experiment_id'];
-        $detector_id = $args['detector_id'];
+        $detector_muid = $args['detector_muid'];
 
-        $detector = Detector::find($detector_id);
+        $detector = Detector::find($detector_muid);
         $experiment = Experiment::find($experiment_id);
         $ex2_review_size = $request->getQueryParam("ex2_review_size", $this->default_ex2_review_size);
 

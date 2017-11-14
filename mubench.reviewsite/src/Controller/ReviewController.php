@@ -20,10 +20,10 @@ class ReviewController extends Controller
     public function getReview(Request $request, Response $response, array $args)
     {
         $experiment_id = $args['experiment_id'];
-        $detector_muid = $args['detector_id'];
-        $project_id = $args['project_id'];
-        $version_id = $args['version_id'];
-        $misuse_id = $args['misuse_id'];
+        $detector_muid = $args['detector_muid'];
+        $project_muid = $args['project_muid'];
+        $version_muid = $args['version_muid'];
+        $misuse_muid = $args['misuse_muid'];
 
         $experiment = Experiment::find($experiment_id);
         $detector = Detector::find($detector_muid);
@@ -32,14 +32,14 @@ class ReviewController extends Controller
         $resolution_reviewer = Reviewer::firstOrCreate(['name' => 'resolution']);
         $is_reviewer = ($this->user && $reviewer && $this->user->id == $reviewer->id) || ($reviewer && $reviewer->id == $resolution_reviewer->id);
 
-        $misuse = Misuse::find($misuse_id);
+        $misuse = Run::of($detector)->in($experiment)->where(['project_muid' => $project_muid, 'version_muid' => $version_muid])->first()->misuses()->where('misuse_muid', $misuse_muid)->first();
         $all_violation_types = Type::all();
         $all_tags = Tag::all();
 
         $review = $misuse->getReview($reviewer);
 
         return $this->renderer->render($response, 'review.phtml', ['reviewer' => $reviewer, 'is_reviewer' => $is_reviewer,
-            'misuse' => $misuse,'experiment' => $experiment,
+            'misuse' => $misuse, 'experiment' => $experiment,
             'detector' => $detector, 'review' => $review,
             'violation_types' => $all_violation_types, 'tags' => $all_tags]);
     }
@@ -100,12 +100,13 @@ class ReviewController extends Controller
     {
         $review = $request->getParsedBody();
         $experiment_id = $args['experiment_id'];
-        $detector_muid = $args['detector_id'];
-        $project_id = $args['project_id'];
-        $version_id = $args['version_id'];
-        $misuse_id = $args['misuse_id'];
+        $detector_muid = $args['detector_muid'];
+        $project_muid = $args['project_muid'];
+        $version_muid = $args['version_muid'];
+        $misuse_muid = $args['misuse_muid'];
         $reviewer_id = $args['reviewer_id'];
         $comment = $review['review_comment'];
+        $misuse_id = $review['misuse_id'];
         $hits = $review['review_hit'];
 
         $this->updateOrCreateReview($misuse_id, $reviewer_id, $comment, $hits);
@@ -114,8 +115,8 @@ class ReviewController extends Controller
             return $response->withRedirect("{$this->site_base_url}index.php/{$review["origin"]}");
         }else {
             return $response->withRedirect($this->router->pathFor("private.review", ["experiment_id" => $experiment_id,
-                "detector_id" => $detector_muid, "project_id" => $project_id, "version_id" => $version_id,
-                "misuse_id" => $misuse_id, "reviewer_id" => $reviewer_id]));
+                "detector_muid" => $detector_muid, "project_muid" => $project_muid, "version_muid" => $version_muid,
+                "misuse_muid" => $misuse_muid, "reviewer_id" => $reviewer_id]));
         }
     }
 
