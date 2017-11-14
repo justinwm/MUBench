@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Misuse extends Model
 {
 
-    protected $fillable = ['misuse_muid', 'run_id', 'detector_id', 'metadata_id'];
+    protected $fillable = ['misuse_muid', 'run_id', 'detector_muid', 'metadata_id'];
 
     public function metadata()
     {

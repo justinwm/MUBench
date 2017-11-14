@@ -15,8 +15,8 @@ class ReviewStateTest extends SlimTestCase
 {
     function test_no_potential_hits()
     {
-        $misuse = Misuse::create(['misuse_muid' => "test", 'run_id' => 1, 'detector_id' => 1]);
-        $detector = Detector::firstOrCreate(['name' => 'test-detector']);
+        $misuse = Misuse::create(['misuse_muid' => "test", 'run_id' => 1, 'detector_muid' => 'test-detector']);
+        $detector = Detector::firstOrCreate(['muid' => 'test-detector']);
         $finding = new \MuBench\ReviewSite\Models\Finding;
         $finding->setDetector($detector);
         Schema::create($finding->getTable(), function (Blueprint $table) {
@@ -118,8 +118,8 @@ class ReviewStateTest extends SlimTestCase
 
     private function someMisuseWithOneFindingAndReviewDecisions($decisions, $resolutionDecision = null)
     {
-        $misuse = Misuse::create(['misuse_muid' => "test", 'run_id' => 1, 'detector_id' => 1]);
-        $detector = Detector::firstOrCreate(['name' => 'test-detector']);
+        $misuse = Misuse::create(['misuse_muid' => "test", 'run_id' => 1, 'detector_muid' => 'test-detector']);
+        $detector = Detector::firstOrCreate(['muid' => 'test-detector']);
         $finding = $this->createFindingWith(Experiment::find(2), $detector, $misuse);
         $reviewController = new ReviewController($this->container);
         foreach ($decisions as $index => $decision) {

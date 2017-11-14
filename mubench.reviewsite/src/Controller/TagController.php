@@ -40,7 +40,7 @@ class TagController extends Controller
         foreach($tags as $tag){
             $tagged_misuses = $tag->misuses;
             foreach($tagged_misuses as $misuse){
-                $results[$misuse->run->experiment_id][$misuse->detector->name][$tag->name][] = $misuse;
+                $results[$misuse->run->experiment_id][$misuse->detector->muid][$tag->name][] = $misuse;
                 $totals[$misuse->run->experiment_id][$tag->name][] = $misuse;
             }
         }

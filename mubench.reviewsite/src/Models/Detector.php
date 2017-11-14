@@ -8,13 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Detector extends Model
 {
     public $timestamps = false;
-    protected $fillable = ['name'];
+    public $incrementing = false;
+    protected $fillable = ['muid'];
+    protected $primaryKey = 'muid';
 
     public static function withFindings(Experiment $experiment)
     {
         return Detector::all()->filter(function(Detector $detector) use ($experiment) {
             return $detector->hasResults($experiment);
-        })->sortBy('name');
+        })->sortBy('muid');
     }
 
     public function hasResults(Experiment $experiment)

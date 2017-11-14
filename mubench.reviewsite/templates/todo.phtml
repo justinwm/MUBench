@@ -45,7 +45,7 @@ $markdown_parser = new Parsedown();
     <tbody>
     <?php $last_project = ""; $version = ""; ?>
     <?php foreach($open_misuses as $detector => $misuses) : ?>
-    <?php foreach($misuses as $misuse) : /** @var \MuBench\ReviewSite\Model\Misuse $misuse */ ?>
+    <?php foreach($misuses as $misuse) : /** @var \MuBench\ReviewSite\Models\Misuse $misuse */ ?>
         <?php
         $project = $misuse->getProject();
         $new_project = strcmp($last_project, $misuse->getProject()) !== 0;
@@ -68,7 +68,7 @@ $markdown_parser = new Parsedown();
             <td class="<?= $style_classes ?>">
                 <?= $markdown_parser->text($misuse->misuse_muid); ?></td>
             <?php
-            $resolution_review = $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_id, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => 1));
+            $resolution_review = $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_muid, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => 1));
             ?>
             <td class="<?= $style_classes ?>">
                 <?php $review_state = $misuse->getReviewState() ?>
@@ -95,11 +95,11 @@ $markdown_parser = new Parsedown();
                 <ul class="inline">
                     <?php foreach($misuse->getReviews() as $review) : /** @var \MuBench\ReviewSite\Model\Review $review */ ?>
                         <?php $reviewer_name = htmlspecialchars($review->reviewer->name) ?>
-                        <li style="display:inline"><a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_id, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => $review->reviewer->id)) ?><?= $reviewer_name ?>"></a></li>
+                        <li style="display:inline"><a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_muid, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => $review->reviewer->id)) ?><?= $reviewer_name ?>"></a></li>
                     <?php endforeach; ?>
                 </ul>
             </td>
-            <td><a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_id, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => $user->id));
+            <td><a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_muid, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => $user->id));
                             ?><?= $origin_param ?>" class="button">review</a></td>
         </tr>
         <?php

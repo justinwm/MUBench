@@ -24,10 +24,10 @@ class RunsController extends Controller
     public function getIndex(Request $request, Response $response, array $args)
     {
         $experiment_id = $args['experiment_id'];
-        $detector_id = $args['detector_id'];
+        $detector_muid = $args['detector_id'];
 
         $experiment = Experiment::find($experiment_id);
-        $detector = Detector::find($detector_id);
+        $detector = Detector::find($detector_muid);
         $ex2_review_size = $request->getQueryParam("ex2_review_size", $this->default_ex2_review_size);
 
         $runs = $this->getRuns($detector, $experiment, $ex2_review_size);
@@ -50,7 +50,7 @@ class RunsController extends Controller
 
         $runs = $this->getRuns($detector, $experiment, $ex2_review_size);
 
-        return download($response, self::exportRunStatistics($runs), $detector->name . ".csv");
+        return download($response, self::exportRunStatistics($runs), $detector->muid . ".csv");
     }
 
     public function getResults(Request $request, Response $response, array $args)
@@ -174,7 +174,7 @@ class RunsController extends Controller
         $misuseId = $run->{'misuse'};
         $detectorName = $run->{'detector'};
 
-        $detector = Detector::firstOrCreate(['name' => $detectorName]);
+        $detector = Detector::firstOrCreate(['muid' => $detectorName]);
         $experiment = Experiment::find($experimentId);
 
         $potential_hits = $run->{'potential_hits'};
@@ -324,12 +324,12 @@ class RunsController extends Controller
         if ($experiment->id == 1 || $experiment->id == 3) {
             $metadata = Metadata::where(['project_muid' => $projectId, 'version_muid' => $versionId, 'misuse_muid' => $misuseId])->first();
             if($metadata){
-                $misuse = Misuse::create(['metadata_id' => $metadata->id, 'misuse_muid' => $misuseId, 'run_id' => $runId, 'detector_id' => $detector->id]);
+                $misuse = Misuse::create(['metadata_id' => $metadata->id, 'misuse_muid' => $misuseId, 'run_id' => $runId, 'detector_muid' => $detector->muid]);
             } else {
-                $misuse = Misuse::create(['misuse_muid' => $misuseId, 'run_id' => $runId, 'detector_id' => $detector->id]);
+                $misuse = Misuse::create(['misuse_muid' => $misuseId, 'run_id' => $runId, 'detector_muid' => $detector->muid]);
             }
         } else {
-            $misuse = Misuse::create(['misuse_muid' => $misuseId, 'run_id' => $runId, 'detector_id' => $detector->id]);
+            $misuse = Misuse::create(['misuse_muid' => $misuseId, 'run_id' => $runId, 'detector_muid' => $detector->muid]);
         }
         return $misuse;
     }
@@ -399,7 +399,7 @@ class RunsController extends Controller
                     $run->misuses = $misuses;
                 }
             }
-            $results[$detector->id] = new DetectorResult($detector, $runs);
+            $results[$detector->muid] = new DetectorResult($detector, $runs);
         }
         $results["total"] = new ExperimentResult($results);
         return $results;

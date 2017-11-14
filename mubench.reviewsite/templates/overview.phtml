@@ -44,7 +44,7 @@ use MuBench\ReviewSite\Models\ReviewState;
     <tbody>
     <?php $last_project = ""; $version = "" ?>
     <?php foreach($closed_misuses as $detector => $misuses) : ?>
-    <?php foreach($misuses as $misuse) : /** @var \MuBench\ReviewSite\Model\Misuse $misuse */ ?>
+    <?php foreach($misuses as $misuse) : /** @var \MuBench\ReviewSite\Models\Misuse $misuse */ ?>
         <?php
         $project = $misuse->getProject();
         $new_project = strcmp($last_project, $misuse->getProject()) !== 0;
@@ -65,7 +65,7 @@ use MuBench\ReviewSite\Models\ReviewState;
                 <td class="<?= $style_classes ?>">
                     <?= htmlspecialchars($misuse->misuse_muid); ?></td>
                 <?php
-                $resolution_review = $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_id, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => 1));
+                $resolution_review = $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_muid, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => 1));
                 ?>
                 <td class="<?= $style_classes ?>">
                     <?php $review_state = $misuse->getReviewState() ?>
@@ -93,13 +93,13 @@ use MuBench\ReviewSite\Models\ReviewState;
                         <?php foreach($misuse->getReviews() as $review) : /** @var \MuBench\ReviewSite\Model\Review $review */ ?>
                             <?php $reviewer_name = htmlspecialchars($review->reviewer->name) ?>
                             <?php if($reviewer_name !== $user->name) : ?>
-                                <li style="display:inline"><a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_id, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => $review->reviewer->id)) ?>"><?= $reviewer_name ?></a></li>
+                                <li style="display:inline"><a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_muid, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => $review->reviewer->id)) ?>"><?= $reviewer_name ?></a></li>
                             <?php endif; ?>
                         <?php endforeach; ?>
                     </ul>
                 </td>
                 <td class="<?= $style_classes ?>">
-                    <a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_id, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => $user->id)) ?><?= $origin_param ?>" class="button">edit
+                    <a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_id' => $misuse->detector_muid, 'project_id' => $misuse->getProject(), 'version_id' => $misuse->getVersion(), 'misuse_id' => $misuse->id, 'reviewer_id' => $user->id)) ?><?= $origin_param ?>" class="button">edit
                         <?php $your_decision = $misuse->getReview($user)->getDecision() ?>
                         <?php if ($your_decision == Decision::YES): ?>
                             (<i class="fa fa-thumbs-o-up" aria-hidden="true" style="color:green;" title="Yes"></i>)

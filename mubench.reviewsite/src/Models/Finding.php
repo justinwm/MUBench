@@ -8,7 +8,7 @@ class Finding extends DetectorDependent
 
     protected  function getTableName(Detector $detector)
     {
-        return 'detector_' . $detector->id;
+        return 'detector_' . $detector->muid;
     }
 
     public function misuse()

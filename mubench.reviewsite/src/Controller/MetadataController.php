@@ -4,7 +4,6 @@ namespace MuBench\ReviewSite\Controller;
 
 use Monolog\Logger;
 use MuBench\ReviewSite\DBConnection;
-use MuBench\ReviewSite\Model\Detector;
 use MuBench\ReviewSite\Models\Metadata;
 use MuBench\ReviewSite\Models\Pattern;
 use MuBench\ReviewSite\Models\Snippet;

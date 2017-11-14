@@ -20,6 +20,6 @@ class DetectorResult extends RunsResult
 
     public function getDisplayName()
     {
-        return $this->detector->name;
+        return $this->detector->muid;
     }
 }

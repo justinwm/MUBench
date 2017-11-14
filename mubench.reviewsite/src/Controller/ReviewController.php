@@ -20,13 +20,13 @@ class ReviewController extends Controller
     public function getReview(Request $request, Response $response, array $args)
     {
         $experiment_id = $args['experiment_id'];
-        $detector_id = $args['detector_id'];
+        $detector_muid = $args['detector_id'];
         $project_id = $args['project_id'];
         $version_id = $args['version_id'];
         $misuse_id = $args['misuse_id'];
 
         $experiment = Experiment::find($experiment_id);
-        $detector = Detector::find($detector_id);
+        $detector = Detector::find($detector_muid);
 
         $reviewer = array_key_exists('reviewer_id', $args) ? Reviewer::find($args['reviewer_id']) : $this->user;
         $resolution_reviewer = Reviewer::firstOrCreate(['name' => 'resolution']);
@@ -61,7 +61,7 @@ class ReviewController extends Controller
                 foreach($run->misuses as $misuse){
                     /** @var Misuse $misuse */
                     if(!$misuse->hasReviewed($reviewer) && !$misuse->hasSufficientReviews() && $misuse->findings){
-                        $open_misuses[$detector->name][] = $misuse;
+                        $open_misuses[$detector->muid][] = $misuse;
                     }
                 }
             }
@@ -87,7 +87,7 @@ class ReviewController extends Controller
                 foreach($run->misuses as $misuse){
                     /** @var Misuse $misuse */
                     if($misuse->hasReviewed($reviewer)){
-                        $closed_misuses[$detector->name][] = $misuse;
+                        $closed_misuses[$detector->muid][] = $misuse;
                     }
                 }
             }
@@ -100,7 +100,7 @@ class ReviewController extends Controller
     {
         $review = $request->getParsedBody();
         $experiment_id = $args['experiment_id'];
-        $detector_id = $args['detector_id'];
+        $detector_muid = $args['detector_id'];
         $project_id = $args['project_id'];
         $version_id = $args['version_id'];
         $misuse_id = $args['misuse_id'];
@@ -114,7 +114,7 @@ class ReviewController extends Controller
             return $response->withRedirect("{$this->site_base_url}index.php/{$review["origin"]}");
         }else {
             return $response->withRedirect($this->router->pathFor("private.review", ["experiment_id" => $experiment_id,
-                "detector_id" => $detector_id, "project_id" => $project_id, "version_id" => $version_id,
+                "detector_id" => $detector_muid, "project_id" => $project_id, "version_id" => $version_id,
                 "misuse_id" => $misuse_id, "reviewer_id" => $reviewer_id]));
         }
     }

@@ -26,8 +26,7 @@ $experiment3->save();
 echo 'Creating detectors table<br/>';
 Schema::dropIfExists('detectors');
 Schema::create('detectors', function (Blueprint $table) {
-    $table->increments('id');
-    $table->string('name', 100);
+    $table->string('muid', 100);
 });
 
 echo 'Creating finding snippet<br/>';
@@ -77,7 +76,7 @@ Schema::dropIfExists($misuse->getTable());
 Schema::create($misuse->getTable(), function (Blueprint $table) {
     $table->increments('id');
     $table->integer('metadata_id')->nullable();
-    $table->integer('detector_id');
+    $table->string('detector_muid');
     $table->integer('run_id');
     $table->string('misuse_muid', 30);
     $table->dateTime('created_at');
