@@ -5,6 +5,7 @@ require_once "SlimTestCase.php";
 use MuBench\ReviewSite\Controller\FindingsController;
 use MuBench\ReviewSite\Controller\FindingsUploader;
 use MuBench\ReviewSite\Controller\MetadataController;
+use MuBench\ReviewSite\Controller\RunsController;
 use MuBench\ReviewSite\Controller\SnippetUploader;
 use MuBench\ReviewSite\Controller\MisuseTagsController;
 use MuBench\ReviewSite\Model\Misuse;
@@ -12,12 +13,12 @@ use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\Experiment;
 use MuBench\ReviewSite\Models\Run;
 
-class FindingsControllerTest extends SlimTestCase
+class RunsControllerTest extends SlimTestCase
 {
     private $request_body;
 
-    /** @var FindingsController */
-    private $findingController;
+    /** @var RunsController */
+    private $runsController;
 
     function setUp()
     {
@@ -43,12 +44,12 @@ class FindingsControllerTest extends SlimTestCase
                     "custom2" => "-val2-"
                 ]]
         ]));
-        $this->findingController = new FindingsController($this->container);
+        $this->runsController = new RunsController($this->container);
     }
 
     function test_store_ex1()
     {
-        $this->findingController->processData(1, $this->request_body);
+        $this->runsController->addRun(1, $this->request_body);
         $detector = Detector::where('name', '=', '-d-')->first();
         $run = Run::of($detector)->in(Experiment::find(1))->where(['project_muid' => '-p-', 'version_muid' => '-v-'])->first();
 
@@ -62,7 +63,7 @@ class FindingsControllerTest extends SlimTestCase
 
     function test_store_ex2()
     {
-        $this->findingController->processData(2, $this->request_body);
+        $this->runsController->addRun(2, $this->request_body);
         $detector = Detector::where('name', '=', '-d-')->first();
         $run = Run::of($detector)->in(Experiment::find(2))->where(['project_muid' => '-p-', 'version_muid' => '-v-'])->first();
 
@@ -94,7 +95,7 @@ class FindingsControllerTest extends SlimTestCase
 
     function test_store_ex3()
     {
-        $this->findingController->processData(3, $this->request_body);
+        $this->runsController->addRun(3, $this->request_body);
         $detector = Detector::where('name', '=', '-d-')->first();
         $run = Run::of($detector)->in(Experiment::find(3))->where(['project_muid' => '-p-', 'version_muid' => '-v-'])->first();
 
@@ -113,7 +114,7 @@ class FindingsControllerTest extends SlimTestCase
             ['file' => '-file-location-', 'method' => '-method-location-'], [],
             [['id' => '-p1-', 'snippet' => ['code' => '-code-', 'first_line' => 42]]], []);
 
-        $this->findingController->processData(1, json_decode(<<<EOT
+        $this->runsController->addRun(1, json_decode(<<<EOT
     {
         "detector": "-d-",
         "project": "-p-",
