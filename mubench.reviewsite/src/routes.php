@@ -50,40 +50,7 @@ $app->group('', function () use ($app, $settings) {
     $app->post('/delete/tag', \MuBench\ReviewSite\Controller\TagController::class.":deleteTag")->setName('private.tag.remove');
 
     // /experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/runs
-    $app->post('/experiments/[{experiment_id}]',
-        function (Request $request, Response $response, array $args) use ($settings) {
-            $experimentId = $args['experiment_id'];
-            $run = decodeJsonBody($request);
-            if (!$run) {
-                return error_response($response,400, "empty: " . print_r($_POST, true));
-            }
-            $detector = $run->{'detector'};
-            if (!$detector) {
-                return error_response($response,400, "no detector: " . print_r($run, true));
-            }
-            $project = $run->{'project'};
-            if (!$project) {
-                return error_response($response,400, "no project: " . print_r($run, true));
-            }
-            $version = $run->{'version'};
-            if (!$version) {
-                return error_response($response,400, "no version: " . print_r($run, true));
-            }
-            $hits = $run->{'potential_hits'};
-            $this->logger->info("received data for '" . $experimentId . "', '" . $project . "." . $version . "' with " . count($hits) . " potential hits.");
-
-            $uploader = new FindingsController($this->container);
-            $uploader->processData($experimentId, $run);
-            $files = $request->getUploadedFiles();
-            $this->logger->info("received " . count($files) . " files");
-            if ($files) {
-                $directoryHelper = new DirectoryHelper($settings['upload'], $this->logger);
-                foreach ($files as $img) {
-                    $directoryHelper->handleImage($experimentId, $detector, $project, $version, $img);
-                }
-            }
-            return $response->withStatus(200);
-        });
+    $app->post('/experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/runs', \MuBench\ReviewSite\Controller\RunsController::class.":postRun");
 
     $app->group('/experiments/{experiment_id}/detectors/{detector_id}/projects/{project_id}/versions/{version_id}/misuses/{misuse_id}', function() use ($app) {
         $app->post('/reviewers/{reviewer_id}', \MuBench\ReviewSite\Controller\ReviewController::class.":postReview")->setName('private.update.review');
