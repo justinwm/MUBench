@@ -5,15 +5,15 @@ use Illuminate\Support\Facades\Schema;
 
 
 echo 'Creating experiments<br/>';
-$experiment = new \MuBench\ReviewSite\Models\Experiment;
-Schema::dropIfExists($experiment->getTable());
-Schema::create($experiment->getTable(), function (Blueprint $table) {
+$experiment1 = new \MuBench\ReviewSite\Models\Experiment;
+Schema::dropIfExists($experiment1->getTable());
+Schema::create($experiment1->getTable(), function (Blueprint $table) {
     $table->increments('id');
     $table->string('name', 100);
 });
-$experiment->id = 1;
-$experiment->name = "Provided Patterns";
-$experiment->save();
+$experiment1->id = 1;
+$experiment1->name = "Provided Patterns";
+$experiment1->save();
 $experiment2 = new \MuBench\ReviewSite\Models\Experiment;
 $experiment2->id = 2;
 $experiment2->name = "All Findings";
@@ -100,8 +100,10 @@ $reviewer = new \MuBench\ReviewSite\Models\Reviewer;
 Schema::dropIfExists($reviewer->getTable());
 Schema::create($reviewer->getTable(), function (Blueprint $table) {
     $table->increments('id');
-    $table->text('name');
+    $table->text('name')->unique();
 });
+$reviewer->name = 'resolution';
+$reviewer->save();
 
 echo 'Creating finding reviews<br/>';
 $findingReview = new \MuBench\ReviewSite\Models\FindingReview;
