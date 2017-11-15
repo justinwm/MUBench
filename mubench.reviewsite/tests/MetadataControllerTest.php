@@ -41,7 +41,7 @@ class MetadataControllerTest extends SlimTestCase
         self::assertEquals('-pattern-code-', $metadata->patterns[0]->code);
         self::assertEquals(42, $metadata->patterns[0]->line);
         self::assertEquals(1 , count($metadata->violation_types()));
-        self::assertEquals('missing/call', $metadata->violation_types()[0]->name);
+        self::assertEquals('missing/call', $metadata->violation_types[0]->name);
         // TODO: snippet test if added
     }
 
@@ -70,7 +70,7 @@ class MetadataControllerTest extends SlimTestCase
         self::assertEquals('-pattern-code-', $metadata->patterns[0]->code);
         self::assertEquals(42, $metadata->patterns[0]->line);
         self::assertEquals(1 , count($metadata->violation_types()));
-        self::assertEquals('missing/call', $metadata->violation_types()[0]->name);
+        self::assertEquals('missing/call', $metadata->violation_types[0]->name);
         // TODO: snippet test if added
     }
 

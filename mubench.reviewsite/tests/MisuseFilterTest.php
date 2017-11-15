@@ -8,6 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\Experiment;
+use MuBench\ReviewSite\Models\Reviewer;
 use SlimTestCase;
 
 class MisuseFilterTest extends SlimTestCase
@@ -22,7 +23,7 @@ class MisuseFilterTest extends SlimTestCase
     private $detector;
 
     private $undecided_review = [
-        'reviewer_id' => 2,
+        'reviewer_id' => 1,
         'misuse_id' => 1,
         'review_comment' => '-comment-',
         'review_hit' => [
@@ -36,7 +37,7 @@ class MisuseFilterTest extends SlimTestCase
     ];
 
     private $decided_review = [
-        'reviewer_id' => 3,
+        'reviewer_id' => 2,
         'misuse_id' => 1,
         'review_comment' => '-comment-',
         'review_hit' => [
@@ -55,6 +56,8 @@ class MisuseFilterTest extends SlimTestCase
         $this->reviewController = new ReviewController($this->container);
         $this->runController = new RunsController($this->container);
         $this->detector = Detector::create(['muid' => 'test-detector']);
+        Reviewer::create(['name' => 'test-reviewer1']);
+        Reviewer::create(['name' => 'test-reviewer2']);
         $this->experiment = Experiment::find(2);
         $run = new \MuBench\ReviewSite\Models\Run;
         $run->setDetector($this->detector);

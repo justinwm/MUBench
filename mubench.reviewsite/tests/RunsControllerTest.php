@@ -36,7 +36,6 @@ class RunsControllerTest extends SlimTestCase
         parent::setUp();
         $this->detector1 = Detector::firstOrCreate(['muid' => '-d1-']);
         $this->detector2 = Detector::firstOrCreate(['muid' => '-d2-']);
-        $this->resolution = Reviewer::create(['name' => 'resolution']);
         $this->request_body = json_decode(json_encode([
             "detector" => "-d-",
             "project" => "-p-",
