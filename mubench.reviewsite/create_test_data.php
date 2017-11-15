@@ -12,4 +12,6 @@ $container = $app->getContainer();
 
 require __DIR__ . '/src/dependencies.php';
 
-require __DIR__ . '/tests/create_test_database.php';
+require __DIR__ . '/tests/create_database_tables.php';
+
+require __DIR__ . '/tests/create_simple_test_data.php';

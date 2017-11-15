@@ -51,7 +51,7 @@ class SlimTestCase extends TestCase
         /** @noinspection PhpParamsInspection */
         \Illuminate\Support\Facades\Schema::setFacadeApplication(["db" => $capsule]);
 
-        require __DIR__ . '/create_test_database.php';
+        require __DIR__ . '/create_database_tables.php';
         $container = $app->getContainer();
         $container['database2'] = $this->db;
         $container['schema'] = $this->schema;
