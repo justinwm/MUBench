@@ -63,6 +63,6 @@ class Review extends Model
     }
 
     private function getFindingReviews($rank){
-        return $this->finding_reviews->whereStrict('rank', $rank)->first();
+        return $this->finding_reviews->where('rank', $rank)->first();
     }
 }
