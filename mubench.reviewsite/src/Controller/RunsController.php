@@ -104,18 +104,26 @@ class RunsController extends Controller
 
     function getRuns($detector, $experiment, $max_reviews)
     {
-        $runs = Run::of($detector)->in($experiment)->get();
+        $runs = Run::of($detector)->in($experiment)->orderBy('project_muid')->orderBy('version_muid')->get();
 
         foreach($runs as $run){
             $conclusive_reviews = 0;
             $filtered_misuses = new Collection;
-            foreach ($run->misuses as $misuse) {
-                if ($conclusive_reviews >= $max_reviews) {
-                    break;
+            $misuses = $run->misuses->sortBy('misuse_muid');
+            if($experiment->id === 2) {
+                foreach ($misuses as $misuse) {
+                    if ($conclusive_reviews >= $max_reviews) {
+                        break;
+                    }
+                    $filtered_misuses->add($misuse);
+                    if ($misuse->hasConclusiveReviewState() || (!$misuse->hasSufficientReviews() && !$misuse->hasInconclusiveReview())) {
+                        $conclusive_reviews++;
+                    }
                 }
-                $filtered_misuses->add($misuse);
-                if ($misuse->hasConclusiveReviewState() || (!$misuse->hasSufficientReviews() && !$misuse->hasInconclusiveReview())) {
-                    $conclusive_reviews++;
+            }
+            foreach($misuses as $misuse){
+                if($misuse->metadata){
+                    $filtered_misuses->add($misuse);
                 }
             }
             $run->misuses = $filtered_misuses;
