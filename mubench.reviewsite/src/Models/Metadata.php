@@ -17,13 +17,7 @@ class Metadata extends Model
 
     public function violation_types()
     {
-        $types = [];
-        foreach(Type::all() as $type){
-            if($type->metadata->where('id', $this->id)->first()){
-                $types[] = $type;
-            }
-        }
-        return $types;
+        return $this->belongsToMany(Type::class, 'metadata_types', 'metadata_id', 'type_id');
     }
 
 }

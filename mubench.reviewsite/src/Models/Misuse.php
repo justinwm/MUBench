@@ -3,6 +3,7 @@
 namespace MuBench\ReviewSite\Models;
 
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class Misuse extends Model
@@ -80,15 +81,12 @@ class Misuse extends Model
         return $instance;
     }
 
-    // TODO: somehow link misuse with runs (custom table name problem)
-
-    // TODO: implement all methods
     public function getViolationTypes()
     {
         if($this->metadata){
-           return $this->metadata->violation_types();
+           return $this->metadata->violation_types;
         }
-        return [];
+        return new Collection;
     }
 
     public function getReviews()
