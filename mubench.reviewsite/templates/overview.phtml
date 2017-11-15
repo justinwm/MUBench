@@ -65,7 +65,7 @@ use MuBench\ReviewSite\Models\ReviewState;
                 <td class="<?= $style_classes ?>">
                     <?= htmlspecialchars($misuse->misuse_muid); ?></td>
                 <?php
-                $resolution_review = $pathFor('review', array('experiment_id' => $experiment->id, 'detector_muid' => $misuse->detector_muid, 'project_muid' => $misuse->getProject(), 'version_muid' => $misuse->getVersion(), 'misuse_muid' => $misuse->misuse_muid, 'reviewer_id' => 1));
+                $resolution_review = $pathFor('review', array('experiment_id' => $experiment->id, 'detector_muid' => $misuse->detector_muid, 'project_muid' => $misuse->getProject(), 'version_muid' => $misuse->getVersion(), 'misuse_muid' => $misuse->misuse_muid, 'reviewer_id' => $resolution_reviewer->id));
                 ?>
                 <td class="<?= $style_classes ?>">
                     <?php $review_state = $misuse->getReviewState() ?>
@@ -90,7 +90,7 @@ use MuBench\ReviewSite\Models\ReviewState;
                 </td>
                 <td class="<?= $style_classes ?>">
                     <ul class="inline">
-                        <?php foreach($misuse->getReviews() as $review) : /** @var \MuBench\ReviewSite\Model\Review $review */ ?>
+                        <?php foreach($misuse->getReviews() as $review) : /** @var \MuBench\ReviewSite\Models\Review $review */ ?>
                             <?php $reviewer_name = htmlspecialchars($review->reviewer->name) ?>
                             <?php if($reviewer_name !== $user->name) : ?>
                                 <li style="display:inline"><a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_muid' => $misuse->detector_muid, 'project_muid' => $misuse->getProject(), 'version_muid' => $misuse->getVersion(), 'misuse_muid' => $misuse->misuse_muid, 'reviewer_id' => $review->reviewer->id)) ?>"><?= $reviewer_name ?></a></li>

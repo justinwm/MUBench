@@ -82,7 +82,9 @@ $markdown_parser = new Parsedown();
     </tr>
     </thead>
     <tbody>
-    <?php $last_project = "" ?>
+    <?php
+        $last_project = ""
+    ?>
     <?php foreach ($runs as $run) : ?>
         <?php
         $project = $run->project_muid;
@@ -96,11 +98,11 @@ $markdown_parser = new Parsedown();
         });
         sort($additional_stats);
         ?>
-        <?php foreach ($run->misuses as $misuse) : /* @var $misuse \MuBench\ReviewSite\Models\Misuse */ ?>
+        <?php foreach ($run->misuses->sortBy('misuse_muid') as $misuse) : /* @var $misuse \MuBench\ReviewSite\Models\Misuse */ ?>
             <?php
             $classes = [];
             if ($new_project) $classes[] = "top";
-            //if (!$misuse->hasPotentialHits()) $classes[] = "no-hit";
+            if(!$misuse->hasPotentialHits()) $classes[] = "no-hit";
             $style_classes = implode(" ", $classes);
             ?>
             <tr>
@@ -138,17 +140,17 @@ $markdown_parser = new Parsedown();
                         <?php elseif ($review_state == ReviewState::NEEDS_CLARIFICATION): ?>
                             <i class="fa fa-question-circle" aria-hidden="true" style="color:blue;" title="Needs Clarification"></i>
                         <?php elseif ($review_state == ReviewState::DISAGREEMENT): ?>
-                        <a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_muid' => $detector->muid, 'project_muid' => $project, 'version_muid' => $version, 'misuse_muid' => $misuse->misuse_muid, 'reviewer_id' => 1)) ?>"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color:red;" title="Disagreement"></i></a>
+                        <a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_muid' => $detector->muid, 'project_muid' => $project, 'version_muid' => $version, 'misuse_muid' => $misuse->misuse_muid, 'reviewer_id' => $resolution_reviewer->id)) ?>"><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color:red;" title="Disagreement"></i></a>
                         <?php elseif ($review_state == ReviewState::AGREEMENT_YES): ?>
                             <i class="fa fa-thumbs-o-up" aria-hidden="true" style="color:green;" title="Agreement: Yes"></i>
                         <?php elseif ($review_state == ReviewState::AGREEMENT_NO): ?>
                             <i class="fa fa-thumbs-o-down" aria-hidden="true" style="color:darkred;" title="Agreement: No"></i>
                         <?php elseif ($review_state == ReviewState::RESOLVED_YES): ?>
                             <i class="fa fa-thumbs-o-up" aria-hidden="true" style="color:green;" title="Resolved: Yes"></i>
-                            (<a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_muid' => $detector->muid, 'project_muid' => $project, 'version_muid' => $version, 'misuse_muid' => $misuse->misuse_muid, 'reviewer_id' => 1)) ?>"><i class="fa fa-handshake-o" aria-hidden="true" title="Resolution"></i></a>)
+                            (<a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_muid' => $detector->muid, 'project_muid' => $project, 'version_muid' => $version, 'misuse_muid' => $misuse->misuse_muid, 'reviewer_id' => $resolution_reviewer->id)) ?>"><i class="fa fa-handshake-o" aria-hidden="true" title="Resolution"></i></a>)
                         <?php elseif ($review_state == ReviewState::RESOLVED_NO): ?>
                             <i class="fa fa-thumbs-o-down" aria-hidden="true" style="color:darkred;" title="Resolved: No"></i>
-                            (<a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_muid' => $detector->muid, 'project_muid' => $project, 'version_muid' => $version, 'misuse_muid' => $misuse->misuse_muid, 'reviewer_id' => 1)) ?>"><i class="fa fa-handshake-o" aria-hidden="true" title="Resolution"></i></a>)
+                            (<a href="<?= $pathFor('review', array('experiment_id' => $experiment->id, 'detector_muid' => $detector->muid, 'project_muid' => $project, 'version_muid' => $version, 'misuse_muid' => $misuse->misuse_muid, 'reviewer_id' => $resolution_reviewer->id)) ?>"><i class="fa fa-handshake-o" aria-hidden="true" title="Resolution"></i></a>)
                         <?php endif; ?>
                         <?php if($misuse->hasReviewed($user)): ?>
                             <?php

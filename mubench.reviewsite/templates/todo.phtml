@@ -68,7 +68,7 @@ $markdown_parser = new Parsedown();
             <td class="<?= $style_classes ?>">
                 <?= $markdown_parser->text($misuse->misuse_muid); ?></td>
             <?php
-            $resolution_review = $pathFor('review', array('experiment_id' => $experiment->id, 'detector_muid' => $misuse->detector_muid, 'project_muid' => $misuse->getProject(), 'version_muid' => $misuse->getVersion(), 'misuse_muid' => $misuse->misuse_muid, 'reviewer_id' => 1));
+            $resolution_review = $pathFor('review', array('experiment_id' => $experiment->id, 'detector_muid' => $misuse->detector_muid, 'project_muid' => $misuse->getProject(), 'version_muid' => $misuse->getVersion(), 'misuse_muid' => $misuse->misuse_muid, 'reviewer_id' => $resolution_reviewer->id));
             ?>
             <td class="<?= $style_classes ?>">
                 <?php $review_state = $misuse->getReviewState() ?>

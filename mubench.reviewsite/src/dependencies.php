@@ -99,6 +99,7 @@ $container['renderer'] = function ($container) use ($request, $user) {
         'experiment' => null,
         'detectors' => $detectors,
         'detector' => null,
+        'resolution_reviewer' => Reviewer::where('name' ,'resolution')->first(),
 
         'ex2_review_size' => $request->getQueryParam("ex2_review_size", $container["default_ex2_review_size"])
     ];
