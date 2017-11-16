@@ -177,6 +177,7 @@ class RunsController extends Controller
 
     function addRun($experimentId, $run)
     {
+        // TODO this needs to use the $args information now, since we don't have it in the run anymore
         $projectId = $run->{'project'};
         $versionId = $run->{'version'};
         $misuseId = $run->{'misuse'};

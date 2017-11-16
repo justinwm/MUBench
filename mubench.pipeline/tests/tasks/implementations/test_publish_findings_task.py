@@ -47,7 +47,9 @@ class TestPublishFindingsTask:
     def test_post_url(self, post_mock):
         self.uut.run(self.project, self.version, self.test_run, self.version_compile)
 
-        assert_equals(post_mock.call_args[0][0], "http://dummy.url/api/upload/" + self.experiment.id)
+        assert_equals(post_mock.call_args[0][0],
+                      "http://dummy.url/experiments/{}/detectors/{}/projects/{}/versions/{}/runs".format(
+                          self.experiment.id, self.detector.id, self.project.id, self.version.version_id))
 
     @patch("tasks.implementations.publish_findings.getpass.getpass")
     def test_post_auth_prompt(self, pass_mock, post_mock):
@@ -81,10 +83,6 @@ class TestPublishFindingsTask:
         self.uut.run(self.project, self.version, self.test_run, self.version_compile)
 
         assert_equals(post_mock.call_args[0][1], {
-            "dataset": self.dataset,
-            "detector": self.detector.id,
-            "project": self.project.id,
-            "version": self.version.version_id,
             "result": "success",
             "runtime": 42.0,
             "number_of_findings": 5,
@@ -159,10 +157,6 @@ class TestPublishFindingsTask:
         self.uut.run(self.project, self.version, self.test_run, self.version_compile)
 
         assert_equals(post_mock.call_args[0][1], {
-            "dataset": self.dataset,
-            "detector": self.detector.id,
-            "project": self.project.id,
-            "version": self.version.version_id,
             "result": "error",
             "runtime": 1337,
             "number_of_findings": 0,
@@ -177,10 +171,6 @@ class TestPublishFindingsTask:
         self.uut.run(self.project, self.version, self.test_run, self.version_compile)
 
         assert_equals(post_mock.call_args[0][1], {
-            "dataset": self.dataset,
-            "detector": self.detector.id,
-            "project": self.project.id,
-            "version": self.version.version_id,
             "result": "timeout",
             "runtime": 1000000,
             "number_of_findings": 0,
@@ -194,10 +184,6 @@ class TestPublishFindingsTask:
         self.uut.run(self.project, self.version, self.test_run, self.version_compile)
 
         assert_equals(post_mock.call_args[0][1], {
-            "dataset": self.dataset,
-            "detector": self.detector.id,
-            "project": self.project.id,
-            "version": self.version.version_id,
             "result": "not run",
             "runtime": 0,
             "number_of_findings": 0,
@@ -213,10 +199,6 @@ class TestPublishFindingsTask:
         self.uut.run(self.project, self.version, self.test_run, self.version_compile)
 
         assert_equals(post_mock.call_args[0][1], {
-            "dataset": self.dataset,
-            "detector": self.detector.id,
-            "project": self.project.id,
-            "version": self.version.version_id,
             "result": "success",
             "info": "k1: \nv1",
             "potential_hits": [{"list": "* hello\n* world", "dict": "key: \nvalue", "target_snippets": []}]
