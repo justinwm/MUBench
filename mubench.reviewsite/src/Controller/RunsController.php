@@ -90,7 +90,7 @@ class RunsController extends Controller
         }
         $hits = $run->{'potential_hits'};
         $this->logger->info("received data for '" . $experimentId . "', '" . $detectorId . "." . $projectId . "." . $versionId . "' with " . count($hits) . " potential hits.");
-        $this->addRun($experimentId, $run);
+        $this->addRun($experimentId, $detectorId, $projectId, $versionId, $run);
         $files = $request->getUploadedFiles();
         $this->logger->info("received " . count($files) . " files");
         if ($files) {
@@ -175,15 +175,10 @@ class RunsController extends Controller
         return createCSV($rows);
     }
 
-    function addRun($experimentId, $run)
+    function addRun($experimentId, $detectorId, $projectId, $versionId, $run)
     {
         // TODO this needs to use the $args information now, since we don't have it in the run anymore
-        $projectId = $run->{'project'};
-        $versionId = $run->{'version'};
-        $misuseId = $run->{'misuse'};
-        $detectorName = $run->{'detector'};
-
-        $detector = Detector::firstOrCreate(['muid' => $detectorName]);
+        $detector = Detector::firstOrCreate(['muid' => $detectorId]);
         $experiment = Experiment::find($experimentId);
 
         $potential_hits = $run->{'potential_hits'};
@@ -191,9 +186,9 @@ class RunsController extends Controller
         $this->createOrUpdateRunsTable($detector, $run);
         $this->updateRun($detector, $experiment, $projectId, $versionId, $run);
         if ($potential_hits) {
-            $run = Run::of($detector)->in($experiment)->where(['project_muid' => $projectId, 'version_muid' => $versionId])->first();
+            $new_run = Run::of($detector)->in($experiment)->where(['project_muid' => $projectId, 'version_muid' => $versionId])->first();
             $this->createOrUpdateFindingsTable($detector, $potential_hits);
-            $this->storeFindings($detector, $experiment, $projectId, $versionId, $misuseId, $run->id, $potential_hits);
+            $this->storeFindings($detector, $experiment, $projectId, $versionId, $new_run, $potential_hits);
         }
     }
 
@@ -316,10 +311,14 @@ class RunsController extends Controller
         });
     }
 
-    private function storeFindings(Detector $detector, Experiment $experiment, $projectId, $versionId, $misuseId, $runId, $findings)
+    private function storeFindings(Detector $detector, Experiment $experiment, $projectId, $versionId, Run $run, $findings)
     {
-        $misuse = $this->createMisuse($detector, $experiment, $projectId, $versionId, $misuseId, $runId);
         foreach ($findings as $finding) {
+            $misuseId = $finding->{'misuse'};
+            $misuse = $run->misuses()->where('misuse_muid', $misuseId)->first();
+            if(!$misuse){
+                $misuse = $this->createMisuse($detector, $experiment, $projectId, $versionId, $misuseId, $run->id);
+            }
             $this->storeFinding($detector, $experiment, $projectId, $versionId, $misuseId, $misuse, $finding);
             if ($experiment->id === 2) {
                 $this->storeFindingTargetSnippets($projectId, $versionId, $misuseId, $finding->{'rank'},

@@ -40,7 +40,6 @@ class RunsControllerTest extends SlimTestCase
             "detector" => "-d-",
             "project" => "-p-",
             "version" => "-v-",
-            "misuse" => "-m-",
             "result" => "success",
             "runtime" => 42.1,
             "number_of_findings" => 23,
@@ -54,6 +53,15 @@ class RunsControllerTest extends SlimTestCase
                     ],
                     "custom1" => "-val1-",
                     "custom2" => "-val2-"
+                ],
+                [
+                    "misuse" => "-m-",
+                    "rank" => 2,
+                    "target_snippets" => [
+                        ["first_line_number" => 5, "code" => "-code-"]
+                    ],
+                    "custom1" => "-val1-",
+                    "custom2" => "-val2-"
                 ]]
         ]));
         $this->runsController = new RunsController($this->container);
@@ -61,7 +69,8 @@ class RunsControllerTest extends SlimTestCase
 
     function test_store_ex1()
     {
-        $this->runsController->addRun(1, $this->request_body);
+
+        $this->runsController->addRun(1, '-d-', '-p-', '-v-',  $this->request_body);
         $detector = Detector::where('muid', '=', '-d-')->first();
         $run = Run::of($detector)->in(Experiment::find(1))->where(['project_muid' => '-p-', 'version_muid' => '-v-'])->first();
 
@@ -75,13 +84,13 @@ class RunsControllerTest extends SlimTestCase
 
     function test_store_ex2()
     {
-        $this->runsController->addRun(2, $this->request_body);
+        $this->runsController->addRun(2, '-d-', '-p-', '-v-', $this->request_body);
         $detector = Detector::where('muid', '=', '-d-')->first();
         $run = Run::of($detector)->in(Experiment::find(2))->where(['project_muid' => '-p-', 'version_muid' => '-v-'])->first();
 
         self::assertEquals(1, sizeof($run->misuses));
-        self::assertEquals(1, sizeof($run->misuses[0]->findings));
-        self::assertEquals(1, sizeof($run->misuses[0]->snippets()));
+        self::assertEquals(2, sizeof($run->misuses[0]->findings));
+        self::assertEquals(2, sizeof($run->misuses[0]->snippets()));
 
         $misuse = $run->misuses[0];
         $finding = $misuse->findings[0];
@@ -107,7 +116,7 @@ class RunsControllerTest extends SlimTestCase
 
     function test_store_ex3()
     {
-        $this->runsController->addRun(3, $this->request_body);
+        $this->runsController->addRun(3, '-d-', '-p-', '-v-', $this->request_body);
         $detector = Detector::where('muid', '=', '-d-')->first();
         $run = Run::of($detector)->in(Experiment::find(3))->where(['project_muid' => '-p-', 'version_muid' => '-v-'])->first();
 
@@ -126,7 +135,7 @@ class RunsControllerTest extends SlimTestCase
             ['file' => '-file-location-', 'method' => '-method-location-'], [],
             [['id' => '-p1-', 'snippet' => ['code' => '-code-', 'first_line' => 42]]], []);
 
-        $this->runsController->addRun(1, json_decode(<<<EOT
+        $this->runsController->addRun(1, '-d-', '-p-', '-v-', json_decode(<<<EOT
     {
         "detector": "-d-",
         "project": "-p-",
