@@ -37,9 +37,6 @@ class RunsControllerTest extends SlimTestCase
         $this->detector1 = Detector::firstOrCreate(['muid' => '-d1-']);
         $this->detector2 = Detector::firstOrCreate(['muid' => '-d2-']);
         $this->request_body = json_decode(json_encode([
-            "detector" => "-d-",
-            "project" => "-p-",
-            "version" => "-v-",
             "result" => "success",
             "runtime" => 42.1,
             "number_of_findings" => 23,
@@ -137,10 +134,6 @@ class RunsControllerTest extends SlimTestCase
 
         $this->runsController->addRun(1, '-d-', '-p-', '-v-', json_decode(<<<EOT
     {
-        "detector": "-d-",
-        "project": "-p-",
-        "version": "-v-",
-        "misuse": "-m-",
         "result": "success",
         "runtime": 42.1,
         "number_of_findings": 23,
