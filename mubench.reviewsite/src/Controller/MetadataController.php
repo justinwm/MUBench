@@ -39,7 +39,7 @@ class MetadataController extends Controller
     function updateMetadata($projectId, $versionId, $misuseId, $description, $fix, $location, $violationTypes, $patterns, $targetSnippets)
     {
         $metadata = $this->saveMetadata($projectId, $versionId, $misuseId, $description, $fix, $location);
-        $this->saveViolationTypes($metadata->id, $violationTypes);
+        $this->saveViolationTypes($metadata, $violationTypes);
         $this->savePatterns($metadata->id, $patterns);
         $this->saveTargetSnippets($misuseId, $projectId, $versionId, $targetSnippets);
     }
@@ -56,13 +56,13 @@ class MetadataController extends Controller
         return $metadata;
     }
 
-    private function saveViolationTypes($metadataId, $violationTypes)
+    private function saveViolationTypes($metadata, $violationTypeNames)
     {
-        $this->database->table('metadata_types')->where('metadata_id', '=', $metadataId)->delete();
-        foreach ($violationTypes as $type_name) {
-            $violation_type = Type::firstOrCreate(['name' => $type_name]);
-            $this->database->table('metadata_types')->insert(array('metadata_id' => $metadataId, 'type_id' => $violation_type->id));
+        $violationTypes = [];
+        foreach ($violationTypeNames as $typeName) {
+            $violationTypes[] = Type::firstOrCreate(['name' => $typeName])->id;
         }
+        $metadata->violation_types()->sync($violationTypes);
     }
 
     private function savePatterns($metadataId, $patterns)
