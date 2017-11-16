@@ -27,8 +27,6 @@ $capsule = new \Illuminate\Database\Capsule\Manager;
 $capsule->addConnection($container['settings']['db']);
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
-$container['database'] = $capsule;
-$container['schema'] = $capsule->schema();
 
 /** @var \Slim\Http\Request $request */
 $request = $container->request;

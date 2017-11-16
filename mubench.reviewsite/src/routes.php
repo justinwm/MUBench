@@ -13,10 +13,6 @@ use MuBench\ReviewSite\RoutesHelper;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-$logger = $app->getContainer()['logger'];
-$database = $app->getContainer()['database'];
-$renderer = $app->getContainer()['renderer'];
-
 $app->get('/', \MuBench\ReviewSite\Controller\ExperimentsController::class.":index")->setName('/');
 $app->get('/experiments/{experiment_id}/detectors/{detector_muid}/runs', \MuBench\ReviewSite\Controller\RunsController::class.":getIndex")->setName('experiment.detector');
 $app->get('/experiments/{experiment_id}/detectors/{detector_muid}/runs.csv', \MuBench\ReviewSite\Controller\RunsController::class.":downloadRuns")->setName('download.runs');

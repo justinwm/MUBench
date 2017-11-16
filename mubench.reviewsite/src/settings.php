@@ -7,7 +7,7 @@ return [
         'db' => [
             'driver' => 'sqlite',
             'host' => 'localhost',
-            'database' => 'test.sqlite',
+            'database' => __DIR__ . '/../test.sqlite',
             'username' => 'admin',
             'password' => 'admin',
             'charset'   => 'utf8',

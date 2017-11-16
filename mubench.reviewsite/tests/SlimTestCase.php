@@ -51,17 +51,13 @@ class SlimTestCase extends TestCase
         /** @noinspection PhpParamsInspection */
         \Illuminate\Support\Facades\Schema::setFacadeApplication(["db" => $capsule]);
 
-        require __DIR__ . '/create_database_tables.php';
-        $container = $app->getContainer();
-        $container['database2'] = $this->db;
-        $container['schema'] = $this->schema;
-
+        require __DIR__ . '/../setup/create_database_tables.php';
         require __DIR__ . '/../src/routes.php';
         require_once __DIR__ . '/../src/route_utils.php';
         require_once __DIR__ . '/../src/csv_utils.php';
 
         $this->app = $app;
-        $this->container = $container;
+        $this->container = $app->getContainer();
     }
 
     public function get($path, $data = array(), $optionalHeaders = array()){

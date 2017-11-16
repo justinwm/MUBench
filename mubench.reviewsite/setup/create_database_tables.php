@@ -112,7 +112,7 @@ Schema::create($findingReview->getTable(), function (Blueprint $table) {
     $table->increments('id');
     $table->integer('review_id');
     $table->text('decision');
-    $table->text('rank');
+    $table->integer('rank');
 });
 
 echo 'Creating Violation Types<br/>';
