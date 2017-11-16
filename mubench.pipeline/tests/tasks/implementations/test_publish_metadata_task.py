@@ -77,7 +77,7 @@ class TestPublishMetadataTask:
         assert_equals(post_mock.call_args[0][1], [{
             "project": self.project.id,
             "version": "-v-",
-            "misuse": misuse.id,
+            "misuse": "-m-",
             "description": "-description-",
             "fix": {
                 "description": "-fix-description-",

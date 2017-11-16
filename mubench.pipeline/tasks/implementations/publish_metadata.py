@@ -40,7 +40,7 @@ class PublishMetadataTask:
         self.__metadata.append({
             "project": project.id,
             "version": version.version_id,
-            "misuse": misuse.id,
+            "misuse": misuse.misuse_id,
             "location": misuse.location.__dict__,
             "description": misuse.description,
             "violation_types": misuse.characteristics,
