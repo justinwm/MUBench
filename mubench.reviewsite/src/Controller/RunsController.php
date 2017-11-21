@@ -81,23 +81,23 @@ class RunsController extends Controller
     public function postRun(Request $request, Response $response, array $args)
     {
         $experimentId = $args['experiment_id'];
-        $detectorId = $args['detector_muid'];
-        $projectId = $args['project_muid'];
-        $versionId = $args['version_muid'];
+        $detector_muid = $args['detector_muid'];
+        $project_muid = $args['project_muid'];
+        $version_muid = $args['version_muid'];
         $run = decodeJsonBody($request);
-        $detector = Detector::find($detectorId);
         if (!$run) {
             return error_response($response,400, "empty: " . print_r($_POST, true));
         }
         $hits = $run->{'potential_hits'};
-        $this->logger->info("received data for '" . $experimentId . "', '" . $detectorId . "." . $projectId . "." . $versionId . "' with " . count($hits) . " potential hits.");
-        $this->addRun($experimentId, $detectorId, $projectId, $versionId, $run);
+        $this->logger->info("received data for '" . $experimentId . "', '" . $detector_muid . "." . $project_muid . "." . $version_muid . "' with " . count($hits) . " potential hits.");
+        $this->addRun($experimentId, $detector_muid, $project_muid, $version_muid, $run);
         $files = $request->getUploadedFiles();
         $this->logger->info("received " . count($files) . " files");
         if ($files) {
+            $detector = Detector::find($detector_muid);
             $directoryHelper = new DirectoryHelper($this->settings['upload'], $this->logger);
             foreach ($files as $img) {
-                $directoryHelper->handleImage($experimentId, $detector->id, $projectId, $versionId, $img);
+                $directoryHelper->handleImage($experimentId, $detector->id, $project_muid, $version_muid, $img);
             }
         }
         return $response->withStatus(200);
