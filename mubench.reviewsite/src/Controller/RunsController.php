@@ -85,6 +85,7 @@ class RunsController extends Controller
         $projectId = $args['project_muid'];
         $versionId = $args['version_muid'];
         $run = decodeJsonBody($request);
+        $detector = Detector::find($detectorId);
         if (!$run) {
             return error_response($response,400, "empty: " . print_r($_POST, true));
         }
@@ -96,7 +97,7 @@ class RunsController extends Controller
         if ($files) {
             $directoryHelper = new DirectoryHelper($this->settings['upload'], $this->logger);
             foreach ($files as $img) {
-                $directoryHelper->handleImage($experimentId, $detectorId, $projectId, $versionId, $img);
+                $directoryHelper->handleImage($experimentId, $detector->id, $projectId, $versionId, $img);
             }
         }
         return $response->withStatus(200);
