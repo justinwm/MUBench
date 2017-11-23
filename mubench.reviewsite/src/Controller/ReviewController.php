@@ -29,7 +29,7 @@ class ReviewController extends Controller
         $detector = Detector::find($detector_muid);
 
         $reviewer = array_key_exists('reviewer_id', $args) ? Reviewer::find($args['reviewer_id']) : $this->user;
-        $resolution_reviewer = Reviewer::first(['name' => 'resolution']);
+        $resolution_reviewer = Reviewer::where(['name' => 'resolution'])->first();
         $is_reviewer = ($this->user && $reviewer && $this->user->id == $reviewer->id) || ($reviewer && $reviewer->id == $resolution_reviewer->id);
 
         $misuse = Run::of($detector)->in($experiment)->where(['project_muid' => $project_muid, 'version_muid' => $version_muid])->first()->misuses()->where('misuse_muid', $misuse_muid)->first();

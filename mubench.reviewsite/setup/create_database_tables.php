@@ -102,7 +102,7 @@ $reviewer = new \MuBench\ReviewSite\Models\Reviewer;
 Schema::dropIfExists($reviewer->getTable());
 Schema::create($reviewer->getTable(), function (Blueprint $table) {
     $table->increments('id');
-    $table->text('name')->unique();
+    $table->string('name', 50)->unique();
 });
 $reviewer->name = 'resolution';
 $reviewer->save();
