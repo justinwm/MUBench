@@ -6,7 +6,6 @@ namespace MuBench\ReviewSite\Controller;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use MuBench\ReviewSite\DirectoryHelper;
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\DetectorResult;
 use MuBench\ReviewSite\Models\Experiment;
@@ -16,6 +15,8 @@ use MuBench\ReviewSite\Models\Metadata;
 use MuBench\ReviewSite\Models\Misuse;
 use MuBench\ReviewSite\Models\ReviewState;
 use MuBench\ReviewSite\Models\Run;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -95,9 +96,8 @@ class RunsController extends Controller
         $this->logger->info("received " . count($files) . " files");
         if ($files) {
             $detector = Detector::find($detector_muid);
-            $directoryHelper = new DirectoryHelper($this->settings['upload'], $this->logger);
             foreach ($files as $img) {
-                $directoryHelper->handleImage($experimentId, $detector->id, $project_muid, $version_muid, $img);
+                $this->handleImage($experimentId, $detector->id, $project_muid, $version_muid, $img);
             }
         }
         return $response->withStatus(200);
@@ -451,5 +451,20 @@ class RunsController extends Controller
             $rows[] = $row;
         }
         return createCSV($rows);
+    }
+
+    public function handleImage($ex, $detector, $project, $version, $img){
+        $path = $this->buildPath($ex, $detector, $project, $version);
+        $file = $path . $img->getClientFilename();
+        $this->logger->info("moving file " . $img->getClientFilename() . " to " . $path);
+        if(file_exists($file)) {
+            unlink($file);
+        }
+        mkdir($path, 0745, true);
+        $img->moveTo($file);
+    }
+
+    private function buildPath($ex, $detector, $project, $version){
+        return $this->settings['upload'] . "/" . $ex .  "/" . $detector . "/" . $project . "/" . $version . "/";
     }
 }
