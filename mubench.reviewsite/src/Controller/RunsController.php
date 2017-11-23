@@ -58,10 +58,10 @@ class RunsController extends Controller
     {
         $ex2_review_size = $request->getQueryParam("ex2_review_size", $this->default_ex2_review_size);
         $experiments = Experiment::all();
-        $detectors = Detector::all();
 
         $results = array();
         foreach($experiments as $experiment){
+            $detectors = Detector::withFindings($experiment);
             $results[$experiment->id] = $this->getResultsForExperiment($experiment, $detectors, $ex2_review_size);
         }
         return $this->renderer->render($response, 'result_stats.phtml', ['results' => $results, 'ex2_review_size' => $ex2_review_size]);
@@ -196,7 +196,7 @@ class RunsController extends Controller
     {
         $detector = Detector::find($detector_muid);
         if(!$detector){
-            $lastId = sizeof(Detector::all()) > 0 ? Detector::all()->last()->id : 1;
+            $lastId = sizeof(Detector::all()) == 0 ? 0 : Detector::all()->last()->id;
             $detector = Detector::create(['muid' => $detector_muid, 'id' => $lastId+1]);
         }
         return $detector;
@@ -402,11 +402,11 @@ class RunsController extends Controller
             $runs = Run::of($detector)->in($experiment)->get();
             if ($experiment->id === 2 && $ex2_review_size > -1) {
                 foreach ($runs as &$run) {
-                    $misuses = array();
+                    $misuses = new Collection;
                     $number_of_misuses = 0;
                     foreach ($run->misuses as $misuse) {
                         if ($misuse->getReviewState() != ReviewState::UNRESOLVED) {
-                            $misuses[] = $misuse;
+                            $misuses->add($misuse);
                             $number_of_misuses++;
                         }
 
