@@ -109,7 +109,8 @@ class ReviewController extends Controller
         $hits = $review['review_hit'];
 
         $reviewer_name = $args['reviewer_name'];
-        $this->updateOrCreateReview($misuse_id, $reviewer_name, $comment, $hits);
+        $reviewer = Reviewer::where(['name' => $reviewer_name])->first();
+        $this->updateOrCreateReview($misuse_id, $reviewer->id, $comment, $hits);
 
         if ($review["origin"] != "") {
             return $response->withRedirect("{$this->site_base_url}index.php/{$review["origin"]}");
@@ -120,10 +121,9 @@ class ReviewController extends Controller
         }
     }
 
-    public function updateOrCreateReview($misuse_id, $reviewer_name, $comment, $findings_reviews_by_rank)
+    public function updateOrCreateReview($misuse_id, $reviewer_id, $comment, $findings_reviews_by_rank)
     {
-        $reviewer = Reviewer::where(['name' => $reviewer_name])->first();
-        $review = Review::firstOrNew(['misuse_id' => $misuse_id, 'reviewer_id' => $reviewer->id]);
+        $review = Review::firstOrNew(['misuse_id' => $misuse_id, 'reviewer_id' => $reviewer_id]);
         $review->comment = $comment;
         $review->save();
 
