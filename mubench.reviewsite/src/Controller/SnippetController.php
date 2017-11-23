@@ -19,7 +19,7 @@ class SnippetController extends Controller
         $code = $form['snippet'];
         $line = $form['line'];
         self::createSnippet($projectId, $versionId, $misuseId, $code, $line);
-        return $response->withRedirect("{$this->site_base_url}index.php/{$form['path']}");
+        return $response->withRedirect("{$this->site_base_url}{$form['path']}");
     }
 
     public function deleteSnippet(Request $request, Response $response, array $args)
@@ -29,7 +29,7 @@ class SnippetController extends Controller
 
         Snippet::find($snippetId)->delete();
 
-        return $response->withRedirect("{$this->site_base_url}index.php/{$form['path']}");
+        return $response->withRedirect("{$this->site_base_url}{$form['path']}");
     }
 
     static function createSnippet($projectId, $versionId, $misuseId, $code, $line)

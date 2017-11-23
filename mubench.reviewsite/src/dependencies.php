@@ -46,8 +46,8 @@ $container['user'] = $user;
 
 $container['renderer'] = function ($container) use ($request, $user) {
     $siteBaseURL = rtrim(str_replace('index.php', '', $container->request->getUri()->getBasePath()), '/') . '/';
-    $publicURLPrefix = $siteBaseURL . 'index.php/';
-    $privateURLPrefix = $siteBaseURL . 'index.php/private/';
+    $publicURLPrefix = $siteBaseURL;
+    $privateURLPrefix = $siteBaseURL . 'private/';
 
     $path = $request->getUri()->getPath();
     $path = htmlspecialchars($path === '/' ? '' : $path);
@@ -60,11 +60,7 @@ $container['renderer'] = function ($container) use ($request, $user) {
 
     $pathFor = function ($routeName, $args = [], $private = false) use ($container, $user) {
         $routeName = $user || $private ? "private.$routeName" : $routeName;
-        $path = $container->router->pathFor($routeName, $args);
-        if (strpos($path, '/index.php') === false) {
-            $path = '/index.php' . $path;
-        }
-        return $path;
+        return $container->router->pathFor($routeName, $args);
     };
 
     $defaultTemplateVariables = [
@@ -73,16 +69,13 @@ $container['renderer'] = function ($container) use ($request, $user) {
         'pathFor' => $pathFor,
         'isCurrentPath' => function ($routeName, $args = []) use ($container, $pathFor) {
             $path = $container->request->getUri()->getPath();
-            if (strpos($path, '/index.php') === false) {
-                $path = '/index.php/' . $path;
-            }
             $checkPath = $pathFor($routeName, $args);
             return strpos($path, $checkPath) !== false;
         },
         'srcUrlFor' => function ($resourceName) use ($container, $siteBaseURL) {
             return  "$siteBaseURL$resourceName";
         },
-        'loginPath' => $privateURLPrefix . $path,
+        'loginPath' => $privateURLPrefix . substr($path, 1),
 
         'site_base_url' => $siteBaseURL,
         'public_url_prefix' => $publicURLPrefix,

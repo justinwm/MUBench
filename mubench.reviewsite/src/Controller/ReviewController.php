@@ -113,7 +113,7 @@ class ReviewController extends Controller
         $this->updateOrCreateReview($misuse_id, $reviewer->id, $comment, $hits);
 
         if ($review["origin"] != "") {
-            return $response->withRedirect("{$this->site_base_url}index.php/{$review["origin"]}");
+            return $response->withRedirect("{$this->site_base_url}{$review["origin"]}");
         }else {
             return $response->withRedirect($this->router->pathFor("private.review", ["experiment_id" => $experiment_id,
                 "detector_muid" => $detector_muid, "project_muid" => $project_muid, "version_muid" => $version_muid,
