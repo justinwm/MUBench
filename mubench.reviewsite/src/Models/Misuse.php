@@ -28,7 +28,7 @@ class Misuse extends Model
 
     public function detector()
     {
-        return $this->belongsTo(Detector::class);
+        return $this->belongsTo(Detector::class, 'detector_muid', 'muid');
     }
 
     public function run()

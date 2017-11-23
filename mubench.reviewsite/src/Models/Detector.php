@@ -9,7 +9,7 @@ class Detector extends Model
 {
     public $timestamps = false;
     public $incrementing = false;
-    protected $fillable = ['muid'];
+    protected $fillable = ['muid', 'id'];
     protected $primaryKey = 'muid';
 
     public static function withFindings(Experiment $experiment)

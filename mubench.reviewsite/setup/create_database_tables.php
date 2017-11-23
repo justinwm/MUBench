@@ -26,8 +26,9 @@ $experiment3->save();
 echo 'Creating detectors table<br/>';
 Schema::dropIfExists('detectors');
 Schema::create('detectors', function (Blueprint $table) {
-    $table->increments('id');
+    $table->integer('id');
     $table->string('muid', 100);
+    $table->unique(['id']);
 });
 
 echo 'Creating finding snippet<br/>';

@@ -8,6 +8,7 @@ echo '<br/>Inserting simple test data<br/>';
 echo 'Creating test detector<br/>';
 $detector = new \MuBench\ReviewSite\Models\Detector;
 $detector->muid = "TestDetector";
+$detector->id = 1;
 $detector->save();
 
 echo 'Creating run entries<br/>';

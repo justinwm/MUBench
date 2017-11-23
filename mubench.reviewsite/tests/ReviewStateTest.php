@@ -5,6 +5,7 @@ require_once 'SlimTestCase.php';
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use MuBench\ReviewSite\Controller\ReviewController;
+use MuBench\ReviewSite\Controller\RunsController;
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\Experiment;
 use MuBench\ReviewSite\Models\Misuse;
@@ -13,12 +14,21 @@ use MuBench\ReviewSite\Models\ReviewState;
 
 class ReviewStateTest extends SlimTestCase
 {
+    /** @var  Detector */
+    private $detector;
+
+    function setUp()
+    {
+        parent::setUp();
+        $runsController = new RunsController($this->container);
+        $this->detector = $runsController->createDetector('test-detector');
+    }
+
     function test_no_potential_hits()
     {
         $misuse = Misuse::create(['misuse_muid' => "test", 'run_id' => 1, 'detector_muid' => 'test-detector']);
-        $detector = Detector::firstOrCreate(['muid' => 'test-detector']);
         $finding = new \MuBench\ReviewSite\Models\Finding;
-        $finding->setDetector($detector);
+        $finding->setDetector($this->detector);
         Schema::create($finding->getTable(), function (Blueprint $table) {
             $table->increments('id');
             $table->integer('experiment_id');
@@ -119,14 +129,12 @@ class ReviewStateTest extends SlimTestCase
     private function someMisuseWithOneFindingAndReviewDecisions($decisions, $resolutionDecision = null)
     {
         $misuse = Misuse::create(['misuse_muid' => "test", 'run_id' => 1, 'detector_muid' => 'test-detector']);
-        $detector = Detector::firstOrCreate(['muid' => 'test-detector']);
-        $finding = $this->createFindingWith(Experiment::find(2), $detector, $misuse);
+        $finding = $this->createFindingWith(Experiment::find(2), $this->detector, $misuse);
         $reviewController = new ReviewController($this->container);
         foreach ($decisions as $index => $decision) {
             $reviewer = Reviewer::firstOrCreate(['name' => 'reviewer' . $index]);
             $reviewController->updateOrCreateReview($misuse->id, $reviewer->id, '', [['hit' => $decision, 'types' => []]]);
         }
-
         if ($resolutionDecision) {
             $reviewController->updateOrCreateReview($misuse->id, Reviewer::firstOrCreate(['name' => 'resolution'])->id, '', [['hit' => $resolutionDecision, 'types' => []]]);
         }

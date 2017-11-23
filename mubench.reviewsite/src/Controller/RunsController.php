@@ -178,7 +178,7 @@ class RunsController extends Controller
 
     function addRun($experimentId, $detectorId, $projectId, $versionId, $run)
     {
-        $detector = Detector::firstOrCreate(['muid' => $detectorId]);
+        $detector = $this->createDetector($detectorId);
         $experiment = Experiment::find($experimentId);
 
         $potential_hits = $run->{'potential_hits'};
@@ -190,6 +190,16 @@ class RunsController extends Controller
             $this->createOrUpdateFindingsTable($detector, $potential_hits);
             $this->storeFindings($detector, $experiment, $projectId, $versionId, $new_run, $potential_hits);
         }
+    }
+
+    function createDetector($detector_muid)
+    {
+        $detector = Detector::find($detector_muid);
+        if(!$detector){
+            $lastId = sizeof(Detector::all()) > 0 ? Detector::all()->last()->id : 1;
+            $detector = Detector::create(['muid' => $detector_muid, 'id' => $lastId+1]);
+        }
+        return $detector;
     }
 
     private function createOrUpdateRunsTable(Detector $detector, $run)
