@@ -463,8 +463,8 @@ class RunsController extends Controller
         return createCSV($rows);
     }
 
-    public function handleImage($ex, $detector, $project, $version, $img){
-        $path = $this->buildPath($ex, $detector, $project, $version);
+    private function handleImage($experimentId, $detectorId, $projectId, $versionId, $img){
+        $path = $this->settings['upload'] . "/$experimentId/$detectorId/$projectId/$versionId/";
         $file = $path . $img->getClientFilename();
         $this->logger->info("moving file " . $img->getClientFilename() . " to " . $path);
         if(file_exists($file)) {
@@ -472,9 +472,5 @@ class RunsController extends Controller
         }
         mkdir($path, 0745, true);
         $img->moveTo($file);
-    }
-
-    private function buildPath($ex, $detector, $project, $version){
-        return $this->settings['upload'] . "/" . $ex .  "/" . $detector . "/" . $project . "/" . $version . "/";
     }
 }
