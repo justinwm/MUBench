@@ -206,7 +206,7 @@ use MuBench\ReviewSite\Models\Experiment;
                         </td></tr>
             <?php endif; ?>
         </table>
-            <form action="<?= $pathFor('update.review', array('experiment_id' => $experiment->id, 'detector_muid' => $detector->muid, 'project_muid' => $misuse->getProject(), 'version_muid' => $misuse->getVersion(), 'misuse_muid' => $misuse->misuse_muid, 'reviewer_id' => $reviewer->id), true) ?>" method="post" target="">
+            <form action="<?= $pathFor('update.review', array('experiment_id' => $experiment->id, 'detector_muid' => $detector->muid, 'project_muid' => $misuse->getProject(), 'version_muid' => $misuse->getVersion(), 'misuse_muid' => $misuse->misuse_muid, 'reviewer_name' => $reviewer->name), true) ?>" method="post" target="">
             <?php if($misuse->hasPotentialHits()) : ?>
 
             <?php if($experiment->id !== 2) : ?>

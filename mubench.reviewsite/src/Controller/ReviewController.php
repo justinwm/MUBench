@@ -28,7 +28,7 @@ class ReviewController extends Controller
         $experiment = Experiment::find($experiment_id);
         $detector = Detector::find($detector_muid);
 
-        $reviewer = array_key_exists('reviewer_id', $args) ? Reviewer::find($args['reviewer_id']) : $this->user;
+        $reviewer = array_key_exists('reviewer_name', $args) ? Reviewer::where(['name' => $args['reviewer_name']])->first() : $this->user;
         $resolution_reviewer = Reviewer::where(['name' => 'resolution'])->first();
         $is_reviewer = ($this->user && $reviewer && $this->user->id == $reviewer->id) || ($reviewer && $reviewer->id == $resolution_reviewer->id);
 
@@ -47,10 +47,10 @@ class ReviewController extends Controller
     public function getTodo(Request $request, Response $response, array $args)
     {
         $experiment_id = $args['experiment_id'];
-        $reviewer_id = $args['reviewer_id'];
+        $reviewer_name = $args['reviewer_name'];
 
         $experiment = Experiment::find($experiment_id);
-        $reviewer = Reviewer::find($reviewer_id);
+        $reviewer = Reviewer::where(['name' => $reviewer_name])->first();
 
         $detectors = Detector::withFindings($experiment);
 
@@ -73,10 +73,10 @@ class ReviewController extends Controller
     public function getOverview(Request $request, Response $response, array $args)
     {
         $experiment_id = $args['experiment_id'];
-        $reviewer_id = $args['reviewer_id'];
+        $reviewer_name = $args['reviewer_name'];
 
         $experiment = Experiment::find($experiment_id);
-        $reviewer = Reviewer::find($reviewer_id);
+        $reviewer = Reviewer::where(['name' => $reviewer_name])->first();
 
         $detectors = Detector::withFindings($experiment);
 
@@ -104,25 +104,26 @@ class ReviewController extends Controller
         $project_muid = $args['project_muid'];
         $version_muid = $args['version_muid'];
         $misuse_muid = $args['misuse_muid'];
-        $reviewer_id = $args['reviewer_id'];
         $comment = $review['review_comment'];
         $misuse_id = $review['misuse_id'];
         $hits = $review['review_hit'];
 
-        $this->updateOrCreateReview($misuse_id, $reviewer_id, $comment, $hits);
+        $reviewer_name = $args['reviewer_name'];
+        $this->updateOrCreateReview($misuse_id, $reviewer_name, $comment, $hits);
 
         if ($review["origin"] != "") {
             return $response->withRedirect("{$this->site_base_url}index.php/{$review["origin"]}");
         }else {
             return $response->withRedirect($this->router->pathFor("private.review", ["experiment_id" => $experiment_id,
                 "detector_muid" => $detector_muid, "project_muid" => $project_muid, "version_muid" => $version_muid,
-                "misuse_muid" => $misuse_muid, "reviewer_id" => $reviewer_id]));
+                "misuse_muid" => $misuse_muid, "reviewer_name" => $reviewer_name]));
         }
     }
 
-    public function updateOrCreateReview($misuse_id, $reviewer_id, $comment, $findings_reviews_by_rank)
+    public function updateOrCreateReview($misuse_id, $reviewer_name, $comment, $findings_reviews_by_rank)
     {
-        $review = Review::firstOrNew(['misuse_id' => $misuse_id, 'reviewer_id' => $reviewer_id]);
+        $reviewer = Reviewer::where(['name' => $reviewer_name])->first();
+        $review = Review::firstOrNew(['misuse_id' => $misuse_id, 'reviewer_id' => $reviewer->id]);
         $review->comment = $comment;
         $review->save();
 
