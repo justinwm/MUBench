@@ -34,7 +34,7 @@ class SlimTestCase extends TestCase
     protected $schema;
 
     public function setUp(){
-        $settings = require __DIR__ . '/../settings.php';
+        $settings = require __DIR__ . '/../settings.default.php';
         $app = new \Slim\App($settings);
         require __DIR__ . '/../bootstrap/bootstrap.php';
         $this->logger = new \Monolog\Logger("test");
