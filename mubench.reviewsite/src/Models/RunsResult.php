@@ -35,14 +35,14 @@ abstract class RunsResult
 
             foreach ($run->misuses as $misuse) {
                 /** @var $misuse Misuse */
-                $misuses[$run->project_muid . "." . $misuse->id] = 1;
-                if ($misuse->findings) {
+                $misuses[$run->project_muid . "." . $misuse->misuse_muid] = 1;
+                if (sizeof($misuse->findings) > 0) {
                     $this->misuses_to_review++;
                 }
                 $reviewState = $misuse->getReviewState();
                 switch ($reviewState) {
                     case ReviewState::NEEDS_REVIEW:
-                        $this->open_reviews += 2 - count($misuse->getReviews());
+                        $this->open_reviews += 2 - sizeof($misuse->getReviews());
                         break;
                     case ReviewState::AGREEMENT_YES:
                         $this->yes_agreements++;

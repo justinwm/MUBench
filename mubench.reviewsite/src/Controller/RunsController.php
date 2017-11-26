@@ -64,6 +64,7 @@ class RunsController extends Controller
             $detectors = Detector::withFindings($experiment);
             $results[$experiment->id] = $this->getResultsForExperiment($experiment, $detectors, $ex2_review_size);
         }
+
         return $this->renderer->render($response, 'result_stats.phtml', ['results' => $results, 'ex2_review_size' => $ex2_review_size]);
     }
 
@@ -400,13 +401,26 @@ class RunsController extends Controller
         $results = array();
         foreach($detectors as $detector){
             $runs = Run::of($detector)->in($experiment)->get();
-            if ($experiment->id === 2 && $ex2_review_size > -1) {
-                foreach ($runs as &$run) {
-                    $misuses = new Collection;
+            foreach ($runs as &$run) {
+                $misuses = $run->misuses->sortBy('misuse_muid');
+                $filtered_misuses = new Collection;
+                if($experiment->id === 1){
+                    foreach ($misuses as $misuse) {
+                        if (!is_null($misuse->metadata) && !$misuse->metadata->patterns->isEmpty()) {
+                            $filtered_misuses->add($misuse);
+                        }
+                    }
+                }elseif($experiment->id === 3){
+                    foreach ($misuses as $misuse) {
+                        if (!is_null($misuse->metadata)) {
+                            $filtered_misuses->add($misuse);
+                        }
+                    }
+                }elseif($experiment->id === 2 && $ex2_review_size > -1){
                     $number_of_misuses = 0;
-                    foreach ($run->misuses as $misuse) {
+                    foreach ($misuses as $misuse) {
                         if ($misuse->getReviewState() != ReviewState::UNRESOLVED) {
-                            $misuses->add($misuse);
+                            $filtered_misuses->add($misuse);
                             $number_of_misuses++;
                         }
 
@@ -414,8 +428,8 @@ class RunsController extends Controller
                             break;
                         }
                     }
-                    $run->misuses = $misuses;
                 }
+                $run->misuses = $filtered_misuses;
             }
             $results[$detector->muid] = new DetectorResult($detector, $runs);
         }

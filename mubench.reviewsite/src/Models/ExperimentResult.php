@@ -10,9 +10,7 @@ class ExperimentResult extends RunsResult
     {
         $runs = array();
         foreach ($detector_results as $detector_result) {
-            foreach($detector_result->runs as $run){
-                $runs[] = $run;
-            }
+                $runs = array_merge($runs, $detector_result->runs->all());
         }
         parent::__construct($runs);
         $this->number_of_detectors = count($detector_results);

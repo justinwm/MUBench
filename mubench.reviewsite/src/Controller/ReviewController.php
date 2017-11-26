@@ -58,9 +58,9 @@ class ReviewController extends Controller
         foreach($detectors as $detector){
             $runs = Run::of($detector)->in($experiment)->get();
             foreach($runs as $run){
-                foreach($run->misuses as $misuse){
+                foreach($run->misuses as $misuse) {
                     /** @var Misuse $misuse */
-                    if(!$misuse->hasReviewed($reviewer) && !$misuse->hasSufficientReviews() && $misuse->findings){
+                    if (!$misuse->hasReviewed($reviewer) && !$misuse->hasSufficientReviews() && sizeof($misuse->findings) > 0) {
                         $open_misuses[$detector->muid][] = $misuse;
                     }
                 }
