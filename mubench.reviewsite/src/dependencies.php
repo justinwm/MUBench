@@ -75,7 +75,7 @@ $container['renderer'] = function ($container) use ($request, $user) {
         'srcUrlFor' => function ($resourceName) use ($container, $siteBaseURL) {
             return  "$siteBaseURL$resourceName";
         },
-        'loginPath' => $privateURLPrefix . substr($path, 1),
+        'loginPath' => $privateURLPrefix . substr($path, 0),
 
         'site_base_url' => $siteBaseURL,
         'public_url_prefix' => $publicURLPrefix,
