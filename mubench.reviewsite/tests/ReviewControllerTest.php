@@ -14,14 +14,14 @@ use SlimTestCase;
 class ReviewControllerTest extends SlimTestCase
 {
     /**
-     * @var ReviewController $reviewController
+     * @var ReviewsController $reviewController
      */
     private $reviewController;
 
     function setUp()
     {
         parent::setUp();
-        $this->reviewController = new ReviewController($this->container);
+        $this->reviewController = new ReviewsController($this->container);
         Misuse::create(['misuse_muid' => '0', 'run_id' => 1, 'detector_muid' => 'test-detector']);
         Reviewer::create(['name' => 'reviewer1']);
     }

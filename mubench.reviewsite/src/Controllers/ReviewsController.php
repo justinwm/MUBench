@@ -15,7 +15,7 @@ use MuBench\ReviewSite\Models\Type;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class ReviewController extends Controller
+class ReviewsController extends Controller
 {
     public function getReview(Request $request, Response $response, array $args)
     {

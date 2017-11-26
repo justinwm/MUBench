@@ -1,6 +1,6 @@
 <?php
 
-use MuBench\ReviewSite\Controllers\SnippetController;
+use MuBench\ReviewSite\Controllers\SnippetsController;
 use MuBench\ReviewSite\Models\Snippet;
 
 require_once 'SlimTestCase.php';
@@ -14,7 +14,7 @@ class SnippetControllerTest extends SlimTestCase
     function setUp()
     {
         parent::setUp();
-        $this->snippetController = new SnippetController($this->container);
+        $this->snippetController = new SnippetsController($this->container);
     }
 
     function test_snippet_creation()

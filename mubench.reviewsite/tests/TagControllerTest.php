@@ -10,7 +10,7 @@ use SlimTestCase;
 
 class TagControllerTest extends SlimTestCase
 {
-    /** @var TagController */
+    /** @var TagsController */
     private $tagController;
 
     /** @var  Misuse */
@@ -19,7 +19,7 @@ class TagControllerTest extends SlimTestCase
     function setUp()
     {
         parent::setUp();
-        $this->tagController = new TagController($this->container);
+        $this->tagController = new TagsController($this->container);
         $misuse = new Misuse;
         $misuse->metadata_id = 1;
         $misuse->misuse_muid = '1';

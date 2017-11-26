@@ -13,7 +13,7 @@ use SlimTestCase;
 
 class MisuseFilterTest extends SlimTestCase
 {
-    /** @var ReviewController */
+    /** @var ReviewsController */
     private $reviewController;
     /** @var RunsController */
     private $runController;
@@ -53,7 +53,7 @@ class MisuseFilterTest extends SlimTestCase
     function setUp()
     {
         parent::setUp();
-        $this->reviewController = new ReviewController($this->container);
+        $this->reviewController = new ReviewsController($this->container);
         $this->runController = new RunsController($this->container);
         $this->detector = $this->runController->createDetector('test-detector');
         Reviewer::create(['name' => 'test-reviewer1']);

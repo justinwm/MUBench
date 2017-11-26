@@ -7,7 +7,7 @@ use MuBench\ReviewSite\Models\Type;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class TypeController extends Controller
+class TypesController extends Controller
 {
 
     public function getTypes(Request $request, Response $response, array $args){

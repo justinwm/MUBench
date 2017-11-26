@@ -8,7 +8,7 @@ use MuBench\ReviewSite\Models\Tag;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class TagController extends Controller
+class TagsController extends Controller
 {
     public function postTag(Request $request, Response $response, array $args)
     {

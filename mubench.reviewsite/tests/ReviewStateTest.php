@@ -4,7 +4,7 @@ require_once 'SlimTestCase.php';
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use MuBench\ReviewSite\Controllers\ReviewController;
+use MuBench\ReviewSite\Controllers\ReviewsController;
 use MuBench\ReviewSite\Controllers\RunsController;
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\Experiment;
@@ -130,7 +130,7 @@ class ReviewStateTest extends SlimTestCase
     {
         $misuse = Misuse::create(['misuse_muid' => "test", 'run_id' => 1, 'detector_muid' => 'test-detector']);
         $finding = $this->createFindingWith(Experiment::find(2), $this->detector, $misuse);
-        $reviewController = new ReviewController($this->container);
+        $reviewController = new ReviewsController($this->container);
         foreach ($decisions as $index => $decision) {
             $reviewer = Reviewer::firstOrCreate(['name' => 'reviewer' . $index]);
             $reviewController->updateOrCreateReview($misuse->id, $reviewer->id, '', [['hit' => $decision, 'types' => []]]);

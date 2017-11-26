@@ -7,7 +7,7 @@ use MuBench\ReviewSite\Models\Snippet;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
-class SnippetController extends Controller
+class SnippetsController extends Controller
 {
 
     public function postSnippet(Request $request, Response $response, array $args)

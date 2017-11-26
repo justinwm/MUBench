@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use MuBench\ReviewSite\Controllers\FindingsController;
 use MuBench\ReviewSite\Controllers\FindingsUploader;
 use MuBench\ReviewSite\Controllers\MetadataController;
-use MuBench\ReviewSite\Controllers\ReviewController;
+use MuBench\ReviewSite\Controllers\ReviewsController;
 use MuBench\ReviewSite\Controllers\RunsController;
 use MuBench\ReviewSite\Controllers\SnippetUploader;
 use MuBench\ReviewSite\Controllers\MisuseTagsController;
@@ -263,7 +263,7 @@ EOT
 
     private function addReviewsForMisuse($misuse, $decisions, $resolutionDecision = null)
     {
-        $reviewController = new ReviewController($this->container);
+        $reviewController = new ReviewsController($this->container);
         foreach ($decisions as $index => $decision) {
             $reviewer = Reviewer::firstOrCreate(['name' => '-reviewer' . $index . '-']);
             $reviewController->updateOrCreateReview($misuse->id, $reviewer->id, '-comment-', [['hit' => $decision, 'types' => []]]);
