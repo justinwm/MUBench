@@ -3,13 +3,13 @@
 require_once "SlimTestCase.php";
 
 use Illuminate\Database\Eloquent\Collection;
-use MuBench\ReviewSite\Controller\FindingsController;
-use MuBench\ReviewSite\Controller\FindingsUploader;
-use MuBench\ReviewSite\Controller\MetadataController;
-use MuBench\ReviewSite\Controller\ReviewController;
-use MuBench\ReviewSite\Controller\RunsController;
-use MuBench\ReviewSite\Controller\SnippetUploader;
-use MuBench\ReviewSite\Controller\MisuseTagsController;
+use MuBench\ReviewSite\Controllers\FindingsController;
+use MuBench\ReviewSite\Controllers\FindingsUploader;
+use MuBench\ReviewSite\Controllers\MetadataController;
+use MuBench\ReviewSite\Controllers\ReviewController;
+use MuBench\ReviewSite\Controllers\RunsController;
+use MuBench\ReviewSite\Controllers\SnippetUploader;
+use MuBench\ReviewSite\Controllers\MisuseTagsController;
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\DetectorResult;
 use MuBench\ReviewSite\Models\Experiment;

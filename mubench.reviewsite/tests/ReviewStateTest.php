@@ -4,8 +4,8 @@ require_once 'SlimTestCase.php';
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use MuBench\ReviewSite\Controller\ReviewController;
-use MuBench\ReviewSite\Controller\RunsController;
+use MuBench\ReviewSite\Controllers\ReviewController;
+use MuBench\ReviewSite\Controllers\RunsController;
 use MuBench\ReviewSite\Models\Detector;
 use MuBench\ReviewSite\Models\Experiment;
 use MuBench\ReviewSite\Models\Misuse;

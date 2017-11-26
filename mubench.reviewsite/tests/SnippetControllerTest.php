@@ -1,6 +1,6 @@
 <?php
 
-use MuBench\ReviewSite\Controller\SnippetController;
+use MuBench\ReviewSite\Controllers\SnippetController;
 use MuBench\ReviewSite\Models\Snippet;
 
 require_once 'SlimTestCase.php';

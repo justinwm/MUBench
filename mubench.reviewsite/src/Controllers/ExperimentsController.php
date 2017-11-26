@@ -1,6 +1,6 @@
 <?php
 
-namespace MuBench\ReviewSite\Controller;
+namespace MuBench\ReviewSite\Controllers;
 
 use Slim\Http\Request;
 use Slim\Http\Response;

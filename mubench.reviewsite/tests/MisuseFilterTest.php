@@ -1,6 +1,6 @@
 <?php
 
-namespace MuBench\ReviewSite\Controller;
+namespace MuBench\ReviewSite\Controllers;
 
 require_once 'SlimTestCase.php';
 
