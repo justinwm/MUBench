@@ -21,10 +21,9 @@ The [MUBench Pipeline](../mubench.pipeline) publishes the detectors' results to 
   - List your reviewer credentials below `users`.
 3. Upload the contents of `mubench.reviewsite/` to your webserver.
 4. Grant the server read/write permissions on the `upload` and `logs` directories.
-5. Import [`mubench.reviewsite/init_db.sql`](https://github.com/stg-tud/MUBench/blob/master/mubench.reviewsite/init_db.sql) into your database.
-6. Add the table-name prefix you entered in the settings to all tables.
-7. [Publish the misuse metadata](#publish-misuse-metadata) to your review site.
-8. Go to `http://<your-site.url>/`.
+5. Run [`mubench.reviewsite/setup/setup.php`](https://github.com/stg-tud/MUBench/blob/master/mubench.reviewsite/setup/setup.php) to create the basic database tables.
+6. [Publish the misuse metadata](#publish-misuse-metadata) to your review site.
+7. Go to `http://<your-site.url>/`.
 
 ## Publish Misuse Metadata
 
