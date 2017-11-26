@@ -56,7 +56,7 @@ class ReviewController extends Controller
 
         $open_misuses = [];
         foreach($detectors as $detector){
-            $runs = Run::of($detector)->in($experiment)->get();
+            $runs = RunsController::getRuns($detector, $experiment, $this->default_ex2_review_size);
             foreach($runs as $run){
                 foreach($run->misuses as $misuse) {
                     /** @var Misuse $misuse */

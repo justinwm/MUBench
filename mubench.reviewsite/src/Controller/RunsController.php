@@ -104,7 +104,7 @@ class RunsController extends Controller
         return $response->withStatus(200);
     }
 
-    function getRuns($detector, $experiment, $max_reviews)
+    static function getRuns($detector, $experiment, $max_reviews)
     {
         $runs = Run::of($detector)->in($experiment)->orderBy('project_muid')->orderBy('version_muid')->get();
 
