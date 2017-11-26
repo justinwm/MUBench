@@ -36,8 +36,7 @@ class SlimTestCase extends TestCase
     public function setUp(){
         $settings = require __DIR__ . '/../settings.php';
         $app = new \Slim\App($settings);
-
-        require __DIR__ . '/../src/dependencies.php';
+        require __DIR__ . '/../bootstrap/bootstrap.php';
         $this->logger = new \Monolog\Logger("test");
         $capsule = new \Illuminate\Database\Capsule\Manager;
         $capsule->addConnection(['driver' => 'sqlite', 'database' => ':memory:']);
