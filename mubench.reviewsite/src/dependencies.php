@@ -20,11 +20,11 @@ $container['logger'] = function (ContainerInterface $c) {
 };
 
 $container['errorHandler'] = function (ContainerInterface $c) {
-    return new Error($c['logger'], $c->get('settings')['settings']['displayErrorDetails']);
+    return new Error($c['logger'], $c->get('settings')['displayErrorDetails']);
 };
 
 $capsule = new \Illuminate\Database\Capsule\Manager;
-$capsule->addConnection($container['settings']['db']);
+$capsule->addConnection($container['db']);
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
 
