@@ -2,6 +2,7 @@
 
 require_once "SlimTestCase.php";
 
+use Illuminate\Database\Eloquent\Collection;
 use MuBench\ReviewSite\Controller\FindingsController;
 use MuBench\ReviewSite\Controller\FindingsUploader;
 use MuBench\ReviewSite\Controller\MetadataController;
@@ -166,16 +167,16 @@ EOT
         $stats = [
             new DetectorResult(
                 $this->detector1
-                , [$run1]),
+                , new Collection([$run1])),
             new DetectorResult(
                 $this->detector2
-                , [$run2])];
+                , new Collection([$run2]))];
         $stats["total"] = new ExperimentResult($stats);
 
         $expected_csv = $this->createCSV(["detector,project,synthetics,misuses,potential_hits,open_reviews,need_clarification,yes_agreements,no_agreements,total_agreements,yes_no_agreements,no_yes_agreements,total_disagreements,kappa_p0,kappa_pe,kappa_score,hits,recall",
             "-d1-,1,0,1,1,2,0,0,0,0,0,0,0,0,0,0,0,0",
             "-d2-,1,0,1,1,0,0,1,0,1,0,0,0,1,0,1,1,1",
-            "Total,1,0,2,2,2,0,1,0,1,0,0,0,0.5,0,0.5,1,0.25"]);
+            "Total,1,0,1,2,2,0,1,0,1,0,0,0,0.5,0,0.5,1,0.5"]);
         self::assertEquals($expected_csv, RunsController::exportStatistics($experiment, $stats));
     }
 
@@ -187,10 +188,10 @@ EOT
         $stats = [
             new DetectorResult(
                 $this->detector1
-                , [$run1]),
+                , new Collection([$run1])),
             new DetectorResult(
                 $this->detector2
-                , [$run2])];
+                , new Collection([$run2]))];
         $stats["total"] = new ExperimentResult($stats);
         $expected_csv = $this->createCSV(["detector,project,potential_hits,open_reviews,need_clarification,yes_agreements,no_agreements,total_agreements,yes_no_agreements,no_yes_agreements,total_disagreements,kappa_p0,kappa_pe,kappa_score,hits,precision",
             "-d1-,1,1,2,0,0,0,0,0,0,0,0,0,0,0,0",
@@ -207,16 +208,16 @@ EOT
         $stats = [
             new DetectorResult(
                 $this->detector1
-                , [$run1]),
+                , new Collection([$run1])),
             new DetectorResult(
                 $this->detector2
-                , [$run2])];
+                , new Collection([$run2]))];
         $stats["total"] = new ExperimentResult($stats);
         $expected_csv = $this->createCSV([
             "detector,project,misuses,potential_hits,open_reviews,need_clarification,yes_agreements,no_agreements,total_agreements,yes_no_agreements,no_yes_agreements,total_disagreements,kappa_p0,kappa_pe,kappa_score,hits,recall",
             "-d1-,1,1,1,2,0,0,0,0,0,0,0,0,0,0,0,0",
             "-d2-,1,1,1,0,0,1,0,1,0,0,0,1,0,1,1,1",
-            "Total,1,2,2,2,0,1,0,1,0,0,0,0.5,0,0.5,1,0.25"
+            "Total,1,1,2,2,0,1,0,1,0,0,0,0.5,0,0.5,1,0.5"
         ]);
 
         self::assertEquals($expected_csv, RunsController::exportStatistics($experiment, $stats));
@@ -248,7 +249,7 @@ EOT
         $run->result = 'success';
         $run->number_of_findings = 23;
         $run->runtime = 42.1;
-        $run->misuses = new \Illuminate\Database\Eloquent\Collection;
+        $run->misuses = new Collection;
         foreach($misuses as $key => $misuse){
             $new_misuse = Misuse::create(['misuse_muid' => $key, 'run_id' => $run->id, 'detector_muid' => $detector->muid]);
             $this->createFindingWith($experiment, $detector, $new_misuse);
