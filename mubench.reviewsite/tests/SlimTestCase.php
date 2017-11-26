@@ -34,7 +34,7 @@ class SlimTestCase extends TestCase
     protected $schema;
 
     public function setUp(){
-        $settings = require __DIR__ . '/../src/settings.php';
+        $settings = require __DIR__ . '/../settings.php';
         $app = new \Slim\App($settings);
 
         require __DIR__ . '/../src/dependencies.php';
